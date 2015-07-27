@@ -4,12 +4,12 @@ usage(){
     echo "Usage: ${0} EXISTING_VM NEW_VM_NAME"
 }
 
-if [ "${0}" = "" ]; then
+if [ "${1}" = "" ]; then
     usage
     exit 1
 fi
 
-if [ "${1}" = "" ]; then
+if [ "${2}" = "" ]; then
     usage
     exit 1
 fi
