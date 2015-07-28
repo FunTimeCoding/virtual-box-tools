@@ -1,3 +1,3 @@
 #!/bin/sh -e
 
-vboxmanage list runningvms
+vboxmanage list vms
