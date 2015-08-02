@@ -29,7 +29,7 @@ else
             sleep 1
             STATE=$(vboxmanage showvminfo --machinereadable "${1}" | grep "VMState=")
             STATE=${STATE#*=}
-            STATE=$(echo "${STATE}" | gsed 's/"//g')
+            STATE=$(echo "${STATE}" | sed 's/"//g')
 
             if [ "${STATE}" = "poweroff" ]; then
 
