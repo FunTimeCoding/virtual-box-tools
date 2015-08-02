@@ -11,7 +11,7 @@ if [ "${1}" = "" ]; then
 fi
 
 NOT_FOUND=false
-bin/show-vm-info.sh > /dev/null || NOT_FOUND=true
+bin/show-info.sh "${1}" > /dev/null 2>&1 || NOT_FOUND=true
 
 if [ "${NOT_FOUND}" = true ]; then
     echo "Not found."
