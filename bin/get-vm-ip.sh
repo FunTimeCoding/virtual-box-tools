@@ -10,4 +10,4 @@ if [ "${1}" = "" ]; then
     exit 1
 fi
 
-vboxmanage guestproperty enumerate "${1}" | grep IP | grep -owPe '\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}'
+vboxmanage guestproperty enumerate "${1}" | grep IP | grep -owPe '\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}' || true
