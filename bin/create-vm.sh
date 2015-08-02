@@ -12,10 +12,9 @@ fi
 
 bin/clone-vm.sh jessie "${1}"
 bin/start-vm.sh "${1}"
-bin/get-vm-ip.sh "${1}"
 
-for SECOND in $(seq 1 120); do
-    echo "${SECOND}"
+echo "Wait for IP."
+for SECOND in $(seq 1 60); do
     sleep 1
     IP=$(bin/get-vm-ip.sh "${1}")
 
@@ -25,4 +24,4 @@ for SECOND in $(seq 1 120); do
     fi
 done
 
-echo "${IP}"
+echo "IP: ${IP}"

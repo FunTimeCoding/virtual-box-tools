@@ -10,4 +10,12 @@ if [ "${1}" = "" ]; then
     exit 1
 fi
 
-vboxmanage startvm "${1}" --type headless
+COMMAND_FAILED=false
+OUTPUT=$(vboxmanage startvm "${1}" --type headless) || COMMAND_FAILED=true
+
+if [ "${COMMAND_FAILED}" = "true" ]; then
+    echo "Error:"
+    echo "${OUTPUT}"
+
+    exit 1
+fi
