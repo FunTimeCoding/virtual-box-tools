@@ -1,5 +1,7 @@
 #!/bin/sh -e
 
+SCRIPT_DIR=$(cd "$(dirname "${0}")"; pwd)
+
 usage(){
     echo "Usage: ${0} VM_NAME"
 }
@@ -16,7 +18,7 @@ bin/start-vm.sh "${1}"
 echo "Wait for IP."
 for SECOND in $(seq 1 60); do
     sleep 1
-    IP=$(bin/get-vm-ip.sh "${1}")
+    IP=$("${SCRIPT_DIR}/bin/get-vm-ip.sh" "${1}")
 
     if [ ! "${IP}" = "" ]; then
 
