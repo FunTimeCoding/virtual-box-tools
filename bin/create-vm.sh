@@ -12,13 +12,13 @@ if [ "${1}" = "" ]; then
     exit 1
 fi
 
-bin/clone-vm.sh jessie "${1}"
-bin/start-vm.sh "${1}"
+"${SCRIPT_DIR}/clone-vm.sh" jessie "${1}"
+"${SCRIPT_DIR}/start-vm.sh" "${1}"
 
 echo "Wait for IP."
 for SECOND in $(seq 1 60); do
     sleep 1
-    IP=$("${SCRIPT_DIR}/bin/get-vm-ip.sh" "${1}")
+    IP=$("${SCRIPT_DIR}/get-vm-ip.sh" "${1}")
 
     if [ ! "${IP}" = "" ]; then
 
