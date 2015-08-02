@@ -16,7 +16,7 @@ NOT_FOUND=false
 "${SCRIPT_DIR}/bin/show-info.sh" "${1}" > /dev/null 2>&1 || NOT_FOUND=true
 
 if [ "${NOT_FOUND}" = true ]; then
-    echo "Not found."
+    echo "Not found: ${1}"
 
     exit 1
 else
