@@ -23,6 +23,19 @@ else
     if [ ! "${IS_RUNNING}" = "" ]; then
         echo "Stop vm."
         bin/stop-vm.sh "${1}"
+
+        for SECOND in $(seq 1 120); do
+            echo "${SECOND}"
+            sleep 1
+            STATE=$(vboxmanage showvminfo --machinereadable "${1}" | grep "VMState=")
+            STATE=${STATE#*=}
+            STATE=$(echo "${STATE}" | gsed 's/"//g')
+
+            if [ "${STATE}" = "poweroff" ]; then
+
+                break
+            fi
+        done
     fi
 fi
 
