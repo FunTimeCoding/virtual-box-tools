@@ -26,7 +26,7 @@ if [ "${NOT_FOUND}" = true ]; then
 
     exit 1
 else
-    IS_RUNNING=$("${SCRIPT_DIR}/list-vms.sh" | grep "${NAME}")
+    IS_RUNNING=$("${SCRIPT_DIR}/list-vms.sh" | grep "${NAME}") || IS_RUNNING=""
 
     if [ ! "${IS_RUNNING}" = "" ]; then
         echo "Stop vm."
