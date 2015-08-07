@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 usage(){
-    echo "Usage: ${0} VM_NAME"
+    echo "Usage: ${0} NAME"
 }
 
 if [ "${1}" = "" ]; then
@@ -10,10 +10,12 @@ if [ "${1}" = "" ]; then
     exit 1
 fi
 
-COMMAND_FAILED=false
-OUTPUT=$(vboxmanage showvminfo "${1}" 2>&1) || COMMAND_FAILED=true
+ERROR=false
+OUTPUT=$(vboxmanage showvminfo "${1}" 2>&1) || ERROR=true
 
-if [ "${COMMAND_FAILED}" = "true" ]; then
+if [ "${ERROR}" = false ]; then
+    echo "${OUTPUT}"
+else
     echo "Error:"
     echo "${OUTPUT}"
 

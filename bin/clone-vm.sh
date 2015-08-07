@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 usage(){
-    echo "Usage: ${0} EXISTING_VM NEW_VM_NAME"
+    echo "Usage: ${0} EXISTING_NAME NEW_NAME"
 }
 
 if [ "${1}" = "" ]; then
@@ -16,10 +16,10 @@ if [ "${2}" = "" ]; then
     exit 1
 fi
 
-COMMAND_FAILED=false
-OUTPUT=$(vboxmanage clonevm "${1}" --name "${2}" --register 2>&1) || COMMAND_FAILED=true
+ERROR=false
+OUTPUT=$(vboxmanage clonevm "${1}" --name "${2}" --register 2>&1) || ERROR=true
 
-if [ "${COMMAND_FAILED}" = "true" ]; then
+if [ "${ERROR}" = true ]; then
     echo "Error:"
     echo "${OUTPUT}"
 
