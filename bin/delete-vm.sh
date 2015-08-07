@@ -18,10 +18,10 @@ if [ "${1}" = "" ]; then
 fi
 
 NAME="${1}"
-NOT_FOUND=false
-"${SCRIPT_DIR}/show-info.sh" "${NAME}" > /dev/null 2>&1 || NOT_FOUND=true
+FOUND=true
+"${SCRIPT_DIR}/show-info.sh" "${NAME}" > /dev/null 2>&1 || FOUND=false
 
-if [ "${NOT_FOUND}" = false ]; then
+if [ "${FOUND}" = true ]; then
     IS_RUNNING=$("${SCRIPT_DIR}/list-vms.sh" | grep "${NAME}") || IS_RUNNING=""
 
     if [ ! "${IS_RUNNING}" = "" ]; then

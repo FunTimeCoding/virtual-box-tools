@@ -10,4 +10,12 @@ if [ "${1}" = "" ]; then
     exit 1
 fi
 
-vboxmanage showvminfo "${1}"
+COMMAND_FAILED=false
+OUTPUT=$(vboxmanage showvminfo "${1}" 2>&1) || COMMAND_FAILED=true
+
+if [ "${COMMAND_FAILED}" = "true" ]; then
+    echo "Error:"
+    echo "${OUTPUT}"
+
+    exit 1
+fi
