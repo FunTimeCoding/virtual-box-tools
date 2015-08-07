@@ -17,7 +17,7 @@ if [ "${2}" = "" ]; then
 fi
 
 COMMAND_FAILED=false
-OUTPUT=$(vboxmanage clonevm "${1}" --name "${2}" --register) || COMMAND_FAILED=true
+OUTPUT=$(vboxmanage clonevm "${1}" --name "${2}" --register 2>&1) || COMMAND_FAILED=true
 
 if [ "${COMMAND_FAILED}" = "true" ]; then
     echo "Error:"

@@ -11,7 +11,7 @@ if [ "${1}" = "" ]; then
 fi
 
 COMMAND_FAILED=false
-OUTPUT=$(vboxmanage startvm "${1}" --type headless) || COMMAND_FAILED=true
+OUTPUT=$(vboxmanage startvm "${1}" --type headless 2>&1) || COMMAND_FAILED=true
 
 if [ "${COMMAND_FAILED}" = "true" ]; then
     echo "Error:"
