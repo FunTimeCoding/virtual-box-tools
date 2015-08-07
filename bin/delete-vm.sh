@@ -21,11 +21,7 @@ NAME="${1}"
 NOT_FOUND=false
 "${SCRIPT_DIR}/show-info.sh" "${NAME}" > /dev/null 2>&1 || NOT_FOUND=true
 
-if [ "${NOT_FOUND}" = true ]; then
-    echo "Not found: ${NAME}"
-
-    exit 1
-else
+if [ "${NOT_FOUND}" = false ]; then
     IS_RUNNING=$("${SCRIPT_DIR}/list-vms.sh" | grep "${NAME}") || IS_RUNNING=""
 
     if [ ! "${IS_RUNNING}" = "" ]; then
@@ -53,6 +49,8 @@ else
             sleep 3
         fi
     fi
+else
+    echo "Not found: ${NAME}"
 fi
 
 vboxmanage unregistervm "${NAME}" --delete
