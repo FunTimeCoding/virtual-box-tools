@@ -41,7 +41,7 @@ NAME="${1}"
 "${SCRIPT_DIR}/start-vm.sh" "${NAME}"
 
 if [ "${WAIT}" = "true" ]; then
-    echo "Wait for IP."
+    echo "Wait for VM to finish booting."
     BOOT_TIME="0"
 
     for SECOND in $(seq 1 60); do
