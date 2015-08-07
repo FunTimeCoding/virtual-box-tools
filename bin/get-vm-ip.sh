@@ -14,4 +14,4 @@ KEY="IP"
 VALUE=$(vboxmanage guestproperty enumerate "${1}" | grep "${KEY}")
 VALUE="${VALUE#*value: }"
 VALUE="${VALUE%%,*}"
-echo ${VALUE}
+echo "${VALUE}"

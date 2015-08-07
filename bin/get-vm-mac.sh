@@ -23,7 +23,7 @@ VALUE="${VALUE#*value: }"
 VALUE="${VALUE%%,*}"
 
 if [ "${COLONS}" = "false" ]; then
-    echo ${VALUE}
+    echo "${VALUE}"
 else
     LIST=$(echo "${VALUE}" | fold -w2)
     RESULT=""

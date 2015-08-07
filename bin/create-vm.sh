@@ -31,11 +31,13 @@ if [ "${WAIT}" = "true" ]; then
 
         if [ ! "${IP}" = "" ]; then
 
+            BOOT_TIME="${SECOND}"
             break
         fi
     done
 
     MAC=$("${SCRIPT_DIR}/get-vm-mac.sh" --colons "${1}")
+    echo "BOOT_TIME: ${BOOT_TIME}"
     echo "IP: ${IP}"
     echo "MAC: ${MAC}"
 else
