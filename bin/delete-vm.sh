@@ -21,7 +21,7 @@ NAME="${1}"
 FOUND=true
 "${SCRIPT_DIR}/show-info.sh" "${NAME}" > /dev/null || FOUND=false
 
-if [ "${INFO}" = true ]; then
+if [ "${FOUND}" = true ]; then
     IS_RUNNING=$("${SCRIPT_DIR}/list-vms.sh" | grep "${NAME}") || IS_RUNNING=""
 
     if [ ! "${IS_RUNNING}" = "" ]; then
