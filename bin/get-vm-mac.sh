@@ -18,7 +18,7 @@ if [ "${1}" = "" ]; then
 fi
 
 KEY="MAC"
-VALUE=$(vboxmanage guestproperty enumerate "${1}" | grep "${KEY}" | VALUE="")
+VALUE=$(vboxmanage guestproperty enumerate "${1}" | grep "${KEY}" || VALUE="")
 
 if [ ! "${VALUE}" = "" ]; then
     VALUE="${VALUE#*value: }"
