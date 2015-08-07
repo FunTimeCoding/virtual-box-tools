@@ -22,7 +22,7 @@ VALUE=$(vboxmanage guestproperty enumerate "${1}" | grep "${KEY}")
 VALUE="${VALUE#*value: }"
 VALUE="${VALUE%%,*}"
 
-if [ "${COLONS}" = "true" ]; then
+if [ "${COLONS}" = "false" ]; then
     echo ${VALUE}
 else
     LIST=$(echo "${VALUE}" | fold -w2)
