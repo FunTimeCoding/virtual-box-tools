@@ -17,8 +17,8 @@ LIST=$(echo "${VALUE}" | fold -w2)
 RESULT=""
 
 for HEX in ${LIST}; do
-    RESULT="${RESULT}:"
+    RESULT="${RESULT}:${HEX}"
 done
 
-RESULT="${RESULT%:}"
+RESULT="${RESULT#:}"
 echo "${RESULT}"
