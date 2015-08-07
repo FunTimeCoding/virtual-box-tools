@@ -19,6 +19,7 @@ echo "Wait for IP."
 for SECOND in $(seq 1 60); do
     sleep 1
     IP=$("${SCRIPT_DIR}/get-vm-ip.sh" "${1}")
+    MAC=$("${SCRIPT_DIR}/get-vm-mac.sh" --colons "${1}")
 
     if [ ! "${IP}" = "" ]; then
 
