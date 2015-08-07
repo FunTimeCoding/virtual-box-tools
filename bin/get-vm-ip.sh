@@ -11,7 +11,10 @@ if [ "${1}" = "" ]; then
 fi
 
 KEY="IP"
-VALUE=$(vboxmanage guestproperty enumerate "${1}" | grep "${KEY}")
-VALUE="${VALUE#*value: }"
-VALUE="${VALUE%%,*}"
-echo "${VALUE}"
+VALUE=$(vboxmanage guestproperty enumerate "${1}" | grep "${KEY}" || VALUE="")
+
+if [ ! "${VALUE}" = "" ]; then
+    VALUE="${VALUE#*value: }"
+    VALUE="${VALUE%%,*}"
+    echo "${VALUE}"
+fi

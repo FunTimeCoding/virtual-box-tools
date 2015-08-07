@@ -18,20 +18,23 @@ if [ "${1}" = "" ]; then
 fi
 
 KEY="MAC"
-VALUE=$(vboxmanage guestproperty enumerate "${1}" | grep "${KEY}")
-VALUE="${VALUE#*value: }"
-VALUE="${VALUE%%,*}"
+VALUE=$(vboxmanage guestproperty enumerate "${1}" | grep "${KEY}" | VALUE="")
 
-if [ "${COLONS}" = "false" ]; then
-    echo "${VALUE}"
-else
-    LIST=$(echo "${VALUE}" | fold -w2)
-    RESULT=""
+if [ ! "${VALUE}" = "" ]; then
+    VALUE="${VALUE#*value: }"
+    VALUE="${VALUE%%,*}"
 
-    for HEX in ${LIST}; do
-        RESULT="${RESULT}:${HEX}"
-    done
+    if [ "${COLONS}" = "false" ]; then
+        echo "${VALUE}"
+    else
+        LIST=$(echo "${VALUE}" | fold -w2)
+        RESULT=""
 
-    RESULT="${RESULT#:}"
-    echo "${RESULT}"
+        for HEX in ${LIST}; do
+            RESULT="${RESULT}:${HEX}"
+        done
+
+        RESULT="${RESULT#:}"
+        echo "${RESULT}"
+    fi
 fi
