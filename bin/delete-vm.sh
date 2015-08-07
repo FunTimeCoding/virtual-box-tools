@@ -18,9 +18,10 @@ if [ "${1}" = "" ]; then
 fi
 
 NAME="${1}"
-INFO=$("${SCRIPT_DIR}/show-info.sh" "${NAME}" > /dev/null) || INFO=""
+FOUND=true
+"${SCRIPT_DIR}/show-info.sh" "${NAME}" > /dev/null || FOUND=false
 
-if [ ! "${INFO}" = "" ]; then
+if [ "${INFO}" = true ]; then
     IS_RUNNING=$("${SCRIPT_DIR}/list-vms.sh" | grep "${NAME}") || IS_RUNNING=""
 
     if [ ! "${IS_RUNNING}" = "" ]; then
@@ -48,8 +49,8 @@ if [ ! "${INFO}" = "" ]; then
             sleep 3
         fi
     fi
+
+    vboxmanage unregistervm "${NAME}" --delete
 else
     echo "Not found: ${NAME}"
 fi
-
-vboxmanage unregistervm "${NAME}" --delete
