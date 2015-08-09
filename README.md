@@ -8,11 +8,11 @@ Helper scripts for running VirtualBox.
 Install the repository in edit mode.
 
 ```sh
-pip3 install --user -e .
+pip-3.2 install --user --editable .
 ```
 
 Uninstall the repository.
 
 ```sh
-pip3 uninstall virtualbox-tools
+pip-3.2 uninstall virtualbox-tools pyyaml
 ```

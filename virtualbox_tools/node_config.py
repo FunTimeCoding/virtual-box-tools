@@ -98,7 +98,7 @@ class NodeConfig:
         add_parent.add_argument('--name', required=True)
         add_parent.add_argument('--ip', required=True)
         add_parent.add_argument('--mac', required=True)
-        add_parent.add_argument('--aliases', nargs='+')
+        add_parent.add_argument('--aliases', nargs='+', metavar='ALIAS')
 
         add_parser = subparsers.add_parser(
             'add',
