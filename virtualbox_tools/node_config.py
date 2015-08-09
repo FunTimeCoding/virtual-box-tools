@@ -17,7 +17,13 @@ class NodeConfig:
     def __init__(self, arguments: list):
         self.parser = self.get_parser()
         self.arguments = self.parser.parse_args(arguments)
-        self.config_file = expanduser("~") + '/srv/salt/pillar/node.sls'
+        print(self.arguments)
+
+        if self.arguments.node_file is not None:
+            self.config_file = expanduser(self.arguments.node_file)
+        else:
+            self.config_file = '/srv/salt/pillar/node.sls'
+
         self.yaml_tree = self.load_config_file()
 
     def run(self):
@@ -124,5 +130,6 @@ class NodeConfig:
         list_parser.add_argument('list', action='store_true')
 
         parser.add_argument('--dry-run', action='store_true')
+        parser.add_argument('--node-file', help='path to node.sls')
 
         return parser
