@@ -12,5 +12,6 @@ setup(
     author_email='funtimecoding@gmail.com',
     url='http://example.org',
     download_url='http://example.org/virtualbox-tools.tar.gz',
-    install_requires=['pyyaml']
+    install_requires=['pyyaml'],
+    scripts=['bin/node-config']
 )
