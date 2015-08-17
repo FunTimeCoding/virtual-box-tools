@@ -1,4 +1,4 @@
-# VirtualBox Tools
+# VirtualBoxTools
 
 Helper scripts for running VirtualBox.
 
@@ -29,5 +29,5 @@ pip-3.2 install --user --editable .
 Uninstall the repository.
 
 ```sh
-pip-3.2 uninstall virtualbox-tools
+pip-3.2 uninstall virtual-box-tools
 ```
