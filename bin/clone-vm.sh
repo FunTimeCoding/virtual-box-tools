@@ -1,6 +1,7 @@
 #!/bin/sh -e
 
-usage(){
+usage()
+{
     echo "Usage: ${0} EXISTING_NAME NEW_NAME"
 }
 

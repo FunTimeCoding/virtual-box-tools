@@ -13,16 +13,16 @@ class CustomArgumentParser(ArgumentParser):
         sys.exit(1)
 
 
-class NodeConfig:
+class NodeConfigMain:
     def __init__(self, arguments: list):
         self.parser = self.get_parser()
         self.arguments = self.parser.parse_args(arguments)
         print(self.arguments)
 
         if self.arguments.node_file is not None:
-            self.config_file = expanduser(self.arguments.node_file)
+            self.node_config_path = expanduser(self.arguments.node_file)
         else:
-            self.config_file = '/srv/salt/pillar/node.sls'
+            self.node_config_path = '/srv/salt/pillar/node.sls'
 
         self.yaml_tree = self.load_config_file()
 
@@ -72,7 +72,7 @@ class NodeConfig:
                 print('Aliases: ' + str(attributes[key]))
 
     def load_config_file(self) -> dict:
-        input_file = open(self.config_file, 'r')
+        input_file = open(self.node_config_path, 'r')
         content = input_file.read()
         input_file.close()
 
@@ -91,7 +91,7 @@ class NodeConfig:
         if self.arguments.dry_run:
             print(yaml_config)
         else:
-            output_file = open(self.config_file, 'w')
+            output_file = open(self.node_config_path, 'w')
             output_file.write(yaml_config)
             output_file.close()
 

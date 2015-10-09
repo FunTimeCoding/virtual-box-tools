@@ -2,7 +2,7 @@
 
 echo "Deleting cached and generated files."
 DIR=$(dirname "${0}")
-SCRIPT_DIR=$(cd "${DIR}"; pwd)
+SCRIPT_DIR=$(cd "${DIR}" || exit 1; pwd)
 FILES="build .pyvenv .coverage"
 
 for FILE in ${FILES}; do

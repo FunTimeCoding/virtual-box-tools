@@ -5,7 +5,7 @@ Helper scripts for running VirtualBox.
 
 ## Usage
 
-Run the node config tool.
+Manage nodes using `node-config`.
 
 ```sh
 ./bin/node-config
