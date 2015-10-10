@@ -12,6 +12,10 @@ setup(
     author_email='funtimecoding@gmail.com',
     url='http://example.org',
     download_url='http://example.org/virtual-box-tools.tar.gz',
-    install_requires=['pyyaml'],
-    scripts=['bin/node-config']
+    install_requires=['pyyaml', 'python-utility==0.1'],
+    scripts=['bin/node-config'],
+    dependency_links=[
+        'git+https://github.com/FunTimeCoding/python-utility.git@master'
+        '#egg=python-utility-0.1'
+    ]
 )

@@ -1,16 +1,12 @@
-from argparse import ArgumentParser
+import argparse
 from collections import OrderedDict
-from os.path import expanduser
+from os.path import expanduser, isfile
 import sys
 
+from python_utility.yaml_config import YamlConfig
 import yaml
 
-
-class CustomArgumentParser(ArgumentParser):
-    def error(self, message):
-        sys.stderr.write('Error: %s\n' % message)
-
-        sys.exit(1)
+from virtual_box_tools.custom_argument_parser import CustomArgumentParser
 
 
 class NodeConfigMain:
@@ -18,13 +14,20 @@ class NodeConfigMain:
         self.parser = self.get_parser()
         self.arguments = self.parser.parse_args(arguments)
         print(self.arguments)
+        config = YamlConfig('~/.virtual-box-tools.yml')
+        config_file_path = config.get('node_file')
 
-        if self.arguments.node_file is not None:
-            self.node_config_path = expanduser(self.arguments.node_file)
+        if config_file_path != '':
+            config_file_path = expanduser(config_file_path)
+            self.node_file_path = config_file_path
         else:
-            self.node_config_path = '/srv/salt/pillar/node.sls'
+            self.node_file_path = expanduser(self.arguments.node_file)
 
-        self.yaml_tree = self.load_config_file()
+        if isfile(self.node_file_path):
+            self.yaml_tree = self.load_config_file()
+        else:
+            print('Node file not found: ' + self.node_file_path)
+            sys.exit(1)
 
     def run(self):
         if 'add' in self.arguments:
@@ -72,7 +75,7 @@ class NodeConfigMain:
                 print('Aliases: ' + str(attributes[key]))
 
     def load_config_file(self) -> dict:
-        input_file = open(self.node_config_path, 'r')
+        input_file = open(self.node_file_path, 'r')
         content = input_file.read()
         input_file.close()
 
@@ -91,13 +94,16 @@ class NodeConfigMain:
         if self.arguments.dry_run:
             print(yaml_config)
         else:
-            output_file = open(self.node_config_path, 'w')
+            output_file = open(self.node_file_path, 'w')
             output_file.write(yaml_config)
             output_file.close()
 
     @staticmethod
     def get_parser() -> CustomArgumentParser:
-        parser = CustomArgumentParser(description='node configuration tool')
+        parser = CustomArgumentParser(
+            description='node configuration tool',
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        )
         subparsers = parser.add_subparsers()
 
         add_parent = CustomArgumentParser(add_help=False)
@@ -123,13 +129,21 @@ class NodeConfigMain:
         )
         delete_parser.add_argument('delete', action='store_true')
 
-        sort_parser = subparsers.add_parser('sort', help='sort the nodes file')
+        sort_parser = subparsers.add_parser('sort', help='sort the node file')
         sort_parser.add_argument('sort', action='store_true')
 
         list_parser = subparsers.add_parser('list', help='list all nodes')
         list_parser.add_argument('list', action='store_true')
 
-        parser.add_argument('--dry-run', action='store_true')
-        parser.add_argument('--node-file', help='path to node.sls')
+        parser.add_argument(
+            '--dry-run',
+            action='store_true',
+            help='do not write node file changes, only print them'
+        )
+        parser.add_argument(
+            '--node-file',
+            help='path to node file',
+            default='/srv/salt/pillar/node.sls'
+        )
 
         return parser
