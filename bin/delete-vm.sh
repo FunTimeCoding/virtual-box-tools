@@ -21,14 +21,14 @@ fi
 
 NAME="${1}"
 FOUND=true
-"${SCRIPT_DIR}/show-info.sh" "${NAME}" > /dev/null || FOUND=false
+"${SCRIPT_DIR}"/show-info.sh "${NAME}" > /dev/null || FOUND=false
 
 if [ "${FOUND}" = true ]; then
-    IS_RUNNING=$("${SCRIPT_DIR}/list-vms.sh" | grep "${NAME}") || IS_RUNNING=""
+    IS_RUNNING=$("${SCRIPT_DIR}"/list-vms.sh | grep "${NAME}") || IS_RUNNING=""
 
     if [ ! "${IS_RUNNING}" = "" ]; then
         echo "Stop vm."
-        "${SCRIPT_DIR}/stop-vm.sh" "${NAME}"
+        "${SCRIPT_DIR}"/stop-vm.sh "${NAME}"
         DOWN=false
 
         for SECOND in $(seq 1 30); do
@@ -47,7 +47,7 @@ if [ "${FOUND}" = true ]; then
 
         if [ "${DOWN}" = "false" ]; then
             echo "Force shutdown."
-            "${SCRIPT_DIR}/stop-vm.sh" --force "${NAME}"
+            "${SCRIPT_DIR}"/stop-vm.sh --force "${NAME}"
             sleep 3
         fi
     fi

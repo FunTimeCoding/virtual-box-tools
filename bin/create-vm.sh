@@ -38,9 +38,8 @@ if [ "${1}" = "" ]; then
 fi
 
 NAME="${1}"
-
-"${SCRIPT_DIR}/clone-vm.sh" jessie "${NAME}"
-"${SCRIPT_DIR}/start-vm.sh" "${NAME}"
+"${SCRIPT_DIR}"/clone-vm.sh jessie "${NAME}"
+"${SCRIPT_DIR}"/start-vm.sh "${NAME}"
 
 if [ "${WAIT}" = "true" ]; then
     echo "Wait for VM to finish booting."
@@ -48,7 +47,7 @@ if [ "${WAIT}" = "true" ]; then
 
     for SECOND in $(seq 1 60); do
         sleep 1
-        IP=$("${SCRIPT_DIR}/get-vm-ip.sh" "${NAME}")
+        IP=$("${SCRIPT_DIR}"/get-vm-ip.sh "${NAME}")
 
         if [ ! "${IP}" = "" ]; then
 
@@ -57,7 +56,7 @@ if [ "${WAIT}" = "true" ]; then
         fi
     done
 
-    MAC=$("${SCRIPT_DIR}/get-vm-mac.sh" --colons "${NAME}")
+    MAC=$("${SCRIPT_DIR}"/get-vm-mac.sh --colons "${NAME}")
     echo "BOOT_TIME: ${BOOT_TIME}"
     echo "IP: ${IP}"
     echo "MAC: ${MAC}"
