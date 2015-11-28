@@ -17,7 +17,7 @@ if [ "${EXISTING_NAME}" = "" ]; then
     exit 1
 fi
 
-NEW_NAME="${1}"
+NEW_NAME="${2}"
 
 if [ "${NEW_NAME}" = "" ]; then
     usage
