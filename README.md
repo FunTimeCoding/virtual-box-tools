@@ -29,14 +29,15 @@ sudo_user: vbox
 
 ## Setup
 
-Install the repository in edit mode.
+Install the repository and project dependencies.
 
 ```sh
+pip3 install --upgrade --user --requirement requirements.txt
 pip3 install --user --editable .
 ```
 
-Uninstall the repository.
+Uninstall the repository and library.
 
 ```sh
-pip3 uninstall virtual-box-tools
+pip3 uninstall virtual_box_tools python_utility
 ```
