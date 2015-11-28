@@ -1,5 +1,11 @@
 #!/bin/sh -e
 
+if [ "$(command -v shyaml || true)" = "" ]; then
+    echo "Command not found: shyaml"
+
+    exit 1
+fi
+
 CONFIG=""
 VERBOSE=false
 
