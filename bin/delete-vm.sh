@@ -8,6 +8,8 @@ usage()
     echo "Usage: ${0} [--verbose] VM_NAME"
 }
 
+. "${SCRIPT_DIR}/../lib/virtual_box_tools.sh"
+
 if [ "${1}" = "--verbose" ]; then
     set -x
     shift
@@ -34,7 +36,7 @@ if [ "${FOUND}" = true ]; then
         for SECOND in $(seq 1 30); do
             echo "${SECOND}"
             sleep 1
-            STATE=$(vboxmanage showvminfo --machinereadable "${VM_NAME}" | grep "VMState=")
+            STATE=$(${MANAGE_COMMAND} showvminfo --machinereadable "${VM_NAME}" | grep "VMState=")
             STATE=${STATE#*=}
             STATE=$(echo "${STATE}" | sed 's/"//g')
 
@@ -52,7 +54,7 @@ if [ "${FOUND}" = true ]; then
         fi
     fi
 
-    vboxmanage unregistervm "${VM_NAME}" --delete
+    ${MANAGE_COMMAND} unregistervm "${VM_NAME}" --delete
 else
     echo "Not found: ${VM_NAME}"
 fi

@@ -1,10 +1,14 @@
 #!/bin/sh -e
 
+DIR=$(dirname "${0}")
+SCRIPT_DIR=$(cd "${DIR}" || exit 1; pwd)
+
 usage()
 {
     echo "Usage: ${0} [--force] VM_NAME"
 }
 
+. "${SCRIPT_DIR}/../lib/virtual_box_tools.sh"
 FORCE=false
 
 if [ "${1}" = "--force" ]; then
@@ -21,7 +25,7 @@ fi
 VM_NAME="${1}"
 
 if [ "${FORCE}" = true ]; then
-    vboxmanage controlvm "${VM_NAME}" poweroff
+    ${MANAGE_COMMAND} controlvm "${VM_NAME}" poweroff
 else
-    vboxmanage controlvm "${VM_NAME}" acpipowerbutton
+    ${MANAGE_COMMAND} controlvm "${VM_NAME}" acpipowerbutton
 fi

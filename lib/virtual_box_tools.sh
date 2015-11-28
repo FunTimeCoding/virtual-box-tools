@@ -23,7 +23,7 @@ while true; do
             shift 2
             ;;
         -h|--help)
-            echo "Global usage: [-v|--verbose][-d|--debug][-h|--help][-c|--config CONFIG]"
+            echo "Global usage: ${0} [-v|--verbose][-d|--debug][-h|--help][-c|--config CONFIG]"
 
             if function_exists usage; then
                 usage

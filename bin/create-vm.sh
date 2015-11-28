@@ -8,6 +8,7 @@ usage()
     echo "Usage: ${0} [--help][--wait][--verbose] VM_NAME"
 }
 
+. "${SCRIPT_DIR}/../lib/virtual_box_tools.sh"
 WAIT=false
 
 while true; do
