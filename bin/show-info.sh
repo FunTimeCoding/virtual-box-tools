@@ -9,15 +9,16 @@ usage()
 }
 
 . "${SCRIPT_DIR}/../lib/virtual_box_tools.sh"
+VM_NAME="${1}"
 
-if [ "${1}" = "" ]; then
+if [ "${VM_NAME}" = "" ]; then
     usage
 
     exit 1
 fi
 
 ERROR=false
-OUTPUT=$(${MANAGE_COMMAND} showvminfo "${1}" 2>&1) || ERROR=true
+OUTPUT=$(${MANAGE_COMMAND} showvminfo "${VM_NAME}" 2>&1) || ERROR=true
 
 if [ "${ERROR}" = false ]; then
     echo "${OUTPUT}"

@@ -16,14 +16,16 @@ if [ "${1}" = "--colons" ]; then
     shift
 fi
 
-if [ "${1}" = "" ]; then
+VM_NAME="${1}"
+
+if [ "${VM_NAME}" = "" ]; then
     usage
 
     exit 1
 fi
 
 KEY="MAC"
-VALUE=$(${MANAGE_COMMAND} guestproperty enumerate "${1}" | grep "${KEY}" || VALUE="")
+VALUE=$(${MANAGE_COMMAND} guestproperty enumerate "${VM_NAME}" | grep "${KEY}" || VALUE="")
 
 if [ ! "${VALUE}" = "" ]; then
     VALUE="${VALUE#*value: }"

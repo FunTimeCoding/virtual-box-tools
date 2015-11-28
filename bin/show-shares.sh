@@ -9,11 +9,12 @@ usage()
 }
 
 . "${SCRIPT_DIR}/../lib/virtual_box_tools.sh"
+VM_NAME="${1}"
 
-if [ "${1}" = "" ]; then
+if [ "${VM_NAME}" = "" ]; then
     usage
 
     exit 1
 fi
 
-${MANAGE_COMMAND} showvminfo "${1}" --details --machinereadable | grep SharedFolder
+${MANAGE_COMMAND} showvminfo "${VM_NAME}" --details --machinereadable | grep SharedFolder

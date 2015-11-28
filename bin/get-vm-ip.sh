@@ -9,15 +9,16 @@ usage()
 }
 
 . "${SCRIPT_DIR}/../lib/virtual_box_tools.sh"
+VM_NAME="${1}"
 
-if [ "${1}" = "" ]; then
+if [ "${VM_NAME}" = "" ]; then
     usage
 
     exit 1
 fi
 
 KEY="IP"
-VALUE=$(${MANAGE_COMMAND} guestproperty enumerate "${1}" | grep "${KEY}" || VALUE="")
+VALUE=$(${MANAGE_COMMAND} guestproperty enumerate "${VM_NAME}" | grep "${KEY}" || VALUE="")
 
 if [ ! "${VALUE}" = "" ]; then
     VALUE="${VALUE#*value: }"

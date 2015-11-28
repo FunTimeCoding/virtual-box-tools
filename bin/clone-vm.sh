@@ -9,21 +9,22 @@ usage()
 }
 
 . "${SCRIPT_DIR}/../lib/virtual_box_tools.sh"
-
-if [ "${1}" = "" ]; then
-    usage
-
-    exit 1
-fi
-
-if [ "${2}" = "" ]; then
-    usage
-
-    exit 1
-fi
-
 EXISTING_NAME="${1}"
-NEW_NAME="${2}"
+
+if [ "${EXISTING_NAME}" = "" ]; then
+    usage
+
+    exit 1
+fi
+
+NEW_NAME="${1}"
+
+if [ "${NEW_NAME}" = "" ]; then
+    usage
+
+    exit 1
+fi
+
 ERROR=false
 OUTPUT=$(${MANAGE_COMMAND} clonevm "${EXISTING_NAME}" --name "${NEW_NAME}" --register 2>&1) || ERROR=true
 

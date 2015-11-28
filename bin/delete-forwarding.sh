@@ -9,17 +9,20 @@ usage()
 }
 
 . "${SCRIPT_DIR}/../lib/virtual_box_tools.sh"
+VM_NAME="${1}"
 
-if [ "${1}" = "" ]; then
+if [ "${VM_NAME}" = "" ]; then
     usage
 
     exit 1
 fi
 
-if [ "${2}" = "" ]; then
+FORWARDING_NAME="${2}"
+
+if [ "${FORWARDING_NAME}" = "" ]; then
     usage
 
     exit 1
 fi
 
-${MANAGE_COMMAND} modifyvm "${1}" --natpf1 delete "${2}"
+${MANAGE_COMMAND} modifyvm "${VM_NAME}" --natpf1 delete "${FORWARDING_NAME}"
