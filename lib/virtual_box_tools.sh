@@ -24,7 +24,10 @@ while true; do
             ;;
         -h|--help)
             echo "Global usage: [-v|--verbose][-d|--debug][-h|--help][-c|--config CONFIG]"
-            function_exists usage && usage
+
+            if function_exists usage; then
+                usage
+            fi
 
             exit 0
             ;;
@@ -55,10 +58,14 @@ find_config()
         CONFIG="${HOME}/.virtual-box-tools.yml"
     fi
 
-    if [ ! "$(command -v realpath 2>&1)" = "" ]; then
+    REALPATH_EXISTS=$(command -v realpath 2>&1)
+
+    if [ ! "${REALPATH_EXISTS}" = "" ]; then
         REALPATH_CMD="realpath"
     else
-        if [ ! "$(command -v grealpath 2>&1)" = "" ]; then
+        REALPATH_EXISTS=$(command -v grealpath 2>&1)
+
+        if [ ! "${REALPATH_EXISTS}" = "" ]; then
             REALPATH_CMD="grealpath"
         else
             echo "Required tool (g)realpath not found."
@@ -83,7 +90,7 @@ load_config()
     fi
 
     if [ ! "${CONFIG}" = "" ]; then
-        SUDO_USER=$(shyaml get-value "sudo_user" < "${CONFIG}" 2&>/dev/null || true)
+        SUDO_USER=$(shyaml get-value "sudo_user" < "${CONFIG}" 2>/dev/null || true)
     fi
 }
 
