@@ -2,7 +2,7 @@
 
 usage()
 {
-    echo "Usage: ${0} NAME"
+    echo "Usage: ${0} VM_NAME"
 }
 
 if [ "${1}" = "" ]; then

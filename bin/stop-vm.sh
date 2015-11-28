@@ -18,8 +18,10 @@ if [ "${1}" = "" ]; then
     exit 1
 fi
 
-if [ "${FORCE}" = "true" ]; then
-    vboxmanage controlvm "${1}" poweroff
+VM_NAME="${1}"
+
+if [ "${FORCE}" = true ]; then
+    vboxmanage controlvm "${VM_NAME}" poweroff
 else
-    vboxmanage controlvm "${1}" acpipowerbutton
+    vboxmanage controlvm "${VM_NAME}" acpipowerbutton
 fi

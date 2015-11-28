@@ -1,3 +1,3 @@
 #!/bin/sh -e
 
-vboxmanage list vms
+vboxmanage list vms | awk -F'"' '{ print $2 }'
