@@ -36,9 +36,7 @@ if [ ! "${IS_RUNNING}" = "" ]; then
     for SECOND in $(seq 1 30); do
         echo "${SECOND}"
         sleep 1
-        STATE=$(${MANAGE_COMMAND} showvminfo --machinereadable "${VM_NAME}" | grep "VMState=")
-        STATE=${STATE#*=}
-        STATE=$(echo "${STATE}" | sed 's/"//g')
+        STATE=$("${SCRIPT_DIR}"/get-vm-state.sh "${VM_NAME}")
 
         if [ "${STATE}" = "poweroff" ]; then
             DOWN=true
