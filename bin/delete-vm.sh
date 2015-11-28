@@ -26,10 +26,9 @@ if [ "${FOUND}" = false ]; then
     exit 1
 fi
 
-IS_RUNNING=$("${SCRIPT_DIR}"/list-vms.sh | grep "${VM_NAME}") || IS_RUNNING=""
+STATE=$("${SCRIPT_DIR}"/get-vm-state.sh "${VM_NAME}")
 
-if [ ! "${IS_RUNNING}" = "" ]; then
-    echo "Stop vm."
+if [ ! "${STATE}" = "poweroff" ]; then
     "${SCRIPT_DIR}"/stop-vm.sh "${VM_NAME}"
     DOWN=false
 
@@ -46,7 +45,6 @@ if [ ! "${IS_RUNNING}" = "" ]; then
     done
 
     if [ "${DOWN}" = "false" ]; then
-        echo "Force shutdown."
         "${SCRIPT_DIR}"/stop-vm.sh --force "${VM_NAME}"
         sleep 3
     fi
