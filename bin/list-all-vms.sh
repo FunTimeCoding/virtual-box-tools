@@ -13,5 +13,7 @@ usage()
 if [ "${1}" = "--raw" ]; then
     ${MANAGE_COMMAND} list vms
 else
-    ${MANAGE_COMMAND} list vms | awk -F '"' '{ print $2 }'
+    OUTPUT=$(${MANAGE_COMMAND} list vms | awk -F '"' '{ print $2 }')
+    SORTED=$(ruby -e "puts \"${OUTPUT}\".split(/\s+/).sort")
+    echo "${SORTED}"
 fi
