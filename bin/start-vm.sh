@@ -53,5 +53,5 @@ if [ "${WAIT}" = true ]; then
     echo "IP: ${IP}"
     echo "MAC: ${MAC}"
 else
-    echo "VM is booting."
+    echo "VM '${VM_NAME}' is booting."
 fi
