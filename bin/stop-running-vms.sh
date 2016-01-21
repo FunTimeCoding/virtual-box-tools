@@ -7,5 +7,5 @@ FILE="${SCRIPT_DIR}/../running-vms.txt"
 LIST=$(cat "${SCRIPT_DIR}/../running-vms.txt")
 
 for ELEMENT in ${LIST}; do
-    echo "${SCRIPT_DIR}/stop-vm.sh ${ELEMENT}"
+    "${SCRIPT_DIR}"/stop-vm.sh "${ELEMENT}"
 done
