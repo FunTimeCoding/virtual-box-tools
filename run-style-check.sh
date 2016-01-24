@@ -6,4 +6,5 @@ if [ "$(command -v shellcheck || true)" = "" ]; then
     exit 1
 fi
 
+# shellcheck disable=SC2016
 find . \( -name '*.sh' -and -not -path '*/.vim/*' \) -exec sh -c 'shellcheck ${1} || true' '_' '{}' \;
