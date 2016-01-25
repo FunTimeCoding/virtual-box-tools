@@ -1,3 +1,8 @@
 *.pyc
 *.egg-info
+.coverage
+.pyvenv
+.cache
+.tox
+build
 running-vms.txt

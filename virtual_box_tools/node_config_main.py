@@ -41,6 +41,8 @@ class NodeConfigMain:
         else:
             self.parser.print_help()
 
+        return 0
+
     def sort(self):
         self.save_config_file()
 

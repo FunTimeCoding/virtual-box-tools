@@ -1,2 +1,6 @@
+pep8
+pylint
+pytest
+pytest-cov
 pyyaml
 git+ssh://git@github.com/FunTimeCoding/python-utility.git#egg=python-utility
