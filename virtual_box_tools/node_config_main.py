@@ -1,10 +1,10 @@
 import argparse
+import sys
 from collections import OrderedDict
 from os.path import expanduser, isfile
-import sys
 
-from python_utility.yaml_config import YamlConfig
 import yaml
+from python_utility.yaml_config import YamlConfig
 
 from virtual_box_tools.custom_argument_parser import CustomArgumentParser
 
@@ -30,10 +30,12 @@ class NodeConfigMain:
             sys.exit(1)
 
     def run(self):
+        result = 0
+
         if 'add' in self.arguments:
             self.add(self.arguments.name)
         elif 'delete' in self.arguments:
-            self.delete(self.arguments.name)
+            result = self.delete(self.arguments.name)
         elif 'list' in self.arguments:
             self.list_nodes()
         elif 'sort' in self.arguments:
@@ -41,7 +43,7 @@ class NodeConfigMain:
         else:
             self.parser.print_help()
 
-        return 0
+        return result
 
     def sort(self):
         self.save_config_file()
@@ -52,8 +54,14 @@ class NodeConfigMain:
             'mac': self.arguments.mac,
         }
 
-        if self.arguments.aliases is not None:
-            entry['canonical_names'] = self.arguments.aliases
+        if self.arguments.canonical_names is not None:
+            entry['canonical_names'] = self.arguments.canonical_names
+
+        if self.arguments.web_roots is not None:
+            entry['web_roots'] = self.arguments.web_roots
+
+        if self.arguments.web_forwards is not None:
+            entry['web_forwards'] = self.arguments.web_forwards
 
         self.yaml_tree['node'][node_name] = entry
         self.save_config_file()
@@ -61,8 +69,13 @@ class NodeConfigMain:
     def delete(self, node_name: str):
         if node_name in self.yaml_tree['node'].keys():
             self.yaml_tree['node'].pop(node_name, None)
+            self.save_config_file()
+            result = 0
+        else:
+            print('Node not found: ' + node_name)
+            result = 1
 
-        self.save_config_file()
+        return result
 
     def list_nodes(self):
         print('Nodes:')
@@ -71,10 +84,21 @@ class NodeConfigMain:
             print('\nName: ' + name)
             print('IP: ' + attributes['ip'])
             print('MAC: ' + attributes['mac'])
-            key = 'canonical_names'
+            canonical_names_key = 'canonical_names'
 
-            if key in attributes:
-                print('Aliases: ' + str(attributes[key]))
+            if canonical_names_key in attributes:
+                print('Canonical names: ' +
+                      str(attributes[canonical_names_key]))
+
+            web_roots_key = 'web_roots'
+
+            if web_roots_key in attributes:
+                print('Web roots: ' + str(attributes[web_roots_key]))
+
+            web_forwards_key = 'web_forwards'
+
+            if web_forwards_key in attributes:
+                print('Web forwards: ' + str(attributes[web_forwards_key]))
 
     def load_config_file(self) -> dict:
         input_file = open(self.node_file_path, 'r')
@@ -112,7 +136,11 @@ class NodeConfigMain:
         add_parent.add_argument('--name', required=True)
         add_parent.add_argument('--ip', required=True)
         add_parent.add_argument('--mac', required=True)
-        add_parent.add_argument('--aliases', nargs='+', metavar='ALIAS')
+        add_parent.add_argument('--canonical-names', nargs='+',
+                                metavar='CANONICAL_NAME')
+        add_parent.add_argument('--web-roots', nargs='+', metavar='WEB_ROOT')
+        add_parent.add_argument('--web-forwards', nargs='+',
+                                metavar='WEB_FORWARD', type=int)
 
         add_parser = subparsers.add_parser(
             'add',

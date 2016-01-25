@@ -53,7 +53,7 @@ pip3 uninstall virtual-box-tools
 Run the main script without having to install the project.
 
 ```sh
-PYTHONPATH=. bin/node_config
+PYTHONPATH=. bin/node-config
 ```
 
 Install tools on OS X.
