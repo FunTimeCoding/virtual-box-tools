@@ -38,7 +38,7 @@ pip3 install --user --editable .
 Install the project from GitHub.
 
 ```sh
-pip3 install git+git://github.com/FunTimeCoding/virtual-box-tools.git
+pip3 install git+ssh://git@github.com/FunTimeCoding/virtual-box-tools.git#egg=virtual-box-tools
 ```
 
 Uninstall the project.
@@ -47,25 +47,31 @@ Uninstall the project.
 pip3 uninstall virtual-box-tools
 ```
 
+Require this repository in another projects `requirements.txt`.
+
+```
+git+ssh://git@github.com/FunTimeCoding/virtual-box-tools.git#egg=virtual-box-tools
+```
+
 
 ## Development
 
-Run the main script without having to install the project.
+Run the main script without installing the project.
 
 ```sh
 PYTHONPATH=. bin/vbt
 ```
 
-Install tools on OS X.
-
-```sh
-brew install shellcheck python3
-```
-
 Install tools on Debian Jessie.
 
 ```sh
-apt-get install shellcheck python3-dev python3-pip python3-venv
+apt-get install shellcheck
+```
+
+Install tools on OS X.
+
+```sh
+brew install shellcheck
 ```
 
 Install pip requirements.
