@@ -1,14 +1,15 @@
 #!/bin/sh -e
 
-DIR=$(dirname "${0}")
-SCRIPT_DIR=$(cd "${DIR}" || exit 1; pwd)
+DIRECTORY=$(dirname "${0}")
+SCRIPT_DIRECTORY=$(cd "${DIRECTORY}" || exit 1; pwd)
 
 usage()
 {
     echo "Usage: ${0} [--force][--wait] VM_NAME"
 }
 
-. "${SCRIPT_DIR}/../lib/virtual_box_tools.sh"
+# shellcheck source=/dev/null
+. "${SCRIPT_DIRECTORY}"/../lib/virtual_box_tools.sh
 FORCE=false
 WAIT=false
 
@@ -48,7 +49,7 @@ if [ "${WAIT}" = true ]; then
     for SECOND in $(seq 1 30); do
         echo "${SECOND}"
         sleep 1
-        STATE=$("${SCRIPT_DIR}"/get-vm-state.sh "${VM_NAME}")
+        STATE=$("${SCRIPT_DIRECTORY}"/get-vm-state.sh "${VM_NAME}")
 
         if [ "${STATE}" = "poweroff" ]; then
             DOWN=true

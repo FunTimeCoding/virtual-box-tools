@@ -1,9 +1,9 @@
 #!/bin/sh -e
 
-DIR=$(dirname "${0}")
-SCRIPT_DIR=$(cd "${DIR}" || exit 1; pwd)
-LIST=$(cat "${SCRIPT_DIR}/../running-vms.txt")
+DIRECTORY=$(dirname "${0}")
+SCRIPT_DIRECTORY=$(cd "${DIRECTORY}" || exit 1; pwd)
+LIST=$(cat "${SCRIPT_DIRECTORY}"/../running-vms.txt)
 
 for ELEMENT in ${LIST}; do
-    "${SCRIPT_DIR}"/start-vm.sh "${ELEMENT}"
+    "${SCRIPT_DIRECTORY}"/start-vm.sh "${ELEMENT}"
 done

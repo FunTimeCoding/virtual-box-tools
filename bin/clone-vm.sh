@@ -1,14 +1,15 @@
 #!/bin/sh -e
 
-DIR=$(dirname "${0}")
-SCRIPT_DIR=$(cd "${DIR}" || exit 1; pwd)
+DIRECTORY=$(dirname "${0}")
+SCRIPT_DIRECTORY=$(cd "${DIRECTORY}" || exit 1; pwd)
 
 usage()
 {
     echo "Usage: ${0} EXISTING_NAME NEW_NAME"
 }
 
-. "${SCRIPT_DIR}/../lib/virtual_box_tools.sh"
+# shellcheck source=/dev/null
+. "${SCRIPT_DIRECTORY}"/../lib/virtual_box_tools.sh
 EXISTING_NAME="${1}"
 
 if [ "${EXISTING_NAME}" = "" ]; then

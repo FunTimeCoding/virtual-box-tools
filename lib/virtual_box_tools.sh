@@ -91,7 +91,7 @@ if [ "${VERBOSE}" = true ]; then
 fi
 
 if [ ! "${SUDO_USER}" = "" ]; then
-    MANAGE_COMMAND="sudo -u ${SUDO_USER} vboxmanage"
+    export MANAGE_COMMAND="sudo -u ${SUDO_USER} vboxmanage"
 else
-    MANAGE_COMMAND="vboxmanage"
+    export MANAGE_COMMAND="vboxmanage"
 fi

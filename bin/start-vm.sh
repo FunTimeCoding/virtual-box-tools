@@ -1,14 +1,15 @@
 #!/bin/sh -e
 
-DIR=$(dirname "${0}")
-SCRIPT_DIR=$(cd "${DIR}" || exit 1; pwd)
+DIRECTORY=$(dirname "${0}")
+SCRIPT_DIRECTORY=$(cd "${DIRECTORY}" || exit 1; pwd)
 
 usage()
 {
     echo "Usage: ${0} [--wait] VM_NAME"
 }
 
-. "${SCRIPT_DIR}/../lib/virtual_box_tools.sh"
+# shellcheck source=/dev/null
+. "${SCRIPT_DIRECTORY}"/../lib/virtual_box_tools.sh
 WAIT=false
 
 if [ "${1}" = "--wait" ]; then
@@ -40,7 +41,7 @@ if [ "${WAIT}" = true ]; then
 
     for SECOND in $(seq 1 60); do
         sleep 1
-        IP=$("${SCRIPT_DIR}"/get-vm-ip.sh "${VM_NAME}")
+        IP=$("${SCRIPT_DIRECTORY}"/get-vm-ip.sh "${VM_NAME}")
 
         if [ ! "${IP}" = "" ]; then
             BOOT_TIME="${SECOND}"
@@ -48,7 +49,7 @@ if [ "${WAIT}" = true ]; then
         fi
     done
 
-    MAC=$("${SCRIPT_DIR}"/get-vm-mac.sh --colons "${VM_NAME}")
+    MAC=$("${SCRIPT_DIRECTORY}"/get-vm-mac.sh --colons "${VM_NAME}")
     echo "BOOT_TIME: ${BOOT_TIME}"
     echo "IP: ${IP}"
     echo "MAC: ${MAC}"

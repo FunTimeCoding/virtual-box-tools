@@ -1,11 +1,11 @@
 #!/bin/sh -e
 
-DIR=$(dirname "${0}")
-SCRIPT_DIR=$(cd "${DIR}" || exit 1; pwd)
-FILE="${SCRIPT_DIR}/../running-vms.txt"
-"${SCRIPT_DIR}"/list-vms.sh > "${FILE}"
-LIST=$(cat "${SCRIPT_DIR}/../running-vms.txt")
+DIRECTORY=$(dirname "${0}")
+SCRIPT_DIRECTORY=$(cd "${DIRECTORY}" || exit 1; pwd)
+FILE="${SCRIPT_DIRECTORY}"/../running-vms.txt
+"${SCRIPT_DIRECTORY}"/list-vms.sh > "${FILE}"
+LIST=$(cat "${SCRIPT_DIRECTORY}"/../running-vms.txt)
 
 for ELEMENT in ${LIST}; do
-    "${SCRIPT_DIR}"/stop-vm.sh "${ELEMENT}"
+    "${SCRIPT_DIRECTORY}"/stop-vm.sh "${ELEMENT}"
 done
