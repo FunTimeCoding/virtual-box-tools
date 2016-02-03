@@ -5,19 +5,19 @@ Helper scripts for running VirtualBox.
 
 ## Usage
 
-Manage nodes using `node-config`.
+Manage hosts using `vbt`.
 
 ```sh
-./bin/node-config
+./bin/vbt
 ```
 
 
 ## Configuration
 
-Optionally specify the location of the `node file` in `~/.virtual-box-tools.yml`.
+Optionally specify the location of the host config in `~/.virtual-box-tools.yml`.
 
 ```yml
-node_file: ~/srv/salt/pillar/node.sls
+host_file: ~/srv/salt/pillar/host.sls
 ```
 
 If VirtualBox runs as a different user, enable use of `sudo`.
@@ -53,7 +53,7 @@ pip3 uninstall virtual-box-tools
 Run the main script without having to install the project.
 
 ```sh
-PYTHONPATH=. bin/node-config
+PYTHONPATH=. bin/vbt
 ```
 
 Install tools on OS X.
@@ -82,7 +82,7 @@ Run code style check, metrics and tests.
 ./run-tests.sh
 ```
 
-Build project like Jenkins.
+Build the project like Jenkins.
 
 ```sh
 ./build.sh
@@ -91,6 +91,5 @@ Build project like Jenkins.
 
 ## Skeleton details
 
-* The reason why the `tests` directory is not called `test` is because a package named `test` exists.
-* The main source code directory is the same name as the package in python packages.
-* Dashes in project names become underscores in python code. They are still legit.
+* The `tests` directory is not called `test` because that package already exists.
+* Dashes in the project name become underscores in Python.

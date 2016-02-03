@@ -6,7 +6,7 @@ setup(
     version='0.1',
     description='Stub description for virtual-box-tools.',
     install_requires=['pyyaml', 'python-utility'],
-    scripts=['bin/node-config'],
+    scripts=['bin/vbt'],
     packages=['virtual_box_tools'],
     author='Alexander Reitzel',
     author_email='funtimecoding@gmail.com',
