@@ -50,18 +50,15 @@ class HostConfigMain:
 
     def add(self, host_name: str):
         entry = {
-            'ip': self.arguments.ip,
-            'mac': self.arguments.mac,
+            'logical_address': self.arguments.logical_address,
+            'physical_address': self.arguments.physical_address,
         }
 
-        if self.arguments.canonical_names is not None:
-            entry['canonical_names'] = self.arguments.canonical_names
+        if self.arguments.canonical_name is not None:
+            entry['canonical_name'] = self.arguments.canonical_name
 
-        if self.arguments.web_roots is not None:
-            entry['web_roots'] = self.arguments.web_roots
-
-        if self.arguments.web_forwards is not None:
-            entry['web_forwards'] = self.arguments.web_forwards
+        if self.arguments.catch_all_domain is not None:
+            entry['catch_all_domain'] = self.arguments.catch_all_domain
 
         self.yaml_tree['host'][host_name] = entry
         self.save_config_file()
@@ -82,23 +79,19 @@ class HostConfigMain:
 
         for name, attributes in self.yaml_tree['host'].items():
             print('\nName: ' + name)
-            print('IP: ' + attributes['ip'])
-            print('MAC: ' + attributes['mac'])
-            canonical_names_key = 'canonical_names'
+            print('Logical address: ' + attributes['logical_address'])
+            print('Physical address: ' + attributes['physical_address'])
+            canonical_names_key = 'canonical_name'
 
             if canonical_names_key in attributes:
                 print('Canonical names: ' +
                       str(attributes[canonical_names_key]))
 
-            web_roots_key = 'web_roots'
+            catch_all_domains_key = 'catch_all_domain'
 
-            if web_roots_key in attributes:
-                print('Web roots: ' + str(attributes[web_roots_key]))
-
-            web_forwards_key = 'web_forwards'
-
-            if web_forwards_key in attributes:
-                print('Web forwards: ' + str(attributes[web_forwards_key]))
+            if catch_all_domains_key in attributes:
+                print('Catch all domains: ' +
+                      str(attributes[catch_all_domains_key]))
 
     def load_config_file(self) -> dict:
         input_file = open(self.host_file_path, 'r')
@@ -134,13 +127,12 @@ class HostConfigMain:
 
         add_parent = CustomArgumentParser(add_help=False)
         add_parent.add_argument('--name', required=True)
-        add_parent.add_argument('--ip', required=True)
-        add_parent.add_argument('--mac', required=True)
+        add_parent.add_argument('--logical-address', required=True)
+        add_parent.add_argument('--physical-address', required=True)
         add_parent.add_argument('--canonical-names', nargs='+',
                                 metavar='CANONICAL_NAME')
-        add_parent.add_argument('--web-roots', nargs='+', metavar='WEB_ROOT')
-        add_parent.add_argument('--web-forwards', nargs='+',
-                                metavar='WEB_FORWARD', type=int)
+        add_parent.add_argument('--catch-all-domains', nargs='+',
+                                metavar='CATCH_ALL_DOMAIN')
 
         add_parser = subparsers.add_parser(
             'add',
