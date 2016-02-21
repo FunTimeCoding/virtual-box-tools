@@ -3,6 +3,35 @@
 This document covers important conventions.
 
 
+## Skeleton
+
+### Directories
+
+Unified directories for all projects. Create them only if necessary.
+
+* bin - Entry point scripts.
+* src,lib - Project code used by more than one entry point script.
+* test - Tests for project code and entry point scripts.
+* doc - Documentation files.
+* web - Web entry points and assets.
+* build - Files, executables and reports generated during build.
+
+
+### Files
+
+Unified files and scripts for all projects. All mentioned scripts have the argument `--ci-mode` to also write reports to `build` rather than just print them.
+
+* README.md - The readme explaining how to install required dependencies and brief usage examples.
+* CONTRIBUTING.md - Notes to help others contribute.
+* CHANGELOG.md - Change log of this project.
+* CONVENTIONS.md - Explains the project structure and things that can be kept similar in other projects.
+* LICENSE.md - A license for the project so that code can be reused by others.
+* build.sh - Builds the project including metrics, checks and tests.
+* run-tests.sh - Run tests, provide access to individual test suites.
+* run-style-check.sh - Code style and lint checks.
+* run-metrics.sh - Collect metrics.
+
+
 ## Glossary
 
 ### Camel Case Convention
@@ -89,9 +118,3 @@ This section explains how to write unified readme files.
 * One blank line after every headline.
 * Two blank lines after every section except the last. A section is every part of a document starting with a headline, but not the main headline.
 * If a section has no body, put only one blank line afterwards instead of two.
-
-
-## Contact
-
-If you do or do not like these conventions, feel free to contact me about them.
-Critique is always welcome. Useful additions and refinements also.

@@ -5,6 +5,8 @@ Helper scripts for running VirtualBox.
 
 ## Usage
 
+This section explains how to use this project.
+
 Manage hosts using `vbt`.
 
 ```sh
@@ -28,6 +30,8 @@ sudo_user: vbox
 
 
 ## Setup
+
+This section explains how to install this project and how to include it in another.
 
 Install the project from a local clone.
 
@@ -55,6 +59,8 @@ git+ssh://git@github.com/FunTimeCoding/virtual-box-tools.git#egg=virtual-box-too
 
 
 ## Development
+
+This section explains how to use scripts that are intended to ease the development of this project.
 
 Run the main script without installing the project.
 
