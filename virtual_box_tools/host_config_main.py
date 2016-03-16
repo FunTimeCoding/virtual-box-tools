@@ -12,8 +12,8 @@ from virtual_box_tools.custom_argument_parser import CustomArgumentParser
 class HostConfigMain:
     def __init__(self, arguments: list):
         self.parser = self.get_parser()
-        self.arguments = self.parser.parse_args(arguments)
-        print(self.arguments)
+        self.parsed_arguments = self.parser.parse_args(arguments)
+        print(self.parsed_arguments)
         config = YamlConfig('~/.virtual-box-tools.yml')
         config_file_path = config.get('host_file')
 
@@ -21,7 +21,7 @@ class HostConfigMain:
             config_file_path = expanduser(config_file_path)
             self.host_file_path = config_file_path
         else:
-            self.host_file_path = expanduser(self.arguments.host_file)
+            self.host_file_path = expanduser(self.parsed_arguments.host_file)
 
         if isfile(self.host_file_path):
             self.yaml_tree = self.load_config_file()
@@ -32,13 +32,13 @@ class HostConfigMain:
     def run(self):
         result = 0
 
-        if 'add' in self.arguments:
-            self.add(self.arguments.name)
-        elif 'delete' in self.arguments:
-            result = self.delete(self.arguments.name)
-        elif 'list' in self.arguments:
+        if 'add' in self.parsed_arguments:
+            self.add(self.parsed_arguments.name)
+        elif 'delete' in self.parsed_arguments:
+            result = self.delete(self.parsed_arguments.name)
+        elif 'list' in self.parsed_arguments:
             self.list_hosts()
-        elif 'sort' in self.arguments:
+        elif 'sort' in self.parsed_arguments:
             self.sort()
         else:
             self.parser.print_help()
@@ -50,15 +50,15 @@ class HostConfigMain:
 
     def add(self, host_name: str):
         entry = {
-            'logical_address': self.arguments.logical_address,
-            'physical_address': self.arguments.physical_address,
+            'logical_address': self.parsed_arguments.logical_address,
+            'physical_address': self.parsed_arguments.physical_address,
         }
 
-        if self.arguments.canonical_name is not None:
-            entry['canonical_name'] = self.arguments.canonical_name
+        if self.parsed_arguments.canonical_name is not None:
+            entry['canonical_name'] = self.parsed_arguments.canonical_name
 
-        if self.arguments.catch_all_domain is not None:
-            entry['catch_all_domain'] = self.arguments.catch_all_domain
+        if self.parsed_arguments.catch_all_domain is not None:
+            entry['catch_all_domain'] = self.parsed_arguments.catch_all_domain
 
         self.yaml_tree['host'][host_name] = entry
         self.save_config_file()
@@ -110,7 +110,7 @@ class HostConfigMain:
 
         yaml_config = yaml.dump(self.yaml_tree, default_flow_style=False)
 
-        if self.arguments.dry_run:
+        if self.parsed_arguments.dry_run:
             print(yaml_config)
         else:
             output_file = open(self.host_file_path, 'w')
