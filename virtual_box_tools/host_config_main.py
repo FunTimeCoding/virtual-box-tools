@@ -32,14 +32,20 @@ class HostConfigMain:
     def run(self):
         result = 0
 
-        if 'add' in self.parsed_arguments:
-            self.add(self.parsed_arguments.name)
-        elif 'delete' in self.parsed_arguments:
-            result = self.delete(self.parsed_arguments.name)
-        elif 'list' in self.parsed_arguments:
-            self.list_hosts()
-        elif 'sort' in self.parsed_arguments:
-            self.sort()
+        if 'host' in self.parsed_arguments:
+            if 'add' in self.parsed_arguments:
+                self.add(self.parsed_arguments.name)
+            elif 'delete' in self.parsed_arguments:
+                result = self.delete(self.parsed_arguments.name)
+            elif 'list' in self.parsed_arguments:
+                self.list_hosts()
+            elif 'sort' in self.parsed_arguments:
+                self.sort()
+            else:
+                self.parser.print_help()
+        if 'service' in self.parsed_arguments:
+            # TODO: Add commands add/list/delete
+            self.parser.print_help()
         else:
             self.parser.print_help()
 
@@ -84,14 +90,17 @@ class HostConfigMain:
             canonical_names_key = 'canonical_name'
 
             if canonical_names_key in attributes:
-                print('Canonical names: ' +
-                      str(attributes[canonical_names_key]))
+                print(
+                    'Canonical names: ' + str(attributes[canonical_names_key])
+                )
 
             catch_all_domains_key = 'catch_all_domain'
 
             if catch_all_domains_key in attributes:
-                print('Catch all domains: ' +
-                      str(attributes[catch_all_domains_key]))
+                print(
+                    'Catch all domains: ' +
+                    str(attributes[catch_all_domains_key])
+                )
 
     def load_config_file(self) -> dict:
         input_file = open(self.host_file_path, 'r')
@@ -124,38 +133,8 @@ class HostConfigMain:
             formatter_class=argparse.ArgumentDefaultsHelpFormatter
         )
         subparsers = parser.add_subparsers()
-
-        add_parent = CustomArgumentParser(add_help=False)
-        add_parent.add_argument('--name', required=True)
-        add_parent.add_argument('--logical-address', required=True)
-        add_parent.add_argument('--physical-address', required=True)
-        add_parent.add_argument('--canonical-names', nargs='+',
-                                metavar='CANONICAL_NAME')
-        add_parent.add_argument('--catch-all-domains', nargs='+',
-                                metavar='CATCH_ALL_DOMAIN')
-
-        add_parser = subparsers.add_parser(
-            'add',
-            parents=[add_parent],
-            help='add or update a host'
-        )
-        add_parser.add_argument('add', action='store_true')
-
-        delete_parent = CustomArgumentParser(add_help=False)
-        delete_parent.add_argument('--name', required=True)
-
-        delete_parser = subparsers.add_parser(
-            'delete',
-            parents=[delete_parent],
-            help='delete a host'
-        )
-        delete_parser.add_argument('delete', action='store_true')
-
-        sort_parser = subparsers.add_parser('sort', help='sort the host file')
-        sort_parser.add_argument('sort', action='store_true')
-
-        list_parser = subparsers.add_parser('list', help='list all hosts')
-        list_parser.add_argument('list', action='store_true')
+        HostConfigMain.add_host_parser(subparsers)
+        HostConfigMain.add_service_parser(subparsers)
 
         parser.add_argument(
             '--dry-run',
@@ -169,3 +148,71 @@ class HostConfigMain:
         )
 
         return parser
+
+    @staticmethod
+    def add_host_parser(subparsers):
+        # host
+        host_parent = CustomArgumentParser(add_help=False)
+        host_parser = subparsers.add_parser(
+            'host',
+            parents=[host_parent],
+            help='manage hosts'
+        )
+        host_parser.add_argument('host', action='store_true')
+        host_subparsers = host_parser.add_subparsers()
+
+        # host add
+        add_parent = CustomArgumentParser(add_help=False)
+        add_parent.add_argument('--name', required=True)
+        add_parent.add_argument('--logical-address', required=True)
+        add_parent.add_argument('--physical-address', required=True)
+        add_parent.add_argument(
+            '--canonical-names',
+            nargs='+',
+            metavar='CANONICAL_NAME'
+        )
+        add_parent.add_argument(
+            '--catch-all-domains',
+            nargs='+',
+            metavar='CATCH_ALL_DOMAIN'
+        )
+        add_parser = host_subparsers.add_parser(
+            'add',
+            parents=[add_parent],
+            help='add or update a host'
+        )
+        add_parser.add_argument('add', action='store_true')
+
+        # host delete
+        delete_parent = CustomArgumentParser(add_help=False)
+        delete_parent.add_argument('--name', required=True)
+        delete_parser = host_subparsers.add_parser(
+            'delete',
+            parents=[delete_parent],
+            help='delete a host'
+        )
+        delete_parser.add_argument('delete', action='store_true')
+
+        # host sort
+        sort_parser = host_subparsers.add_parser(
+            'sort',
+            help='sort the host file'
+        )
+        sort_parser.add_argument('sort', action='store_true')
+
+        # host list
+        list_parser = host_subparsers.add_parser('list', help='list all hosts')
+        list_parser.add_argument('list', action='store_true')
+
+    @staticmethod
+    def add_service_parser(subparsers):
+        # service
+        service_parent = CustomArgumentParser(add_help=False)
+        service_parser = subparsers.add_parser(
+            'service',
+            parents=[service_parent],
+            help='manage services'
+        )
+        service_parser.add_argument('service', action='store_true')
+        # service_subparsers = service_parser.add_subparsers()
+        # TODO: This is where the service sub commands go.
