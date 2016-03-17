@@ -19,7 +19,7 @@ if [ "${VM_NAME}" = "" ]; then
 fi
 
 FOUND=true
-"${SCRIPT_DIRECTORY}"/show-info.sh "${VM_NAME}" > /dev/null || FOUND=false
+"${SCRIPT_DIRECTORY}"/get-info.sh "${VM_NAME}" > /dev/null || FOUND=false
 
 if [ "${FOUND}" = false ]; then
     echo "Not found: ${VM_NAME}"
