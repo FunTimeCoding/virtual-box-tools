@@ -16,6 +16,8 @@ class HostConfigMain:
         print(self.parsed_arguments)
         config = YamlConfig('~/.virtual-box-tools.yml')
         config_file_path = config.get('host_file')
+        self.CANONICAL_NAMES_KEY = 'canonical_name'
+        self.CATCH_ALL_DOMAIN_KEY = 'catch_all_domain'
 
         if config_file_path != '':
             config_file_path = expanduser(config_file_path)
@@ -43,7 +45,7 @@ class HostConfigMain:
                 self.sort()
             else:
                 self.parser.print_help()
-        if 'service' in self.parsed_arguments:
+        elif 'service' in self.parsed_arguments:
             # TODO: Add commands add/list/delete
             self.parser.print_help()
         else:
@@ -60,11 +62,15 @@ class HostConfigMain:
             'physical_address': self.parsed_arguments.physical_address,
         }
 
-        if self.parsed_arguments.canonical_name is not None:
-            entry['canonical_name'] = self.parsed_arguments.canonical_name
+        if self.CANONICAL_NAMES_KEY in self.parsed_arguments:
+            entry[
+                self.CANONICAL_NAMES_KEY
+            ] = self.parsed_arguments.canonical_name
 
-        if self.parsed_arguments.catch_all_domain is not None:
-            entry['catch_all_domain'] = self.parsed_arguments.catch_all_domain
+        if self.CATCH_ALL_DOMAIN_KEY in self.parsed_arguments:
+            entry[
+                self.CATCH_ALL_DOMAIN_KEY
+            ] = self.parsed_arguments.catch_all_domain
 
         self.yaml_tree['host'][host_name] = entry
         self.save_config_file()
@@ -87,19 +93,20 @@ class HostConfigMain:
             print('\nName: ' + name)
             print('Logical address: ' + attributes['logical_address'])
             print('Physical address: ' + attributes['physical_address'])
-            canonical_names_key = 'canonical_name'
 
-            if canonical_names_key in attributes:
+            if self.CANONICAL_NAMES_KEY in attributes:
                 print(
-                    'Canonical names: ' + str(attributes[canonical_names_key])
+                    'Canonical names: ' + str(
+                        attributes[self.CANONICAL_NAMES_KEY]
+                    )
                 )
 
-            catch_all_domains_key = 'catch_all_domain'
-
-            if catch_all_domains_key in attributes:
+            if self.CATCH_ALL_DOMAIN_KEY in attributes:
                 print(
                     'Catch all domains: ' +
-                    str(attributes[catch_all_domains_key])
+                    str(
+                        attributes[self.CATCH_ALL_DOMAIN_KEY]
+                    )
                 )
 
     def load_config_file(self) -> dict:
@@ -169,7 +176,7 @@ class HostConfigMain:
         add_parent.add_argument(
             '--canonical-names',
             nargs='+',
-            metavar='CANONICAL_NAME'
+            metavar='CANONICAL_NAME',
         )
         add_parent.add_argument(
             '--catch-all-domains',
