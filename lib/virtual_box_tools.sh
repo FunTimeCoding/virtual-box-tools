@@ -7,7 +7,6 @@ if [ "$(command -v shyaml || true)" = "" ]; then
 fi
 
 CONFIG=""
-VERBOSE=false
 
 function_exists()
 {
@@ -18,12 +17,8 @@ function_exists()
 
 while true; do
     case ${1} in
-        -c|--config)
-            CONFIG=${2-}
-            shift 2
-            ;;
-        -h|--help)
-            echo "Global usage: ${0} [-v|--verbose][-d|--debug][-h|--help][-c|--config CONFIG]"
+        --help)
+            echo "Global usage: ${0} [--help][--config CONFIG]"
 
             if function_exists usage; then
                 usage
@@ -31,14 +26,9 @@ while true; do
 
             exit 0
             ;;
-        -v|--verbose)
-            VERBOSE=true
-            echo "Verbose mode enabled."
-            shift
-            ;;
-        -d|--debug)
-            set -x
-            shift
+        --config)
+            CONFIG=${2-}
+            shift 2
             ;;
         *)
             break
@@ -47,10 +37,6 @@ while true; do
 done
 
 OPTIND=1
-
-if [ "${VERBOSE}" = true ]; then
-    echo "find_config"
-fi
 
 if [ "${CONFIG}" = "" ]; then
     CONFIG="${HOME}/.virtual-box-tools.yml"
@@ -78,20 +64,14 @@ else
     CONFIG=""
 fi
 
-if [ "${VERBOSE}" = true ]; then
-    echo "load_config"
-fi
-
 if [ ! "${CONFIG}" = "" ]; then
     SUDO_USER=$(shyaml get-value "sudo_user" < "${CONFIG}" 2>/dev/null || true)
 fi
 
-if [ "${VERBOSE}" = true ]; then
-    echo "define_library_variables"
+if [ ! "${SUDO_USER}" = "" ]; then
+    MANAGE_COMMAND="sudo -u ${SUDO_USER} vboxmanage"
+else
+    MANAGE_COMMAND="vboxmanage"
 fi
 
-if [ ! "${SUDO_USER}" = "" ]; then
-    export MANAGE_COMMAND="sudo -u ${SUDO_USER} vboxmanage"
-else
-    export MANAGE_COMMAND="vboxmanage"
-fi
+export MANAGE_COMMAND

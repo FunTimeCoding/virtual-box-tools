@@ -53,7 +53,7 @@ wget http://ftp.debian.org/debian/dists/jessie/main/installer-amd64/current/imag
 tar xf netboot.tar.gz
 mkdir tmp
 cd tmp
-cat ../debian-installer/amd64/initrd.gz | gzip -d | sudo cpio -i
+gzip -d < ../debian-installer/amd64/initrd.gz | sudo cpio -i
 # Use debian-tools to generate preseed.cfg.
 sudo wget http://www.golem.de/projekte/vbox/preseed.cfg
 sudo chown root:wheel preseed.cfg

@@ -13,7 +13,7 @@ usage()
 VM_NAME="${1}"
 MEMORY="${2}"
 
-if [ "${VM_NAME}" = "" ] || [ "${MEMORY}" == "" ]; then
+if [ "${VM_NAME}" = "" ] || [ "${MEMORY}" = "" ]; then
     usage
 
     exit 1

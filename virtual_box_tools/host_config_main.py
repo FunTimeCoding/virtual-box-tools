@@ -1,18 +1,19 @@
-import argparse
-import sys
+from argparse import ArgumentDefaultsHelpFormatter
 from collections import OrderedDict
 from os.path import expanduser, isfile
+from sys import exit
 
-import yaml
 from python_utility.custom_argument_parser import CustomArgumentParser
 from python_utility.yaml_config import YamlConfig
+from yaml import load, dump
 
 
 class HostConfigMain:
     def __init__(self, arguments: list):
-        self.parser = self.get_parser()
+        self.parser = self.create_parser()
         self.parsed_arguments = self.parser.parse_args(arguments)
         print(self.parsed_arguments)
+
         config = YamlConfig('~/.virtual-box-tools.yml')
         config_file_path = config.get('host_file')
         self.CANONICAL_NAMES_KEY = 'canonical_name'
@@ -28,115 +29,13 @@ class HostConfigMain:
             self.yaml_tree = self.load_config_file()
         else:
             print('File not found: ' + self.host_file_path)
-            sys.exit(1)
-
-    def run(self):
-        result = 0
-
-        if 'host' in self.parsed_arguments:
-            if 'add' in self.parsed_arguments:
-                self.add(self.parsed_arguments.name)
-            elif 'delete' in self.parsed_arguments:
-                result = self.delete(self.parsed_arguments.name)
-            elif 'list' in self.parsed_arguments:
-                self.list_hosts()
-            elif 'sort' in self.parsed_arguments:
-                self.sort()
-            else:
-                self.parser.print_help()
-        elif 'service' in self.parsed_arguments:
-            # TODO: Add commands add/list/delete
-            self.parser.print_help()
-        else:
-            self.parser.print_help()
-
-        return result
-
-    def sort(self):
-        self.save_config_file()
-
-    def add(self, host_name: str):
-        entry = {
-            'logical_address': self.parsed_arguments.logical_address,
-            'physical_address': self.parsed_arguments.physical_address,
-        }
-
-        if self.CANONICAL_NAMES_KEY in self.parsed_arguments:
-            entry[
-                self.CANONICAL_NAMES_KEY
-            ] = self.parsed_arguments.canonical_name
-
-        if self.CATCH_ALL_DOMAIN_KEY in self.parsed_arguments:
-            entry[
-                self.CATCH_ALL_DOMAIN_KEY
-            ] = self.parsed_arguments.catch_all_domain
-
-        self.yaml_tree['host'][host_name] = entry
-        self.save_config_file()
-
-    def delete(self, host_name: str):
-        if host_name in self.yaml_tree['host'].keys():
-            self.yaml_tree['host'].pop(host_name, None)
-            self.save_config_file()
-            result = 0
-        else:
-            print('host not found: ' + host_name)
-            result = 1
-
-        return result
-
-    def list_hosts(self):
-        print('hosts:')
-
-        for name, attributes in self.yaml_tree['host'].items():
-            print('\nName: ' + name)
-            print('Logical address: ' + attributes['logical_address'])
-            print('Physical address: ' + attributes['physical_address'])
-
-            if self.CANONICAL_NAMES_KEY in attributes:
-                print(
-                    'Canonical names: ' + str(
-                        attributes[self.CANONICAL_NAMES_KEY]
-                    )
-                )
-
-            if self.CATCH_ALL_DOMAIN_KEY in attributes:
-                print(
-                    'Catch all domains: ' +
-                    str(
-                        attributes[self.CATCH_ALL_DOMAIN_KEY]
-                    )
-                )
-
-    def load_config_file(self) -> dict:
-        input_file = open(self.host_file_path, 'r')
-        content = input_file.read()
-        input_file.close()
-
-        return yaml.load(content)
-
-    def save_config_file(self):
-        ordered_hosts = OrderedDict(sorted(self.yaml_tree['host'].items()))
-        self.yaml_tree.pop('host', None)
-        self.yaml_tree['host'] = {}
-
-        for k, v in ordered_hosts.items():
-            self.yaml_tree['host'][k] = v
-
-        yaml_config = yaml.dump(self.yaml_tree, default_flow_style=False)
-
-        if self.parsed_arguments.dry_run:
-            print(yaml_config)
-        else:
-            output_file = open(self.host_file_path, 'w')
-            output_file.write(yaml_config)
-            output_file.close()
+            exit(1)
 
     @staticmethod
-    def get_parser() -> CustomArgumentParser:
+    def create_parser() -> CustomArgumentParser:
         parser = CustomArgumentParser(
             description='host configuration tool',
-            formatter_class=argparse.ArgumentDefaultsHelpFormatter
+            formatter_class=ArgumentDefaultsHelpFormatter
         )
         subparsers = parser.add_subparsers()
         HostConfigMain.add_host_parser(subparsers)
@@ -145,7 +44,7 @@ class HostConfigMain:
         parser.add_argument(
             '--dry-run',
             action='store_true',
-            help='do not write host file changes, only print them'
+            help='do not save changes'
         )
         parser.add_argument(
             '--host-file',
@@ -156,7 +55,7 @@ class HostConfigMain:
         return parser
 
     @staticmethod
-    def add_host_parser(subparsers):
+    def add_host_parser(subparsers) -> None:
         # host
         host_parent = CustomArgumentParser(add_help=False)
         host_parser = subparsers.add_parser(
@@ -211,7 +110,7 @@ class HostConfigMain:
         list_parser.add_argument('list', action='store_true')
 
     @staticmethod
-    def add_service_parser(subparsers):
+    def add_service_parser(subparsers) -> None:
         # service
         service_parent = CustomArgumentParser(add_help=False)
         service_parser = subparsers.add_parser(
@@ -222,3 +121,105 @@ class HostConfigMain:
         service_parser.add_argument('service', action='store_true')
         # service_subparsers = service_parser.add_subparsers()
         # TODO: This is where the service sub commands go.
+
+    def run(self) -> int:
+        result = 0
+
+        if 'host' in self.parsed_arguments:
+            if 'add' in self.parsed_arguments:
+                self.add(self.parsed_arguments.name)
+            elif 'delete' in self.parsed_arguments:
+                result = self.delete(self.parsed_arguments.name)
+            elif 'list' in self.parsed_arguments:
+                self.list_hosts()
+            elif 'sort' in self.parsed_arguments:
+                self.sort()
+            else:
+                self.parser.print_help()
+        elif 'service' in self.parsed_arguments:
+            # TODO: Add commands add/list/delete
+            self.parser.print_help()
+        else:
+            self.parser.print_help()
+
+        return result
+
+    def sort(self) -> None:
+        self.save_config_file()
+
+    def add(self, host_name: str) -> None:
+        entry = {
+            'logical_address': self.parsed_arguments.logical_address,
+            'physical_address': self.parsed_arguments.physical_address,
+        }
+
+        if self.CANONICAL_NAMES_KEY in self.parsed_arguments:
+            entry[
+                self.CANONICAL_NAMES_KEY
+            ] = self.parsed_arguments.canonical_name
+
+        if self.CATCH_ALL_DOMAIN_KEY in self.parsed_arguments:
+            entry[
+                self.CATCH_ALL_DOMAIN_KEY
+            ] = self.parsed_arguments.catch_all_domain
+
+        self.yaml_tree['host'][host_name] = entry
+        self.save_config_file()
+
+    def delete(self, host_name: str) -> int:
+        if host_name in self.yaml_tree['host'].keys():
+            self.yaml_tree['host'].pop(host_name, None)
+            self.save_config_file()
+            result = 0
+        else:
+            print('host not found: ' + host_name)
+            result = 1
+
+        return result
+
+    def list_hosts(self) -> None:
+        print('hosts:')
+
+        for name, attributes in self.yaml_tree['host'].items():
+            print('\nName: ' + name)
+            print('Logical address: ' + attributes['logical_address'])
+            print('Physical address: ' + attributes['physical_address'])
+
+            if self.CANONICAL_NAMES_KEY in attributes:
+                print(
+                    'Canonical names: ' + str(
+                        attributes[self.CANONICAL_NAMES_KEY]
+                    )
+                )
+
+            if self.CATCH_ALL_DOMAIN_KEY in attributes:
+                print(
+                    'Catch all domains: ' +
+                    str(
+                        attributes[self.CATCH_ALL_DOMAIN_KEY]
+                    )
+                )
+
+    def load_config_file(self) -> dict:
+        input_file = open(self.host_file_path, 'r')
+        content = input_file.read()
+        input_file.close()
+
+        return load(content)
+
+    def save_config_file(self) -> None:
+        ordered_hosts = OrderedDict(sorted(self.yaml_tree['host'].items()))
+        self.yaml_tree.pop('host', None)
+        self.yaml_tree['host'] = {}
+
+        for k, v in ordered_hosts.items():
+            self.yaml_tree['host'][k] = v
+
+        yaml_config = dump(self.yaml_tree, default_flow_style=False)
+
+        if self.parsed_arguments.dry_run:
+            print(yaml_config)
+        else:
+            output_file = open(self.host_file_path, 'w')
+            output_file.write(yaml_config)
+            output_file.close()
