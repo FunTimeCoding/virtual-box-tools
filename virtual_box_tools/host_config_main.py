@@ -56,7 +56,6 @@ class HostConfigMain:
 
     @staticmethod
     def add_host_parser(subparsers) -> None:
-        # host
         host_parent = CustomArgumentParser(add_help=False)
         host_parser = subparsers.add_parser(
             'host',
@@ -66,7 +65,6 @@ class HostConfigMain:
         host_parser.add_argument('host', action='store_true')
         host_subparsers = host_parser.add_subparsers()
 
-        # host add
         add_parent = CustomArgumentParser(add_help=False)
         add_parent.add_argument('--name', required=True)
         add_parent.add_argument('--logical-address', required=True)
@@ -88,7 +86,6 @@ class HostConfigMain:
         )
         add_parser.add_argument('add', action='store_true')
 
-        # host delete
         delete_parent = CustomArgumentParser(add_help=False)
         delete_parent.add_argument('--name', required=True)
         delete_parser = host_subparsers.add_parser(
@@ -98,20 +95,17 @@ class HostConfigMain:
         )
         delete_parser.add_argument('delete', action='store_true')
 
-        # host sort
         sort_parser = host_subparsers.add_parser(
             'sort',
             help='sort the host file'
         )
         sort_parser.add_argument('sort', action='store_true')
 
-        # host list
         list_parser = host_subparsers.add_parser('list', help='list all hosts')
         list_parser.add_argument('list', action='store_true')
 
     @staticmethod
     def add_service_parser(subparsers) -> None:
-        # service
         service_parent = CustomArgumentParser(add_help=False)
         service_parser = subparsers.add_parser(
             'service',
