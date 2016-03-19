@@ -4,9 +4,8 @@ from collections import OrderedDict
 from os.path import expanduser, isfile
 
 import yaml
+from python_utility.custom_argument_parser import CustomArgumentParser
 from python_utility.yaml_config import YamlConfig
-
-from virtual_box_tools.custom_argument_parser import CustomArgumentParser
 
 
 class HostConfigMain:
