@@ -55,5 +55,23 @@ mkdir tmp
 cd tmp
 gzip -d < ../debian-installer/amd64/initrd.gz | sudo cpio -i
 # Use debian-tools to generate preseed.cfg.
-sudo wget http://www.golem.de/projekte/vbox/preseed.cfg
+cd ~/Code/Personal/debian-tools
+PYTHONPATH=. bin/dt --hostname example --domain example.org --root-password root --user-name shiin --user-password shiin --user-real-name "Alexander Reitzel" --insecure > preseed.cfg
+sudo mv preseed.cfg "${TFTP_DIRECTORY}/tmp"
+popd
 sudo chown root:wheel preseed.cfg
+find . | cpio -o --format=newc | gzip -9c > ../initrd.gz
+cd ..
+cp initrd.gz debian-installer/amd64
+ln -s debian-installer/amd64/pxelinux.0 debian.pxe
+vboxmanage modifyvm "${VM_NAME}" --nattftpfile1 /debian.pxe
+
+echo "DEFAULT jessie
+LABEL jessie
+kernel debian-installer/amd64/linux
+append vga=normal initrd=debian-installer/amd64/initrd.gz auto=true priority=critical preseed/file=/preseed.cfg" >> debian-installer/amd64/boot-screens/syslinux.cfg
+
+vboxmanage modifyvm "${VM_NAME}" --boot1 net
+vboxmanage startvm "${VM_NAME}" --type headless
+
+vboxmanage modifyvm "${VM_NAME}" --boot1 disk
