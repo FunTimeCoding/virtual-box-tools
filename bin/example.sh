@@ -3,12 +3,6 @@
 echo "Only contains example vboxmanage commands."
 exit 1
 
-VM_NAME="example"
-
-# Create new VM.
-vboxmanage createvm --name "${VM_NAME}" --register
-# Enable ACPI.
-vboxmanage modifyvm "${VM_NAME}" --acpi on
 # Enable CPU hotplug while VM is stopped.
 vboxmanage modifyvm "${VM_NAME}" --cpuhotplug on
 # Hotplug a core while VM is running.
@@ -16,22 +10,15 @@ vboxmanage modifyvm "${VM_NAME}" --plugcpu 1
 # Unplug a core while VM is running.
 vboxmanage modifyvm "${VM_NAME}" --unplugcpu 1
 
-DISK_NAME="example.vdi"
-# Create a disk.
-vboxmanage createhd --filename "${DISK_NAME}" --size 16384
-# Change an existing disks size.
+# Resize a disk.
 vboxmanage modifyhd "${DISK_PATH}" --resize 32768
-# Attach a disk to a VM.
-vboxmanage storageattach "${VM_NAME}" --storagectl "SATA Controller" --port 0 --device 0 --type hdd --medium "${DISK_NAME}"
-# Alternative types: fdd (floppy), dvddrive
-# An optical drive must exist.
-vboxmanage storageattach "${VM_NAME}" --storagectl "SATA Controller" --port 1 --device 0 --type dvddrive --medium emptydrive
 
-# Create a network device. Enumeration starts with 1, not 0.
 # Possible nictype values: http://www.virtualbox.org/manual/ch06.html#nichardware
 vboxmanage modifyvm "${VM_NAME}" --nic1 nat --nictype1 82540EM
+
 # Set address space.
 vboxmanage modifyvm "${VM_NAME}" --natnet1 "192.168/16".
+
 # Forward host port 2222 to guest port 22. FORWARD_NAME is an arbitrary string.
 FORWARD_NAME="example ssh"
 vboxmanage modifyvm "${VM_NAME}" --natpf1 "${FORWARD_NAME},tcp,,2222,,22"
