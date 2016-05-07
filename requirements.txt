@@ -3,4 +3,5 @@ pylint
 pytest
 pytest-cov
 pyyaml
+shyaml
 git+ssh://git@github.com/FunTimeCoding/python-utility.git#egg=python-utility

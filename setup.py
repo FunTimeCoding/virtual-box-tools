@@ -5,7 +5,7 @@ setup(
     name='virtual-box-tools',
     version='0.1',
     description='Stub description for virtual-box-tools.',
-    install_requires=['pyyaml', 'python-utility'],
+    install_requires=['shyaml', 'pyyaml', 'python-utility'],
     scripts=['bin/vbt'],
     packages=['virtual_box_tools'],
     author='Alexander Reitzel',
