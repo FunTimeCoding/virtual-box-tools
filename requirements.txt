@@ -4,4 +4,4 @@ pytest
 pytest-cov
 pyyaml
 shyaml
-git+ssh://git@github.com/FunTimeCoding/python-utility.git#egg=python-utility
+git+https://git@github.com/FunTimeCoding/python-utility.git#egg=python-utility
