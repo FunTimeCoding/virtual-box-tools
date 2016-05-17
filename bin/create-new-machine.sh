@@ -33,7 +33,7 @@ else
     TRIVIAL_DIRECTORY="${HOME}/.config/VirtualBox/TFTP"
 fi
 
-rm -rf "${TRIVIAL_DIRECTORY:?}"
+sudo rm -rf "${TRIVIAL_DIRECTORY:?}"
 mkdir "${TRIVIAL_DIRECTORY}"
 cp "${PRESEED_FILE}" "${TRIVIAL_DIRECTORY}/preseed.cfg"
 cd "${TRIVIAL_DIRECTORY}"
