@@ -5,7 +5,7 @@ SCRIPT_DIRECTORY=$(cd "${DIRECTORY}" || exit 1; pwd)
 
 usage()
 {
-    echo "Usage: ${0} [--colons] VM_NAME"
+    echo "Usage: ${0} [--colons] MACHINE_NAME"
 }
 
 # shellcheck source=/dev/null
@@ -17,16 +17,16 @@ if [ "${1}" = "--colons" ]; then
     shift
 fi
 
-VM_NAME="${1}"
+MACHINE_NAME="${1}"
 
-if [ "${VM_NAME}" = "" ]; then
+if [ "${MACHINE_NAME}" = "" ]; then
     usage
 
     exit 1
 fi
 
 KEY="MAC"
-VALUE=$(${MANAGE_COMMAND} guestproperty enumerate "${VM_NAME}" | grep "${KEY}" || VALUE="")
+VALUE=$(${MANAGE_COMMAND} guestproperty enumerate "${MACHINE_NAME}" | grep "${KEY}" || VALUE="")
 
 if [ ! "${VALUE}" = "" ]; then
     VALUE="${VALUE#*value: }"

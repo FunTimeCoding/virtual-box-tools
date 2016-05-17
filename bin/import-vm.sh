@@ -26,15 +26,15 @@ if [ ! -d "${PATH_TO_VM}" ]; then
 fi
 
 sudo chown -R virtualbox:virtualbox "${PATH_TO_VM}"
-VM_NAME=$(basename ${PATH_TO_VM})
+MACHINE_NAME=$(basename ${PATH_TO_VM})
 BOX_DIRECTORY="/home/virtualbox/VirtualBox VMs"
 
-if [ -f "${BOX_DIRECTORY}/${VM_NAME}" ]; then
-    echo "Virtual machine already exists: ${BOX_DIRECTORY}/${VM_NAME}"
+if [ -f "${BOX_DIRECTORY}/${MACHINE_NAME}" ]; then
+    echo "Virtual machine already exists: ${BOX_DIRECTORY}/${MACHINE_NAME}"
 
     exit 1
 fi
 
-sudo mv "${PATH_TO_VM}" "${BOX_DIRECTORY}/${VM_NAME}"
-${MANAGE_COMMAND} registervm "${BOX_DIRECTORY}/${VM_NAME}/${VM_NAME}.vbox"
-"${DIRECTORY}"/start-vm.sh --wait "${VM_NAME}"
+sudo mv "${PATH_TO_VM}" "${BOX_DIRECTORY}/${MACHINE_NAME}"
+${MANAGE_COMMAND} registervm "${BOX_DIRECTORY}/${MACHINE_NAME}/${MACHINE_NAME}.vbox"
+"${DIRECTORY}"/start-vm.sh --wait "${MACHINE_NAME}"

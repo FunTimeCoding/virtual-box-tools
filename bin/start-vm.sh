@@ -5,7 +5,7 @@ SCRIPT_DIRECTORY=$(cd "${DIRECTORY}" || exit 1; pwd)
 
 usage()
 {
-    echo "Usage: ${0} [--wait] VM_NAME"
+    echo "Usage: ${0} [--wait] MACHINE_NAME"
 }
 
 # shellcheck source=/dev/null
@@ -17,9 +17,9 @@ if [ "${1}" = "--wait" ]; then
     shift
 fi
 
-VM_NAME="${1}"
+MACHINE_NAME="${1}"
 
-if [ "${VM_NAME}" = "" ]; then
+if [ "${MACHINE_NAME}" = "" ]; then
     usage
 
     exit 1
@@ -41,7 +41,7 @@ if [ "${WAIT}" = true ]; then
 
     for SECOND in $(seq 1 60); do
         sleep 1
-        IP=$("${SCRIPT_DIRECTORY}"/get-vm-ip.sh "${VM_NAME}")
+        IP=$("${SCRIPT_DIRECTORY}"/get-vm-ip.sh "${MACHINE_NAME}")
 
         if [ ! "${IP}" = "" ]; then
             BOOT_TIME="${SECOND}"
@@ -49,10 +49,10 @@ if [ "${WAIT}" = true ]; then
         fi
     done
 
-    MAC=$("${SCRIPT_DIRECTORY}"/get-vm-mac.sh --colons "${VM_NAME}")
+    MAC=$("${SCRIPT_DIRECTORY}"/get-vm-mac.sh --colons "${MACHINE_NAME}")
     echo "BOOT_TIME: ${BOOT_TIME}"
     echo "IP: ${IP}"
     echo "MAC: ${MAC}"
 else
-    echo "VM '${VM_NAME}' is booting."
+    echo "VM '${MACHINE_NAME}' is booting."
 fi

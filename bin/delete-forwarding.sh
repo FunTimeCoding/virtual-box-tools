@@ -5,14 +5,14 @@ SCRIPT_DIRECTORY=$(cd "${DIRECTORY}" || exit 1; pwd)
 
 usage()
 {
-    echo "Usage: ${0} VM_NAME FORWARDING_NAME"
+    echo "Usage: ${0} MACHINE_NAME FORWARDING_NAME"
 }
 
 # shellcheck source=/dev/null
 . "${SCRIPT_DIRECTORY}"/../lib/virtual_box_tools.sh
-VM_NAME="${1}"
+MACHINE_NAME="${1}"
 
-if [ "${VM_NAME}" = "" ]; then
+if [ "${MACHINE_NAME}" = "" ]; then
     usage
 
     exit 1
@@ -26,4 +26,4 @@ if [ "${FORWARDING_NAME}" = "" ]; then
     exit 1
 fi
 
-${MANAGE_COMMAND} modifyvm "${VM_NAME}" --natpf1 delete "${FORWARDING_NAME}"
+${MANAGE_COMMAND} modifyvm "${MACHINE_NAME}" --natpf1 delete "${FORWARDING_NAME}"

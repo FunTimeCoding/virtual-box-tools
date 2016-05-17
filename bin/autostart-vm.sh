@@ -5,14 +5,14 @@ SCRIPT_DIRECTORY=$(cd "${DIRECTORY}" || exit 1; pwd)
 
 usage()
 {
-    echo "Usage: ${0} VM_NAME [enable|disable]"
+    echo "Usage: ${0} MACHINE_NAME [enable|disable]"
 }
 
 # shellcheck source=/dev/null
 . "${SCRIPT_DIRECTORY}"/../lib/virtual_box_tools.sh
-VM_NAME="${1}"
+MACHINE_NAME="${1}"
 
-if [ "${VM_NAME}" = "" ]; then
+if [ "${MACHINE_NAME}" = "" ]; then
     usage
 
     exit 1
@@ -33,14 +33,14 @@ fi
 NEW_STATE="${2}"
 
 if [ "${NEW_STATE}" = "" ]; then
-    OUTPUT=$(${MANAGE_COMMAND} showvminfo "${VM_NAME}" --details --machinereadable | grep "autostart-enabled")
+    OUTPUT=$(${MANAGE_COMMAND} showvminfo "${MACHINE_NAME}" --details --machinereadable | grep "autostart-enabled")
     VALUE=$(echo "${OUTPUT#*autostart-enabled=}" | xargs)
     echo "${VALUE}"
 else
     if [ "${NEW_STATE}" = "enable" ]; then
-        ${MANAGE_COMMAND} modifyvm "${VM_NAME}" --autostart-enabled on
+        ${MANAGE_COMMAND} modifyvm "${MACHINE_NAME}" --autostart-enabled on
     elif [ "${NEW_STATE}" = "disable" ]; then
-        ${MANAGE_COMMAND} modifyvm "${VM_NAME}" --autostart-enabled off
+        ${MANAGE_COMMAND} modifyvm "${MACHINE_NAME}" --autostart-enabled off
     else
         echo "Unknown state: ${NEW_STATE}"
 

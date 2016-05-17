@@ -5,7 +5,7 @@ SCRIPT_DIRECTORY=$(cd "${DIRECTORY}" || exit 1; pwd)
 
 usage()
 {
-    echo "Usage: ${0} [--force][--wait] VM_NAME"
+    echo "Usage: ${0} [--force][--wait] MACHINE_NAME"
 }
 
 # shellcheck source=/dev/null
@@ -29,9 +29,9 @@ while true; do
     esac
 done
 
-VM_NAME="${1}"
+MACHINE_NAME="${1}"
 
-if [ "${VM_NAME}" = "" ]; then
+if [ "${MACHINE_NAME}" = "" ]; then
     usage
 
     exit 1
@@ -39,17 +39,17 @@ fi
 
 if [ "${FORCE}" = true ]; then
     echo "Force shutdown."
-    ${MANAGE_COMMAND} controlvm "${VM_NAME}" poweroff
+    ${MANAGE_COMMAND} controlvm "${MACHINE_NAME}" poweroff
 else
-    echo "Stop running VM '${VM_NAME}'."
-    ${MANAGE_COMMAND} controlvm "${VM_NAME}" acpipowerbutton
+    echo "Stop running VM '${MACHINE_NAME}'."
+    ${MANAGE_COMMAND} controlvm "${MACHINE_NAME}" acpipowerbutton
 fi
 
 if [ "${WAIT}" = true ]; then
     for SECOND in $(seq 1 30); do
         echo "${SECOND}"
         sleep 1
-        STATE=$("${SCRIPT_DIRECTORY}"/get-vm-state.sh "${VM_NAME}")
+        STATE=$("${SCRIPT_DIRECTORY}"/get-vm-state.sh "${MACHINE_NAME}")
 
         if [ "${STATE}" = "poweroff" ]; then
             DOWN=true
