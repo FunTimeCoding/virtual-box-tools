@@ -51,7 +51,7 @@ if [ "${WAIT}" = true ]; then
         sleep 1
         STATE=$("${SCRIPT_DIRECTORY}"/get-vm-state.sh "${MACHINE_NAME}")
 
-        if [ "${STATE}" = "poweroff" ]; then
+        if [ "${STATE}" = poweroff ]; then
             DOWN=true
 
             break

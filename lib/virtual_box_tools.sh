@@ -6,8 +6,6 @@ if [ "$(command -v shyaml || true)" = "" ]; then
     exit 1
 fi
 
-CONFIG=""
-
 function_exists()
 {
     declare -f -F "${1}" > /dev/null
@@ -45,12 +43,12 @@ fi
 REALPATH_EXISTS=$(command -v realpath 2>&1)
 
 if [ ! "${REALPATH_EXISTS}" = "" ]; then
-    REALPATH_CMD="realpath"
+    REALPATH=realpath
 else
     REALPATH_EXISTS=$(command -v grealpath 2>&1)
 
     if [ ! "${REALPATH_EXISTS}" = "" ]; then
-        REALPATH_CMD="grealpath"
+        REALPATH=grealpath
     else
         echo "Required tool (g)realpath not found."
 
@@ -59,19 +57,19 @@ else
 fi
 
 if [ -f "${CONFIG}" ]; then
-    CONFIG=$(${REALPATH_CMD} "${CONFIG}")
+    CONFIG=$(${REALPATH} "${CONFIG}")
 else
     CONFIG=""
 fi
 
 if [ ! "${CONFIG}" = "" ]; then
-    SUDO_USER=$(shyaml get-value "sudo_user" < "${CONFIG}" 2>/dev/null || true)
+    SUDO_USER=$(shyaml get-value sudo_user < "${CONFIG}" 2>/dev/null || true)
 fi
 
 if [ ! "${SUDO_USER}" = "" ]; then
     MANAGE_COMMAND="sudo -u ${SUDO_USER} vboxmanage"
 else
-    MANAGE_COMMAND="vboxmanage"
+    MANAGE_COMMAND=vboxmanage
 fi
 
 export MANAGE_COMMAND
