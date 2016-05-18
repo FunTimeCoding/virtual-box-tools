@@ -2,7 +2,6 @@
 
 DIRECTORY=$(dirname "${0}")
 SCRIPT_DIRECTORY=$(cd "${DIRECTORY}" || exit 1; pwd)
-
 OPERATING_SYSTEM=$(uname)
 
 if [ "${OPERATING_SYSTEM}" = Linux ]; then
@@ -66,9 +65,7 @@ DISK_PATH="${MACHINE_DIRECTORY}/${DISK_NAME}"
 vboxmanage createmedium disk --filename "${DISK_PATH}" --size 16384
 vboxmanage storageattach "${MACHINE_NAME}" --storagectl "${CONTROLLER_NAME}" --port 0 --device 0 --type hdd --medium "${DISK_PATH}"
 vboxmanage storageattach "${MACHINE_NAME}" --storagectl "${CONTROLLER_NAME}" --port 1 --device 0 --type dvddrive --medium emptydrive
-vboxmanage modifyvm "${MACHINE_NAME}" --acpi on
-vboxmanage modifyvm "${MACHINE_NAME}" --memory 256
-vboxmanage modifyvm "${MACHINE_NAME}" --vram 16
+vboxmanage modifyvm "${MACHINE_NAME}" --acpi on --memory 256 --vram 16
 
 if [ "${PRESEED_FILE}" = "" ]; then
     vboxmanage startvm "${MACHINE_NAME}"
@@ -94,6 +91,7 @@ fi
 
 tar xf "${NETWORK_BOOT_ARCHIVE}" --directory "${TRIVIAL_DIRECTORY}"
 mkdir tmp
+(
 cd tmp
 gzip -d < ../debian-installer/amd64/initrd.gz | sudo cpio -i
 sudo cp ../preseed.cfg .
@@ -105,29 +103,24 @@ else
 fi
 
 find . | cpio -o --format=newc | gzip -9c > ../initrd.gz
-cd ..
+)
 cp initrd.gz debian-installer/amd64
 ln -s debian-installer/amd64/pxelinux.0 debian.pxe
-vboxmanage modifyvm "${MACHINE_NAME}" --nattftpfile1 /debian.pxe
 echo "DEFAULT ${DEBIAN_RELEASE}
 LABEL ${DEBIAN_RELEASE}
 kernel debian-installer/amd64/linux
 append auto initrd=debian-installer/amd64/initrd.gz priority=critical preseed/file=/preseed.cfg" >> debian-installer/amd64/boot-screens/syslinux.cfg
-vboxmanage modifyvm "${MACHINE_NAME}" --boot1 net
+vboxmanage modifyvm "${MACHINE_NAME}" --boot1 net --nattftpfile1 /debian.pxe
 vboxmanage startvm "${MACHINE_NAME}" --type headless
-#vboxmanage startvm "${MACHINE_NAME}"
 
-for MINUTE in $(seq 1 15); do
+for MINUTE in $(seq 1 30); do
     echo "${MINUTE}"
     sleep 60
     STATE=$("${SCRIPT_DIRECTORY}"/get-vm-state.sh "${MACHINE_NAME}")
 
     if [ "${STATE}" = poweroff ]; then
-        DOWN=true
-
         break
     fi
 done
 
-vboxmanage modifyvm "${MACHINE_NAME}" --boot1 disk
-vboxmanage modifyvm "${MACHINE_NAME}" --nic1 bridged --bridgeadapter1 "${NETWORK_DEVICE}"
+vboxmanage modifyvm "${MACHINE_NAME}" --boot1 disk --nic1 bridged --bridgeadapter1 "${NETWORK_DEVICE}"

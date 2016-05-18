@@ -41,7 +41,7 @@ if [ "${FORCE}" = true ]; then
     echo "Force shutdown."
     ${MANAGE_COMMAND} controlvm "${MACHINE_NAME}" poweroff
 else
-    echo "Stop running VM '${MACHINE_NAME}'."
+    echo "Stop running virtual machine '${MACHINE_NAME}'."
     ${MANAGE_COMMAND} controlvm "${MACHINE_NAME}" acpipowerbutton
 fi
 
@@ -59,6 +59,6 @@ if [ "${WAIT}" = true ]; then
     done
 
     if [ "${DOWN}" = "false" ]; then
-        echo "Error: VM could not be shut down."
+        echo "Error: Virtual machine could not be stopped."
     fi
 fi

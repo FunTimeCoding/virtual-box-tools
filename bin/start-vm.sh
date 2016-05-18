@@ -36,7 +36,7 @@ if [ "${ERROR}" = true ]; then
 fi
 
 if [ "${WAIT}" = true ]; then
-    echo "Wait for VM to finish booting."
+    echo "Wait for virtual machine be started."
     BOOT_TIME="0"
 
     for SECOND in $(seq 1 60); do
@@ -54,5 +54,5 @@ if [ "${WAIT}" = true ]; then
     echo "IP: ${IP}"
     echo "MAC: ${MAC}"
 else
-    echo "VM '${MACHINE_NAME}' is booting."
+    echo "Virtual machine '${MACHINE_NAME}' is starting."
 fi

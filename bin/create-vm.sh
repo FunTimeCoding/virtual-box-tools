@@ -29,7 +29,7 @@ fi
 "${SCRIPT_DIRECTORY}"/start-vm.sh "${MACHINE_NAME}"
 
 if [ "${WAIT}" = true ]; then
-    echo "Wait for VM to finish booting."
+    echo "Wait for virtual machine to be started."
     BOOT_TIME="0"
 
     for SECOND in $(seq 1 60); do
@@ -47,5 +47,5 @@ if [ "${WAIT}" = true ]; then
     echo "IP: ${IP}"
     echo "MAC: ${MAC}"
 else
-    echo "VM is booting."
+    echo "Virtual machine is starting."
 fi
