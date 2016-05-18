@@ -67,9 +67,8 @@ vboxmanage createmedium disk --filename "${DISK_PATH}" --size 16384
 vboxmanage storageattach "${MACHINE_NAME}" --storagectl "${CONTROLLER_NAME}" --port 0 --device 0 --type hdd --medium "${DISK_PATH}"
 vboxmanage storageattach "${MACHINE_NAME}" --storagectl "${CONTROLLER_NAME}" --port 1 --device 0 --type dvddrive --medium emptydrive
 vboxmanage modifyvm "${MACHINE_NAME}" --acpi on
-#vboxmanage modifyvm "${MACHINE_NAME}" --nictype1 82540EM
-#vboxmanage modifyvm "${MACHINE_NAME}" --nictype1 Am79C973
-#vboxmanage modifyvm "${MACHINE_NAME}" --vram 16
+vboxmanage modifyvm "${MACHINE_NAME}" --memory 256
+vboxmanage modifyvm "${MACHINE_NAME}" --vram 16
 
 if [ "${PRESEED_FILE}" = "" ]; then
     vboxmanage startvm "${MACHINE_NAME}"
@@ -113,7 +112,7 @@ vboxmanage modifyvm "${MACHINE_NAME}" --nattftpfile1 /debian.pxe
 echo "DEFAULT ${DEBIAN_RELEASE}
 LABEL ${DEBIAN_RELEASE}
 kernel debian-installer/amd64/linux
-append vga=normal initrd=debian-installer/amd64/initrd.gz auto=true priority=critical preseed/file=/preseed.cfg" >> debian-installer/amd64/boot-screens/syslinux.cfg
+append auto initrd=debian-installer/amd64/initrd.gz priority=critical preseed/file=/preseed.cfg" >> debian-installer/amd64/boot-screens/syslinux.cfg
 vboxmanage modifyvm "${MACHINE_NAME}" --boot1 net
 vboxmanage startvm "${MACHINE_NAME}" --type headless
 #vboxmanage startvm "${MACHINE_NAME}"
