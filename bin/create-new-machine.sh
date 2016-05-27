@@ -3,6 +3,7 @@
 DIRECTORY=$(dirname "${0}")
 SCRIPT_DIRECTORY=$(cd "${DIRECTORY}" || exit 1; pwd)
 OPERATING_SYSTEM=$(uname)
+DEBIAN_RELEASE=jessie
 
 if [ "${OPERATING_SYSTEM}" = Linux ]; then
     NETWORK_DEVICE=eth0
@@ -13,8 +14,10 @@ fi
 usage()
 {
     echo "Usage: ${0} [--release DEBIAN_RELEASE] [--device eth0] [--preseed PRESEED_FILE] MACHINE_NAME"
-    echo "Release can be jessie, wheezy, squeeze. Default is jessie."
-    echo "Default network device: ${NETWORK_DEVICE}"
+    echo "Debian release can be jessie, wheezy, squeeze."
+    echo "Default release: ${DEBIAN_RELEASE}"
+    echo "Debian device examples: eth0, eth1, en0, en1"
+    echo "Default device: ${NETWORK_DEVICE}"
 }
 
 # shellcheck source=/dev/null
@@ -46,14 +49,6 @@ if [ "${MACHINE_NAME}" = "" ]; then
     usage
 
     exit 1
-fi
-
-if [ "${DEBIAN_RELEASE}" = "" ]; then
-    DEBIAN_RELEASE=jessie
-fi
-
-if [ "${NETWORK_DEVICE}" = "" ]; then
-    NETWORK_DEVICE=dynamic
 fi
 
 vboxmanage createvm --name "${MACHINE_NAME}" --register --ostype Debian_64
