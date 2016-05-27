@@ -51,19 +51,19 @@ if [ "${MACHINE_NAME}" = "" ]; then
     exit 1
 fi
 
-vboxmanage createvm --name "${MACHINE_NAME}" --register --ostype Debian_64
+${MANAGE_COMMAND} createvm --name "${MACHINE_NAME}" --register --ostype Debian_64
 CONTROLLER_NAME="SATA Controller"
-vboxmanage storagectl "${MACHINE_NAME}" --name "${CONTROLLER_NAME}" --add sata
+${MANAGE_COMMAND} storagectl "${MACHINE_NAME}" --name "${CONTROLLER_NAME}" --add sata
 DISK_NAME="${MACHINE_NAME}.vdi"
 MACHINE_DIRECTORY="${HOME}/VirtualBox VMs/${MACHINE_NAME}"
 DISK_PATH="${MACHINE_DIRECTORY}/${DISK_NAME}"
-vboxmanage createmedium disk --filename "${DISK_PATH}" --size 16384
-vboxmanage storageattach "${MACHINE_NAME}" --storagectl "${CONTROLLER_NAME}" --port 0 --device 0 --type hdd --medium "${DISK_PATH}"
-vboxmanage storageattach "${MACHINE_NAME}" --storagectl "${CONTROLLER_NAME}" --port 1 --device 0 --type dvddrive --medium emptydrive
-vboxmanage modifyvm "${MACHINE_NAME}" --acpi on --memory 256 --vram 16
+${MANAGE_COMMAND} createmedium disk --filename "${DISK_PATH}" --size 16384
+${MANAGE_COMMAND} storageattach "${MACHINE_NAME}" --storagectl "${CONTROLLER_NAME}" --port 0 --device 0 --type hdd --medium "${DISK_PATH}"
+${MANAGE_COMMAND} storageattach "${MACHINE_NAME}" --storagectl "${CONTROLLER_NAME}" --port 1 --device 0 --type dvddrive --medium emptydrive
+${MANAGE_COMMAND} modifyvm "${MACHINE_NAME}" --acpi on --memory 256 --vram 16
 
 if [ "${PRESEED_FILE}" = "" ]; then
-    vboxmanage startvm "${MACHINE_NAME}"
+    ${MANAGE_COMMAND} startvm "${MACHINE_NAME}"
 
     exit 0
 fi
@@ -105,8 +105,8 @@ echo "DEFAULT ${DEBIAN_RELEASE}
 LABEL ${DEBIAN_RELEASE}
 kernel debian-installer/amd64/linux
 append auto initrd=debian-installer/amd64/initrd.gz priority=critical preseed/file=/preseed.cfg" >> debian-installer/amd64/boot-screens/syslinux.cfg
-vboxmanage modifyvm "${MACHINE_NAME}" --boot1 net --nattftpfile1 /debian.pxe
-vboxmanage startvm "${MACHINE_NAME}" --type headless
+${MANAGE_COMMAND} modifyvm "${MACHINE_NAME}" --boot1 net --nattftpfile1 /debian.pxe
+${MANAGE_COMMAND} startvm "${MACHINE_NAME}" --type headless
 
 for MINUTE in $(seq 1 30); do
     echo "${MINUTE}"
@@ -118,4 +118,4 @@ for MINUTE in $(seq 1 30); do
     fi
 done
 
-vboxmanage modifyvm "${MACHINE_NAME}" --boot1 disk --nic1 bridged --bridgeadapter1 "${NETWORK_DEVICE}"
+${MANAGE_COMMAND} modifyvm "${MACHINE_NAME}" --boot1 disk --nic1 bridged --bridgeadapter1 "${NETWORK_DEVICE}"
