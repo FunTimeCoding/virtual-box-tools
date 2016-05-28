@@ -91,6 +91,7 @@ ${SUDO} cp "${PRESEED_FILE}" "${TRIVIAL_DIRECTORY}/preseed.cfg"
 NETWORK_BOOT_ARCHIVE="${HOME_DIRECTORY}/tmp/netboot-${DEBIAN_RELEASE}.tar.gz"
 
 if [ ! -f "${NETWORK_BOOT_ARCHIVE}" ]; then
+    ${SUDO} mkdir -p "${HOME_DIRECTORY}/tmp"
     ${SUDO} wget --output-document "${NETWORK_BOOT_ARCHIVE}" "http://ftp.debian.org/debian/dists/${DEBIAN_RELEASE}/main/installer-amd64/current/images/netboot/netboot.tar.gz"
 fi
 
