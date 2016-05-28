@@ -87,7 +87,7 @@ fi
 
 TRIVIAL_DIRECTORY="${HOME}/tmp/trivial"
 CPIO_ROOT_DIRECTORY="${TRIVIAL_DIRECTORY}/cpio"
-sudo rm -rf "${TRIVIAL_DIRECTORY:?}"
+sudo rm -rf "${TRIVIAL_DIRECTORY}"
 mkdir -p "${CPIO_ROOT_DIRECTORY}"
 tar xf "${NETWORK_BOOT_ARCHIVE}" --directory "${TRIVIAL_DIRECTORY}"
 cp "${PRESEED_FILE}" "${CPIO_ROOT_DIRECTORY}/preseed.cfg"
@@ -114,7 +114,7 @@ else
     VIRTUAL_BOX_DIRECTORY="${HOME_DIRECTORY}/.config/VirtualBox"
 fi
 
-sudo rm -rf "${VIRTUAL_BOX_DIRECTORY:?}"
+sudo rm -rf "${VIRTUAL_BOX_DIRECTORY}"
 sudo mv "${TRIVIAL_DIRECTORY}" "${VIRTUAL_BOX_DIRECTORY}/TFTP"
 sudo chown -R virtualbox:virtualbox "${VIRTUAL_BOX_DIRECTORY}/TFTP"
 ${VBOXMANAGE} modifyvm "${MACHINE_NAME}" --boot1 net --nattftpfile1 /debian.pxe
