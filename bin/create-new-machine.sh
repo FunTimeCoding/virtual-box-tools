@@ -78,41 +78,44 @@ if [ "${PRESEED_FILE}" = "" ]; then
     exit 0
 fi
 
+NETWORK_BOOT_ARCHIVE="${HOME}/tmp/netboot-${DEBIAN_RELEASE}.tar.gz"
+
+if [ ! -f "${NETWORK_BOOT_ARCHIVE}" ]; then
+    mkdir -p "${HOME}/tmp"
+    wget --output-document "${NETWORK_BOOT_ARCHIVE}" "http://ftp.debian.org/debian/dists/${DEBIAN_RELEASE}/main/installer-amd64/current/images/netboot/netboot.tar.gz"
+fi
+
+TRIVIAL_DIRECTORY="${HOME}/tmp/trivial"
+CPIO_ROOT_DIRECTORY="${TRIVIAL_DIRECTORY}/cpio"
+sudo rm -rf "${TRIVIAL_DIRECTORY:?}"
+mkdir -p "${CPIO_ROOT_DIRECTORY}"
+tar xf "${NETWORK_BOOT_ARCHIVE}" --directory "${TRIVIAL_DIRECTORY}"
+cp "${PRESEED_FILE}" "${CPIO_ROOT_DIRECTORY}/preseed.cfg"
+
+if [ "${OPERATING_SYSTEM}" = Darwin ]; then
+    sudo chown root:wheel "${CPIO_ROOT_DIRECTORY}/preseed.cfg"
+else
+    sudo chown root:root "${CPIO_ROOT_DIRECTORY}/preseed.cfg"
+fi
+
+cd "${CPIO_ROOT_DIRECTORY}"
+gzip -d < "${TRIVIAL_DIRECTORY}/debian-installer/amd64/initrd.gz" | sudo cpio -i
+find . | cpio -o --format=newc | gzip -9c > "${TRIVIAL_DIRECTORY}/debian-installer/amd64/initrd.gz"
+ln -s debian-installer/amd64/pxelinux.0 debian.pxe
+echo "DEFAULT ${DEBIAN_RELEASE}
+LABEL ${DEBIAN_RELEASE}
+kernel debian-installer/amd64/linux
+append auto initrd=debian-installer/amd64/initrd.gz priority=critical preseed/file=/preseed.cfg" >> "${TRIVIAL_DIRECTORY}/debian-installer/amd64/boot-screens/syslinux.cfg"
+
 if [ "${OPERATING_SYSTEM}" = Darwin ]; then
     VIRTUAL_BOX_DIRECTORY="${HOME_DIRECTORY}/Library/VirtualBox"
 else
     VIRTUAL_BOX_DIRECTORY="${HOME_DIRECTORY}/.config/VirtualBox"
 fi
 
-TRIVIAL_DIRECTORY="${VIRTUAL_BOX_DIRECTORY}/TFTP"
-sudo rm -rf "${TRIVIAL_DIRECTORY:?}"
-${SUDO} mkdir "${TRIVIAL_DIRECTORY}"
-${SUDO} cp "${PRESEED_FILE}" "${TRIVIAL_DIRECTORY}/preseed.cfg"
-NETWORK_BOOT_ARCHIVE="${HOME_DIRECTORY}/tmp/netboot-${DEBIAN_RELEASE}.tar.gz"
-
-if [ ! -f "${NETWORK_BOOT_ARCHIVE}" ]; then
-    ${SUDO} mkdir -p "${HOME_DIRECTORY}/tmp"
-    ${SUDO} wget --output-document "${NETWORK_BOOT_ARCHIVE}" "http://ftp.debian.org/debian/dists/${DEBIAN_RELEASE}/main/installer-amd64/current/images/netboot/netboot.tar.gz"
-fi
-
-${SUDO} tar xf "${NETWORK_BOOT_ARCHIVE}" --directory "${TRIVIAL_DIRECTORY}"
-${SUDO} mkdir "${VIRTUAL_BOX_DIRECTORY}/tmp"
-${SUDO} sh -c "cd ${VIRTUAL_BOX_DIRECTORY}/tmp && gzip -d < ../debian-installer/amd64/initrd.gz | sudo cpio -i"
-sudo cp "${VIRTUAL_BOX_DIRECTORY}/preseed.cfg" "${VIRTUAL_BOX_DIRECTORY}/tmp"
-
-if [ "${OPERATING_SYSTEM}" = Darwin ]; then
-    sudo chown root:wheel "${VIRTUAL_BOX_DIRECTORY}/tmp/preseed.cfg"
-else
-    sudo chown root:root "${VIRTUAL_BOX_DIRECTORY}/tmp/preseed.cfg"
-fi
-
-${SUDO} sh -c 'find . | cpio -o --format=newc | gzip -9c > ../initrd.gz'
-${SUDO} cp initrd.gz debian-installer/amd64
-${SUDO} ln -s debian-installer/amd64/pxelinux.0 debian.pxe
-${SUDO} sh -c "echo 'DEFAULT ${DEBIAN_RELEASE}
-LABEL ${DEBIAN_RELEASE}
-kernel debian-installer/amd64/linux
-append auto initrd=debian-installer/amd64/initrd.gz priority=critical preseed/file=/preseed.cfg' >> debian-installer/amd64/boot-screens/syslinux.cfg"
+sudo rm -rf "${VIRTUAL_BOX_DIRECTORY:?}"
+sudo mv "${TRIVIAL_DIRECTORY}" "${VIRTUAL_BOX_DIRECTORY}/TFTP"
+sudo chown -R virtualbox:virtualbox "${VIRTUAL_BOX_DIRECTORY}/TFTP"
 ${VBOXMANAGE} modifyvm "${MACHINE_NAME}" --boot1 net --nattftpfile1 /debian.pxe
 ${VBOXMANAGE} startvm "${MACHINE_NAME}" --type headless
 
