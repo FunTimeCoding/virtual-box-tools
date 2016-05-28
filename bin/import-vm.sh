@@ -36,5 +36,5 @@ if [ -f "${BOX_DIRECTORY}/${MACHINE_NAME}" ]; then
 fi
 
 sudo mv "${PATH_TO_MACHINE}" "${BOX_DIRECTORY}/${MACHINE_NAME}"
-${MANAGE_COMMAND} registervm "${BOX_DIRECTORY}/${MACHINE_NAME}/${MACHINE_NAME}.vbox"
+${VBOXMANAGE} registervm "${BOX_DIRECTORY}/${MACHINE_NAME}/${MACHINE_NAME}.vbox"
 "${DIRECTORY}"/start-vm.sh --wait "${MACHINE_NAME}"

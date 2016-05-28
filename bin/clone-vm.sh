@@ -27,7 +27,7 @@ if [ "${NEW_NAME}" = "" ]; then
 fi
 
 ERROR=false
-OUTPUT=$(${MANAGE_COMMAND} clonevm "${EXISTING_NAME}" --name "${NEW_NAME}" --register 2>&1) || ERROR=true
+OUTPUT=$(${VBOXMANAGE} clonevm "${EXISTING_NAME}" --name "${NEW_NAME}" --register 2>&1) || ERROR=true
 
 if [ "${ERROR}" = true ]; then
     echo "Error:"

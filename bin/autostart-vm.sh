@@ -18,29 +18,29 @@ if [ "${MACHINE_NAME}" = "" ]; then
     exit 1
 fi
 
-OUTPUT=$(${MANAGE_COMMAND} list systemproperties | grep Autostart)
+OUTPUT=$(${VBOXMANAGE} list systemproperties | grep Autostart)
 ACTUAL=$(echo "${OUTPUT#*path:}" | xargs)
-KEY="autostartdbpath"
-EXPECTED="/etc/vbox"
+KEY=autostartdbpath
+EXPECTED=/etc/vbox
 
 if [ ! "${ACTUAL}" = "${EXPECTED}" ]; then
     echo "Setting ${KEY} incorrect '${ACTUAL}'."
     echo "Update to new value '${EXPECTED}'."
-    ${MANAGE_COMMAND} setproperty "${KEY}" "${EXPECTED}"
+    ${VBOXMANAGE} setproperty "${KEY}" "${EXPECTED}"
     echo "Done."
 fi
 
 NEW_STATE="${2}"
 
 if [ "${NEW_STATE}" = "" ]; then
-    OUTPUT=$(${MANAGE_COMMAND} showvminfo "${MACHINE_NAME}" --details --machinereadable | grep "autostart-enabled")
+    OUTPUT=$(${VBOXMANAGE} showvminfo "${MACHINE_NAME}" --details --machinereadable | grep autostart-enabled)
     VALUE=$(echo "${OUTPUT#*autostart-enabled=}" | xargs)
     echo "${VALUE}"
 else
-    if [ "${NEW_STATE}" = "enable" ]; then
-        ${MANAGE_COMMAND} modifyvm "${MACHINE_NAME}" --autostart-enabled on
-    elif [ "${NEW_STATE}" = "disable" ]; then
-        ${MANAGE_COMMAND} modifyvm "${MACHINE_NAME}" --autostart-enabled off
+    if [ "${NEW_STATE}" = enable ]; then
+        ${VBOXMANAGE} modifyvm "${MACHINE_NAME}" --autostart-enabled on
+    elif [ "${NEW_STATE}" = disable ]; then
+        ${VBOXMANAGE} modifyvm "${MACHINE_NAME}" --autostart-enabled off
     else
         echo "Unknown state: ${NEW_STATE}"
 

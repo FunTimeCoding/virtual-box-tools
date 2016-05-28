@@ -19,7 +19,7 @@ if [ "${MACHINE_NAME}" = "" ]; then
 fi
 
 ERROR=false
-OUTPUT=$(${MANAGE_COMMAND} showvminfo "${MACHINE_NAME}" 2>&1) || ERROR=true
+OUTPUT=$(${VBOXMANAGE} showvminfo "${MACHINE_NAME}" 2>&1) || ERROR=true
 
 if [ "${ERROR}" = false ]; then
     echo "${OUTPUT}"

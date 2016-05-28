@@ -18,7 +18,7 @@ if [ "${MACHINE_NAME}" = "" ]; then
     exit 1
 fi
 
-STATE=$(${MANAGE_COMMAND} showvminfo --machinereadable "${MACHINE_NAME}" | grep "VMState=")
+STATE=$(${VBOXMANAGE} showvminfo --machinereadable "${MACHINE_NAME}" | grep "VMState=")
 STATE=${STATE#*=}
 STATE=$(echo "${STATE}" | sed 's/"//g')
 echo "${STATE}"

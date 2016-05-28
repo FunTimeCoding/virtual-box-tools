@@ -26,4 +26,4 @@ if [ "${FORWARDING_NAME}" = "" ]; then
     exit 1
 fi
 
-${MANAGE_COMMAND} modifyvm "${MACHINE_NAME}" --natpf1 delete "${FORWARDING_NAME}"
+${VBOXMANAGE} modifyvm "${MACHINE_NAME}" --natpf1 delete "${FORWARDING_NAME}"

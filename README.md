@@ -1,22 +1,30 @@
 # VirtualBoxTools
 
-Helper scripts for running VirtualBox.
+Tools for VirtualBox to simplify manual usage and automated integration.
 
 
-## Usage
+## Setup
 
-This section explains how to use this project.
+This section covers how to install and uninstall `VirtualBoxTools` as a user.
 
-Manage hosts using `vbt`.
+Install from GitHub.
 
 ```sh
-./bin/vbt
+pip3 install git+https://git@github.com/FunTimeCoding/virtual-box-tools.git#egg=virtual-box-tools
+```
+
+Uninstall the project.
+
+```sh
+pip3 uninstall virtual-box-tools
 ```
 
 
 ## Configuration
 
-Optionally specify the location of the host config in `~/.virtual-box-tools.yml`.
+This section explains configuration options.
+
+Specify the location of the host config in `~/.virtual-box-tools.yml`. This is optional.
 
 ```yml
 host_file: ~/srv/salt/pillar/host.sls
@@ -29,61 +37,34 @@ sudo_user: vbox
 ```
 
 
-## Setup
+## Usage
 
-This section explains how to install this project and how to include it in another.
+This section explains how to use this project.
 
-Install the project from a local clone.
-
-```sh
-pip3 install --user --editable .
-```
-
-Install the project from GitHub.
+Show help.
 
 ```sh
-pip3 install git+ssh://git@github.com/FunTimeCoding/virtual-box-tools.git#egg=virtual-box-tools
-```
-
-Uninstall the project.
-
-```sh
-pip3 uninstall virtual-box-tools
-```
-
-Require this repository in another projects `requirements.txt`.
-
-```
-git+ssh://git@github.com/FunTimeCoding/virtual-box-tools.git#egg=virtual-box-tools
+vbt --help
+vbt host --help
+vbt service --help
 ```
 
 
 ## Development
 
-This section explains how to use scripts that are intended to ease the development of this project.
+This section contains notes for developers.
 
-Run the main script without installing the project.
+Install the project from a clone.
+
+```sh
+pip3 install --user --editable .
+pip3 install --upgrade --user --requirement requirements.txt
+```
+
+Run main entry point without installing the project.
 
 ```sh
 PYTHONPATH=. bin/vbt
-```
-
-Install tools on Debian Jessie.
-
-```sh
-apt-get install shellcheck
-```
-
-Install tools on OS X.
-
-```sh
-brew install shellcheck
-```
-
-Install pip requirements.
-
-```sh
-pip3 install --upgrade --user --requirement requirements.txt
 ```
 
 Run code style check, metrics and tests.
@@ -94,14 +75,22 @@ Run code style check, metrics and tests.
 ./run-tests.sh
 ```
 
-Build the project like Jenkins.
+Build the project.
 
 ```sh
 ./build.sh
 ```
 
+Run VirtualBox commands as a different user.
 
-## Skeleton details
+```sh
+sudo -u virtualbox vboxmanage showvminfo --machinereadable ${MACHINE_NAME}
+```
 
-* The `tests` directory is not called `test` because that package already exists.
-* Dashes in the project name become underscores in Python.
+
+## Appendix
+
+This section contains notes about the project skeleton.
+
+- The `tests` directory is not called `test` because that package already exists.
+- Dashes in the project name become underscores in Python.

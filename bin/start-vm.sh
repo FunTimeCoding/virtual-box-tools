@@ -26,7 +26,7 @@ if [ "${MACHINE_NAME}" = "" ]; then
 fi
 
 ERROR=false
-OUTPUT=$(${MANAGE_COMMAND} startvm "${1}" --type headless 2>&1) || ERROR=true
+OUTPUT=$(${VBOXMANAGE} startvm "${1}" --type headless 2>&1) || ERROR=true
 
 if [ "${ERROR}" = true ]; then
     echo "Error:"
@@ -37,22 +37,22 @@ fi
 
 if [ "${WAIT}" = true ]; then
     echo "Wait for virtual machine be started."
-    BOOT_TIME="0"
+    BOOT_TIME=0
 
     for SECOND in $(seq 1 60); do
         sleep 1
-        IP=$("${SCRIPT_DIRECTORY}"/get-vm-ip.sh "${MACHINE_NAME}")
+        LOGICAL_ADDRESS=$("${SCRIPT_DIRECTORY}"/get-vm-ip.sh "${MACHINE_NAME}")
 
-        if [ ! "${IP}" = "" ]; then
+        if [ ! "${LOGICAL_ADDRESS}" = "" ]; then
             BOOT_TIME="${SECOND}"
             break
         fi
     done
 
-    MAC=$("${SCRIPT_DIRECTORY}"/get-vm-mac.sh --colons "${MACHINE_NAME}")
+    PHYSICAL_ADDRESS=$("${SCRIPT_DIRECTORY}"/get-vm-mac.sh --colons "${MACHINE_NAME}")
     echo "BOOT_TIME: ${BOOT_TIME}"
-    echo "IP: ${IP}"
-    echo "MAC: ${MAC}"
+    echo "IP: ${LOGICAL_ADDRESS}"
+    echo "MAC: ${PHYSICAL_ADDRESS}"
 else
     echo "Virtual machine '${MACHINE_NAME}' is starting."
 fi

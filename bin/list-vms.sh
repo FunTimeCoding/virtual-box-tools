@@ -12,9 +12,9 @@ usage()
 . "${SCRIPT_DIRECTORY}"/../lib/virtual_box_tools.sh
 
 if [ "${1}" = "--raw" ]; then
-    ${MANAGE_COMMAND} list runningvms
+    ${VBOXMANAGE} list runningvms
 else
-    OUTPUT=$(${MANAGE_COMMAND} list runningvms | awk -F '"' '{ print $2 }')
+    OUTPUT=$(${VBOXMANAGE} list runningvms | awk -F '"' '{ print $2 }')
     SORTED=$(ruby -e "puts \"${OUTPUT}\".split(/\s+/).sort")
     echo "${SORTED}"
 fi

@@ -18,8 +18,7 @@ if [ "${MACHINE_NAME}" = "" ]; then
     exit 1
 fi
 
-KEY="IP"
-VALUE=$(${MANAGE_COMMAND} guestproperty enumerate "${MACHINE_NAME}" | grep "${KEY}" || VALUE="")
+VALUE=$(${VBOXMANAGE} guestproperty enumerate "${MACHINE_NAME}" | grep IP || VALUE="")
 
 if [ ! "${VALUE}" = "" ]; then
     VALUE="${VALUE#*value: }"

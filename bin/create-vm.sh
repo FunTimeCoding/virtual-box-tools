@@ -30,13 +30,13 @@ fi
 
 if [ "${WAIT}" = true ]; then
     echo "Wait for virtual machine to be started."
-    BOOT_TIME="0"
+    BOOT_TIME=0
 
     for SECOND in $(seq 1 60); do
         sleep 1
-        IP=$("${SCRIPT_DIRECTORY}"/get-vm-ip.sh "${MACHINE_NAME}")
+        ADDRESS=$("${SCRIPT_DIRECTORY}"/get-vm-ip.sh "${MACHINE_NAME}")
 
-        if [ ! "${IP}" = "" ]; then
+        if [ ! "${ADDRESS}" = "" ]; then
             BOOT_TIME="${SECOND}"
             break
         fi
@@ -44,7 +44,7 @@ if [ "${WAIT}" = true ]; then
 
     MAC=$("${SCRIPT_DIRECTORY}"/get-vm-mac.sh --colons "${MACHINE_NAME}")
     echo "BOOT_TIME: ${BOOT_TIME}"
-    echo "IP: ${IP}"
+    echo "IP: ${ADDRESS}"
     echo "MAC: ${MAC}"
 else
     echo "Virtual machine is starting."

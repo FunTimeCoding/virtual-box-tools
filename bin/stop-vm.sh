@@ -15,11 +15,11 @@ WAIT=false
 
 while true; do
     case ${1} in
-        -f|--force)
+        --force)
             FORCE=true
             shift
             ;;
-        -w|--wait)
+        --wait)
             WAIT=true
             shift
             ;;
@@ -39,10 +39,10 @@ fi
 
 if [ "${FORCE}" = true ]; then
     echo "Force shutdown."
-    ${MANAGE_COMMAND} controlvm "${MACHINE_NAME}" poweroff
+    ${VBOXMANAGE} controlvm "${MACHINE_NAME}" poweroff
 else
     echo "Stop running virtual machine '${MACHINE_NAME}'."
-    ${MANAGE_COMMAND} controlvm "${MACHINE_NAME}" acpipowerbutton
+    ${VBOXMANAGE} controlvm "${MACHINE_NAME}" acpipowerbutton
 fi
 
 if [ "${WAIT}" = true ]; then
@@ -58,7 +58,7 @@ if [ "${WAIT}" = true ]; then
         fi
     done
 
-    if [ "${DOWN}" = "false" ]; then
+    if [ "${DOWN}" = false ]; then
         echo "Error: Virtual machine could not be stopped."
     fi
 fi

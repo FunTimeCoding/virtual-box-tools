@@ -18,4 +18,4 @@ if [ "${MACHINE_NAME}" = "" ]; then
     exit 1
 fi
 
-${MANAGE_COMMAND} showvminfo "${MACHINE_NAME}" --details --machinereadable | grep memory
+${VBOXMANAGE} showvminfo "${MACHINE_NAME}" --details --machinereadable | grep memory

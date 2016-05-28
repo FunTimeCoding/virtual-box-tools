@@ -51,4 +51,4 @@ if [ ! "${STATE}" = "poweroff" ]; then
     fi
 fi
 
-${MANAGE_COMMAND} unregistervm "${MACHINE_NAME}" --delete
+${VBOXMANAGE} unregistervm "${MACHINE_NAME}" --delete

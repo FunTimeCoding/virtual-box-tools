@@ -19,4 +19,4 @@ if [ "${MACHINE_NAME}" = "" ] || [ "${MEMORY}" = "" ]; then
     exit 1
 fi
 
-${MANAGE_COMMAND} modifyvm "${MACHINE_NAME}" --memory "${MEMORY}"
+${VBOXMANAGE} modifyvm "${MACHINE_NAME}" --memory "${MEMORY}"
