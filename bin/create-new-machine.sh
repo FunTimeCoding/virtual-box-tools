@@ -87,7 +87,7 @@ fi
 sudo rm -rf "${TRIVIAL_DIRECTORY:?}"
 ${SUDO} mkdir "${TRIVIAL_DIRECTORY}"
 ${SUDO} cp "${PRESEED_FILE}" "${TRIVIAL_DIRECTORY}/preseed.cfg"
-${SUDO} cd "${TRIVIAL_DIRECTORY}"
+cd "${TRIVIAL_DIRECTORY}"
 NETWORK_BOOT_ARCHIVE="${HOME}/tmp/netboot-${DEBIAN_RELEASE}.tar.gz"
 
 if [ ! -f "${NETWORK_BOOT_ARCHIVE}" ]; then
@@ -97,7 +97,7 @@ fi
 ${SUDO} tar xf "${NETWORK_BOOT_ARCHIVE}" --directory "${TRIVIAL_DIRECTORY}"
 ${SUDO} mkdir tmp
 (
-${SUDO} cd tmp
+cd tmp
 ${SUDO} gzip -d < ../debian-installer/amd64/initrd.gz | sudo cpio -i
 sudo cp ../preseed.cfg .
 
