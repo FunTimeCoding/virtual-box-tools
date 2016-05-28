@@ -101,6 +101,7 @@ fi
 cd "${CPIO_ROOT_DIRECTORY}"
 gzip -d < "${TRIVIAL_DIRECTORY}/debian-installer/amd64/initrd.gz" | sudo cpio -i
 find . | cpio -o --format=newc | gzip -9c > "${TRIVIAL_DIRECTORY}/debian-installer/amd64/initrd.gz"
+sudo rm -rf "${CPIO_ROOT_DIRECTORY}"
 cd "${TRIVIAL_DIRECTORY}"
 ln -s debian-installer/amd64/pxelinux.0 debian.pxe
 echo "DEFAULT ${DEBIAN_RELEASE}
@@ -114,7 +115,7 @@ else
     VIRTUAL_BOX_DIRECTORY="${HOME_DIRECTORY}/.config/VirtualBox"
 fi
 
-sudo rm -rf "${VIRTUAL_BOX_DIRECTORY:?}/TFTP"
+sudo rm -rf "${VIRTUAL_BOX_DIRECTORY}/TFTP"
 sudo mv "${TRIVIAL_DIRECTORY}" "${VIRTUAL_BOX_DIRECTORY}/TFTP"
 sudo chown -R virtualbox:virtualbox "${VIRTUAL_BOX_DIRECTORY}/TFTP"
 ${VBOXMANAGE} modifyvm "${MACHINE_NAME}" --boot1 net --nattftpfile1 /debian.pxe
