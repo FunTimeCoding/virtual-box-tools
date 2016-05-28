@@ -101,6 +101,7 @@ fi
 cd "${CPIO_ROOT_DIRECTORY}"
 gzip -d < "${TRIVIAL_DIRECTORY}/debian-installer/amd64/initrd.gz" | sudo cpio -i
 find . | cpio -o --format=newc | gzip -9c > "${TRIVIAL_DIRECTORY}/debian-installer/amd64/initrd.gz"
+cd "${TRIVIAL_DIRECTORY}"
 ln -s debian-installer/amd64/pxelinux.0 debian.pxe
 echo "DEFAULT ${DEBIAN_RELEASE}
 LABEL ${DEBIAN_RELEASE}
