@@ -79,36 +79,33 @@ if [ "${PRESEED_FILE}" = "" ]; then
 fi
 
 if [ "${OPERATING_SYSTEM}" = Darwin ]; then
-    TRIVIAL_DIRECTORY="${HOME_DIRECTORY}/Library/VirtualBox/TFTP"
+    VIRTUAL_BOX_DIRECTORY="${HOME_DIRECTORY}/Library/VirtualBox"
 else
-    TRIVIAL_DIRECTORY="${HOME_DIRECTORY}/.config/VirtualBox/TFTP"
+    VIRTUAL_BOX_DIRECTORY="${HOME_DIRECTORY}/.config/VirtualBox"
 fi
 
+TRIVIAL_DIRECTORY="${VIRTUAL_BOX_DIRECTORY}/TFTP"
 sudo rm -rf "${TRIVIAL_DIRECTORY:?}"
 ${SUDO} mkdir "${TRIVIAL_DIRECTORY}"
 ${SUDO} cp "${PRESEED_FILE}" "${TRIVIAL_DIRECTORY}/preseed.cfg"
-cd "${TRIVIAL_DIRECTORY}"
-NETWORK_BOOT_ARCHIVE="${HOME}/tmp/netboot-${DEBIAN_RELEASE}.tar.gz"
+NETWORK_BOOT_ARCHIVE="${HOME_DIRECTORY}/tmp/netboot-${DEBIAN_RELEASE}.tar.gz"
 
 if [ ! -f "${NETWORK_BOOT_ARCHIVE}" ]; then
     ${SUDO} wget --output-document "${NETWORK_BOOT_ARCHIVE}" "http://ftp.debian.org/debian/dists/${DEBIAN_RELEASE}/main/installer-amd64/current/images/netboot/netboot.tar.gz"
 fi
 
 ${SUDO} tar xf "${NETWORK_BOOT_ARCHIVE}" --directory "${TRIVIAL_DIRECTORY}"
-${SUDO} mkdir tmp
-(
-cd tmp
-${SUDO} gzip -d < ../debian-installer/amd64/initrd.gz | sudo cpio -i
-sudo cp ../preseed.cfg .
+${SUDO} mkdir "${VIRTUAL_BOX_DIRECTORY}/tmp"
+${SUDO} sh -c "cd ${VIRTUAL_BOX_DIRECTORY}/tmp && gzip -d < ../debian-installer/amd64/initrd.gz | sudo cpio -i"
+sudo cp "${VIRTUAL_BOX_DIRECTORY}/preseed.cfg" "${VIRTUAL_BOX_DIRECTORY}/tmp"
 
 if [ "${OPERATING_SYSTEM}" = Darwin ]; then
-    sudo chown root:wheel preseed.cfg
+    sudo chown root:wheel "${VIRTUAL_BOX_DIRECTORY}/tmp/preseed.cfg"
 else
-    sudo chown root:root preseed.cfg
+    sudo chown root:root "${VIRTUAL_BOX_DIRECTORY}/tmp/preseed.cfg"
 fi
 
 ${SUDO} sh -c 'find . | cpio -o --format=newc | gzip -9c > ../initrd.gz'
-)
 ${SUDO} cp initrd.gz debian-installer/amd64
 ${SUDO} ln -s debian-installer/amd64/pxelinux.0 debian.pxe
 ${SUDO} sh -c "echo 'DEFAULT ${DEBIAN_RELEASE}
