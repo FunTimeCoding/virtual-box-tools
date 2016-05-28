@@ -55,11 +55,17 @@ if [ "${MACHINE_NAME}" = "" ]; then
     exit 1
 fi
 
+if [ "${SUDO_USER}" = "" ]; then
+    HOME_DIRECTORY="${HOME}"
+else
+    HOME_DIRECTORY="/home/${SUDO_USER}"
+fi
+
 ${VBOXMANAGE} createvm --name "${MACHINE_NAME}" --register --ostype Debian_64
 CONTROLLER_NAME="SATA Controller"
 ${VBOXMANAGE} storagectl "${MACHINE_NAME}" --name "${CONTROLLER_NAME}" --add sata
 DISK_NAME="${MACHINE_NAME}.vdi"
-MACHINE_DIRECTORY="${HOME}/VirtualBox VMs/${MACHINE_NAME}"
+MACHINE_DIRECTORY="${HOME_DIRECTORY}/VirtualBox VMs/${MACHINE_NAME}"
 DISK_PATH="${MACHINE_DIRECTORY}/${DISK_NAME}"
 ${VBOXMANAGE} createmedium disk --filename "${DISK_PATH}" --size 16384
 ${VBOXMANAGE} storageattach "${MACHINE_NAME}" --storagectl "${CONTROLLER_NAME}" --port 0 --device 0 --type hdd --medium "${DISK_PATH}"
@@ -70,12 +76,6 @@ if [ "${PRESEED_FILE}" = "" ]; then
     ${VBOXMANAGE} startvm "${MACHINE_NAME}"
 
     exit 0
-fi
-
-if [ "${SUDO_USER}" = "" ]; then
-    HOME_DIRECTORY="${HOME}"
-else
-    HOME_DIRECTORY="/home/${SUDO_USER}"
 fi
 
 if [ "${OPERATING_SYSTEM}" = Darwin ]; then
