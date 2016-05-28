@@ -114,7 +114,7 @@ else
     VIRTUAL_BOX_DIRECTORY="${HOME_DIRECTORY}/.config/VirtualBox"
 fi
 
-sudo rm -rf "${VIRTUAL_BOX_DIRECTORY}"
+sudo rm -rf "${VIRTUAL_BOX_DIRECTORY:?}/TFTP"
 sudo mv "${TRIVIAL_DIRECTORY}" "${VIRTUAL_BOX_DIRECTORY}/TFTP"
 sudo chown -R virtualbox:virtualbox "${VIRTUAL_BOX_DIRECTORY}/TFTP"
 ${VBOXMANAGE} modifyvm "${MACHINE_NAME}" --boot1 net --nattftpfile1 /debian.pxe
