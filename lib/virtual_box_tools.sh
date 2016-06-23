@@ -46,7 +46,7 @@ OPTIND=1
 
 if [ -f "${CONFIG}" ]; then
     CONFIG=$(realpath "${CONFIG}")
-    SUDO_USER=$(shyaml get-value sudo_user < "${CONFIG}" 2>/dev/null || true)
+    SUDO_USER=$(shyaml get-value sudo_user < "${CONFIG}" 2> /dev/null || true)
 else
     CONFIG=""
 fi
