@@ -20,4 +20,4 @@ if [ "${MACHINE_NAME}" = "" ]; then
 fi
 
 CONTROLLER_NAME="SATA Controller"
-${VBOXMANAGE} storageattach "${MACHINE_NAME}" --storagectl "${CONTROLLER_NAME}" --port 1 --device 0 --type dvddrive --medium emptydrive
+${VBOXMANAGE} storageattach "${MACHINE_NAME}" --storagectl "${CONTROLLER_NAME}" --port 1 --device 0 --medium emptydrive
