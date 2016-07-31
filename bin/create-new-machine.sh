@@ -5,10 +5,10 @@ SCRIPT_DIRECTORY=$(cd "${DIRECTORY}" || exit 1; pwd)
 OPERATING_SYSTEM=$(uname)
 DEBIAN_RELEASE=jessie
 
-if [ "${OPERATING_SYSTEM}" = Linux ]; then
-    NETWORK_DEVICE=eth0
-elif [ "${OPERATING_SYSTEM}" = Darwin ]; then
+if [ "${OPERATING_SYSTEM}" = Darwin ]; then
     NETWORK_DEVICE=en0
+else
+    NETWORK_DEVICE=eth0
 fi
 
 usage()
