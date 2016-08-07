@@ -36,7 +36,7 @@ if [ "${ERROR}" = true ]; then
 fi
 
 if [ "${WAIT}" = true ]; then
-    echo "Wait for virtual machine be started."
+    echo "Wait for virtual machine to be started."
     BOOT_TIME=0
 
     for SECOND in $(seq 1 60); do

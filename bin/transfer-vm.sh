@@ -13,13 +13,17 @@ TEMPORARY_DIRECTORY="${HOME}/tmp/virtualbox"
 mkdir -p "${TEMPORARY_DIRECTORY}"
 
 if [ ! -d "${TEMPORARY_DIRECTORY}/${MACHINE_NAME}" ]; then
+    echo "Stop running machine"
     bin/stop-vm.sh --wait "${MACHINE_NAME}"
+    echo "Make local copy of machine to minimize downtime"
     sudo cp -R "/home/vbox/VirtualBox VMs/${MACHINE_NAME}" "${TEMPORARY_DIRECTORY}/${MACHINE_NAME}"
+    echo "Start machine again"
     bin/start-vm.sh --wait "${MACHINE_NAME}"
     sudo chown -R shiin:shiin "${TEMPORARY_DIRECTORY}/${MACHINE_NAME}"
 fi
 
 rm -f "${TEMPORARY_DIRECTORY}/${MACHINE_NAME}/${MACHINE_NAME}.vbox-prev"
 rm -rf "${TEMPORARY_DIRECTORY}/${MACHINE_NAME}/Logs"
+echo "Transfer machine to destination server"
 ssh "${DESTINATION_HOST}" mkdir -p tmp/virtualbox
 rsync --archive --verbose --update --delete --progress "${TEMPORARY_DIRECTORY}/${MACHINE_NAME}" "${DESTINATION_HOST}:${HOME}/tmp/virtualbox"
