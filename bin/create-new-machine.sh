@@ -120,7 +120,7 @@ fi
 
 cd "${CPIO_ROOT_DIRECTORY}"
 gzip -d < "${TRIVIAL_DIRECTORY}/debian-installer/amd64/initrd.gz" | sudo cpio -i
-find . | cpio -o --format=newc | gzip -9c > "${TRIVIAL_DIRECTORY}/debian-installer/amd64/initrd.gz"
+find . | sudo cpio -o --format=newc | gzip -9c > "${TRIVIAL_DIRECTORY}/debian-installer/amd64/initrd.gz"
 sudo rm -rf "${CPIO_ROOT_DIRECTORY}"
 cd "${TRIVIAL_DIRECTORY}"
 ln -s debian-installer/amd64/pxelinux.0 debian.pxe
