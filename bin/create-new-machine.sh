@@ -4,6 +4,8 @@ DIRECTORY=$(dirname "${0}")
 SCRIPT_DIRECTORY=$(cd "${DIRECTORY}" || exit 1; pwd)
 OPERATING_SYSTEM=$(uname)
 DEBIAN_RELEASE=jessie
+MEMORY_IN_MEGABYTE=256
+DISK_SIZE_IN_GIGABYTE=16
 
 if [ "${OPERATING_SYSTEM}" = Darwin ]; then
     NETWORK_DEVICE=en0
@@ -14,9 +16,12 @@ fi
 usage()
 {
     echo "Usage: ${0} [--debian-release jessie|wheezy|squeeze][--network-device eth0][--network-type bridged|hostonly][--preseed-file FILE] MACHINE_NAME"
-    echo "Default release: ${DEBIAN_RELEASE}"
     echo "Debian device examples: eth0, eth1, en0, en1"
-    echo "Default device: ${NETWORK_DEVICE}"
+    echo "Defaults"
+    echo "Release: ${DEBIAN_RELEASE}"
+    echo "Device: ${NETWORK_DEVICE}"
+    echo "Memory in megabyte: ${MEMORY_IN_MEGABYTE}"
+    echo "Disk size in gigabyte: ${DISK_SIZE_IN_GIGABYTE}"
     echo "Leave --type unspecified to skip network configuration."
 }
 
@@ -39,6 +44,14 @@ while true; do
             ;;
         --preseed-file)
             PRESEED_FILE=${2-}
+            shift 2
+            ;;
+        --memory)
+            MEMORY_IN_MEGABYTE=${2-}
+            shift 2
+            ;;
+        --disk-size)
+            DISK_SIZE_IN_GIGABYTE=${2-}
             shift 2
             ;;
         *)
@@ -67,10 +80,11 @@ ${VBOXMANAGE} storagectl "${MACHINE_NAME}" --name "${CONTROLLER_NAME}" --add sat
 DISK_NAME="${MACHINE_NAME}.vdi"
 MACHINE_DIRECTORY="${HOME_DIRECTORY}/VirtualBox VMs/${MACHINE_NAME}"
 DISK_PATH="${MACHINE_DIRECTORY}/${DISK_NAME}"
-${VBOXMANAGE} createmedium disk --filename "${DISK_PATH}" --size 16384
+DISK_SIZE_IN_MEGABYTE=$(echo "${DISK_SIZE_IN_GIGABYTE} * 1024" | bc)
+${VBOXMANAGE} createmedium disk --filename "${DISK_PATH}" --size "${DISK_SIZE_IN_MEGABYTE}"
 ${VBOXMANAGE} storageattach "${MACHINE_NAME}" --storagectl "${CONTROLLER_NAME}" --port 0 --device 0 --type hdd --medium "${DISK_PATH}"
 ${VBOXMANAGE} storageattach "${MACHINE_NAME}" --storagectl "${CONTROLLER_NAME}" --port 1 --device 0 --type dvddrive --medium emptydrive
-${VBOXMANAGE} modifyvm "${MACHINE_NAME}" --acpi on --memory 256 --vram 16
+${VBOXMANAGE} modifyvm "${MACHINE_NAME}" --acpi on --memory "${MEMORY_IN_MEGABYTE}" --vram 16
 
 if [ "${PRESEED_FILE}" = "" ]; then
     ${VBOXMANAGE} startvm "${MACHINE_NAME}"
