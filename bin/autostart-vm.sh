@@ -30,6 +30,10 @@ if [ ! "${ACTUAL}" = "${EXPECTED}" ]; then
     echo "Done."
 fi
 
+if [ ! "${SUDO_USER}" = "" ]; then
+    sudo chown "${SUDO_USER}" "${EXPECTED}"
+fi
+
 NEW_STATE="${2}"
 
 if [ "${NEW_STATE}" = "" ]; then
