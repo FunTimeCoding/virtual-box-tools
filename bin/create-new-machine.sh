@@ -66,6 +66,12 @@ while true; do
     esac
 done
 
+if [ ! "${NETWORK_TYPE}" = hostonly ] && [ ! "${NETWORK_TYPE}" = bridged ]; then
+    echo "Unsupported network type: ${NETWORK_TYPE}"
+
+    exit 1
+fi
+
 MACHINE_NAME="${1}"
 
 if [ "${MACHINE_NAME}" = "" ]; then
@@ -147,7 +153,7 @@ ${VBOXMANAGE} modifyvm "${MACHINE_NAME}" --boot1 net --nattftpfile1 /debian.pxe
 ${VBOXMANAGE} startvm "${MACHINE_NAME}" --type headless
 echo "Install operating system. The virtual machine will shut down for post configuration afterwards."
 
-for MINUTE in $(seq 1 60); do
+for MINUTE in $(seq 1 45); do
     echo "${MINUTE}"
     sleep 60
     STATE=$("${SCRIPT_DIRECTORY}"/get-vm-state.sh "${MACHINE_NAME}")
