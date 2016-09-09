@@ -16,5 +16,8 @@ if [ "${1}" = "--raw" ]; then
 else
     OUTPUT=$(${VBOXMANAGE} list runningvms | awk -F '"' '{ print $2 }')
     SORTED=$(ruby -e "puts \"${OUTPUT}\".split(/\s+/).sort")
-    echo "${SORTED}"
+
+    if [ ! "${SORTED}" = "" ]; then
+        echo "${SORTED}"
+    fi
 fi
