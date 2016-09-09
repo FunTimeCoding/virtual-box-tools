@@ -142,7 +142,7 @@ if [ ! "${SUDO_USER}" = "" ]; then
     sudo chown -R "${SUDO_USER}:${SUDO_USER}" "${VIRTUAL_BOX_DIRECTORY}/TFTP"
 fi
 
-${VBOXMANAGE} modifyvm "${MACHINE_NAME}" --nic1 nat --nictype1 virtio
+${VBOXMANAGE} modifyvm "${MACHINE_NAME}" --nic1 nat
 ${VBOXMANAGE} modifyvm "${MACHINE_NAME}" --boot1 net --nattftpfile1 /debian.pxe
 ${VBOXMANAGE} startvm "${MACHINE_NAME}" --type headless
 echo "Install operating system. The virtual machine will shut down for post configuration afterwards."
