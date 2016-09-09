@@ -147,7 +147,7 @@ ${VBOXMANAGE} modifyvm "${MACHINE_NAME}" --boot1 net --nattftpfile1 /debian.pxe
 ${VBOXMANAGE} startvm "${MACHINE_NAME}" --type headless
 echo "Install operating system. The virtual machine will shut down for post configuration afterwards."
 
-for MINUTE in $(seq 1 30); do
+for MINUTE in $(seq 1 60); do
     echo "${MINUTE}"
     sleep 60
     STATE=$("${SCRIPT_DIRECTORY}"/get-vm-state.sh "${MACHINE_NAME}")
