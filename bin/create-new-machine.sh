@@ -12,6 +12,7 @@ OPERATING_SYSTEM=$(uname)
 DEBIAN_RELEASE=jessie
 MEMORY_IN_MEGABYTE=256
 DISK_SIZE_IN_GIGABYTE=16
+NETWORK_TYPE=hostonly
 
 if [ "${OPERATING_SYSTEM}" = Darwin ]; then
     NETWORK_DEVICE=en0
@@ -26,6 +27,7 @@ usage()
     echo "Defaults"
     echo "Release: ${DEBIAN_RELEASE}"
     echo "Device: ${NETWORK_DEVICE}"
+    echo "Network type: ${NETWORK_TYPE}"
     echo "Memory in megabyte: ${MEMORY_IN_MEGABYTE}"
     echo "Disk size in gigabyte: ${DISK_SIZE_IN_GIGABYTE}"
     echo "Leave --type unspecified to skip network configuration."
