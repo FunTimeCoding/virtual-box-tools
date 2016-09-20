@@ -110,7 +110,14 @@ NETWORK_BOOT_ARCHIVE="${HOME}/tmp/netboot-${DEBIAN_RELEASE}.tar.gz"
 
 if [ ! -f "${NETWORK_BOOT_ARCHIVE}" ]; then
     mkdir -p "${HOME}/tmp"
-    wget --output-document "${NETWORK_BOOT_ARCHIVE}" "http://ftp.debian.org/debian/dists/${DEBIAN_RELEASE}/main/installer-amd64/current/images/netboot/netboot.tar.gz"
+
+    if [ "${DEBIAN_RELEASE}" = squeeze ]; then
+        MIRROR=archive.debian.org
+    else
+        MIRROR=ftp.debian.org
+    fi
+
+    wget --output-document "${NETWORK_BOOT_ARCHIVE}" "http://${MIRROR}/debian/dists/${DEBIAN_RELEASE}/main/installer-amd64/current/images/netboot/netboot.tar.gz"
 fi
 
 TRIVIAL_DIRECTORY="${HOME}/tmp/trivial"
