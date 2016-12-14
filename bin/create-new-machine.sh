@@ -22,7 +22,7 @@ fi
 
 usage()
 {
-    echo "Usage: ${0} [--debian-release jessie|wheezy|squeeze][--network-device eth0][--network-type bridged|hostonly][--preseed-file FILE] MACHINE_NAME"
+    echo "Usage: ${0} [--debian-release jessie|wheezy][--network-device eth0][--network-type bridged|hostonly][--preseed-file FILE] MACHINE_NAME"
     echo "Debian device examples: eth0, eth1, en0, en1"
     echo "Defaults"
     echo "Release: ${DEBIAN_RELEASE}"
@@ -110,14 +110,7 @@ NETWORK_BOOT_ARCHIVE="${HOME}/tmp/netboot-${DEBIAN_RELEASE}.tar.gz"
 
 if [ ! -f "${NETWORK_BOOT_ARCHIVE}" ]; then
     mkdir -p "${HOME}/tmp"
-
-    if [ "${DEBIAN_RELEASE}" = squeeze ]; then
-        MIRROR=archive.debian.org
-    else
-        MIRROR=ftp.debian.org
-    fi
-
-    wget --output-document "${NETWORK_BOOT_ARCHIVE}" "http://${MIRROR}/debian/dists/${DEBIAN_RELEASE}/main/installer-amd64/current/images/netboot/netboot.tar.gz"
+    wget --output-document "${NETWORK_BOOT_ARCHIVE}" "http://ftp.debian.org/debian/dists/${DEBIAN_RELEASE}/main/installer-amd64/current/images/netboot/netboot.tar.gz"
 fi
 
 TRIVIAL_DIRECTORY="${HOME}/tmp/trivial"
