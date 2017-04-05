@@ -7,4 +7,5 @@ pytest-cov # pytest coverage plugin
 pyyaml # YAML library
 shyaml # shell program to parse YAML
 
+# helper classes
 git+https://git@github.com/FunTimeCoding/python-utility.git#egg=python-utility
