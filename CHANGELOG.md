@@ -7,7 +7,7 @@ Notable changes to this project are documented here.
 
 ### Added
 
-- Thing that isn't released yet.
+- Thing that is not released yet.
 
 
 ## [0.0.2] - 2015-12-14

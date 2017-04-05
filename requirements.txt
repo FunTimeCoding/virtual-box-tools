@@ -1,7 +1,10 @@
-pep8
-pylint
-pytest
-pytest-cov
-pyyaml
-shyaml
+pep8 # style check
+pylint # style check
+flake8 # style check
+pyenchant # pylint spellcheck plugin
+pytest # test framework
+pytest-cov # pytest coverage plugin
+pyyaml # YAML library
+shyaml # shell program to parse YAML
+
 git+https://git@github.com/FunTimeCoding/python-utility.git#egg=python-utility

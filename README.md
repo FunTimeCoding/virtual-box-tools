@@ -5,9 +5,9 @@ Tools for VirtualBox to simplify manual usage and automated integration.
 
 ## Setup
 
-This section covers how to install and uninstall `VirtualBoxTools` as a user.
+This section explains how to install and uninstall this project.
 
-Install from GitHub.
+Install the project.
 
 ```sh
 pip3 install git+https://git@github.com/FunTimeCoding/virtual-box-tools.git#egg=virtual-box-tools
@@ -52,27 +52,20 @@ vbt service --help
 
 ## Development
 
-This section contains notes for developers.
+This section explains commands to help the development of this project.
 
 Install the project from a clone.
 
 ```sh
-pip3 install --user --editable .
-pip3 install --upgrade --user --requirement requirements.txt
+./setup.sh
 ```
 
-Run main entry point without installing the project.
+Run tests, style check and metrics.
 
 ```sh
-PYTHONPATH=. bin/vbt
-```
-
-Run code style check, metrics and tests.
-
-```sh
+./run-tests.sh
 ./run-style-check.sh
 ./run-metrics.sh
-./run-tests.sh
 ```
 
 Build the project.
@@ -86,11 +79,3 @@ Run VirtualBox commands as a different user.
 ```sh
 sudo -u virtualbox vboxmanage showvminfo --machinereadable ${MACHINE_NAME}
 ```
-
-
-## Appendix
-
-This section contains notes about the project skeleton.
-
-- The `tests` directory is not called `test` because that package already exists.
-- Dashes in the project name become underscores in Python.

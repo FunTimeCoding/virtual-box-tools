@@ -37,7 +37,7 @@ else
     FIND=find
 fi
 
-RESULT=$(${FIND} . -type f -name '*.py' -size -4096c -regextype posix-extended ! -regex '^.*/(.pyvenv|.tox|.git)/.*$')
+RESULT=$(${FIND} . -type f -name '*.py' -or -path '*\/bin\/*' -regextype posix-extended ! -regex '^.*/(.pyvenv|.tox|.git)/.*$')
 RETURN_CODE=0
 
 if [ "${CONTINUOUS_INTEGRATION_MODE}" = true ]; then

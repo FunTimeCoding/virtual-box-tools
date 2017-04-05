@@ -1,8 +1,12 @@
+build
 *.pyc
 *.egg-info
-.coverage
 .pyvenv
-.cache
 .tox
-build
+
+# pytest
+.coverage
+.cache
+
+# project specific
 running-vms.txt
