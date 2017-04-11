@@ -100,8 +100,15 @@ key_codes = {
 }
 
 result = ''
+escape = False
 
 for character in sys.argv[1]:
-    result += key_codes[character] + ' '
+    if character is '\\':
+        escape = True
+    else:
+        if escape is True:
+            result += key_codes['\\' + character]
+        else:
+            result += key_codes[character] + ' '
 
 print(result.rstrip(' '))
