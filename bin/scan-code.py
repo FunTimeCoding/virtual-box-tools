@@ -95,7 +95,8 @@ key_codes = {
     '"': '2a 28 a8 aa',
     '\'': '28 a8',
     '>': '2a 34 b4 aa',
-    '<': '2a 33 b3 aa'
+    '<': '2a 33 b3 aa',
+    '\n': '1c 9c'
 }
 
 result = ''
@@ -103,4 +104,4 @@ result = ''
 for character in sys.argv[1]:
     result += key_codes[character] + ' '
 
-print(result + '1c 9c')
+print(result.rstrip(' '))

@@ -29,7 +29,7 @@ fi
 
 STATE=$("${SCRIPT_DIRECTORY}"/get-vm-state.sh "${MACHINE_NAME}")
 
-if [ ! "${STATE}" = "poweroff" ]; then
+if [ ! "${STATE}" = poweroff ]; then
     "${SCRIPT_DIRECTORY}"/stop-vm.sh "${MACHINE_NAME}"
     DOWN=false
 
@@ -38,14 +38,14 @@ if [ ! "${STATE}" = "poweroff" ]; then
         sleep 1
         STATE=$("${SCRIPT_DIRECTORY}"/get-vm-state.sh "${MACHINE_NAME}")
 
-        if [ "${STATE}" = "poweroff" ]; then
+        if [ "${STATE}" = poweroff ]; then
             DOWN=true
 
             break
         fi
     done
 
-    if [ "${DOWN}" = "false" ]; then
+    if [ "${DOWN}" = false ]; then
         "${SCRIPT_DIRECTORY}"/stop-vm.sh --force "${MACHINE_NAME}"
         sleep 3
     fi
