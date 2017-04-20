@@ -1,3 +1,6 @@
 shellcheck
 OPTIND
 sudo
+netmask
+nameservers
+DHCP
