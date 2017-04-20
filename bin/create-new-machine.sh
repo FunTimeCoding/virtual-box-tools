@@ -153,6 +153,7 @@ fi
 ${VBOXMANAGE} modifyvm "${MACHINE_NAME}" --nic1 nat
 ${VBOXMANAGE} modifyvm "${MACHINE_NAME}" --boot1 net --nattftpfile1 /debian.pxe
 ${VBOXMANAGE} startvm "${MACHINE_NAME}" --type headless
+cd "${SCRIPT_DIRECTORY}/.."
 echo "Install operating system. The virtual machine will shut down for post configuration afterwards."
 
 for MINUTE in $(seq 1 45); do
