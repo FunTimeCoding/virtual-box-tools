@@ -28,8 +28,14 @@ if [ "${MACHINE_NAME}" = "" ] || [ "${ROOT_PASSWORD}" = "" ] || [ "${ADDRESS}" =
 fi
 
 "${SCRIPT_DIRECTORY}"/input.sh "${MACHINE_NAME}" "root
-${ROOT_PASSWORD}
-sed -i s:dhcp:static: /etc/network/interfaces
+"
+sleep 1
+
+"${SCRIPT_DIRECTORY}"/input.sh "${MACHINE_NAME}" "${ROOT_PASSWORD}
+"
+sleep 1
+
+"${SCRIPT_DIRECTORY}"/input.sh "${MACHINE_NAME}" "sed -i s:dhcp:static: /etc/network/interfaces
 echo 'address ${ADDRESS}' >> /etc/network/interfaces
 echo 'netmask ${NETMASK}' >> /etc/network/interfaces
 echo 'network ${NETWORK}' >> /etc/network/interfaces
