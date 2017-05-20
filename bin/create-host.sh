@@ -10,15 +10,17 @@ usage()
 
 # shellcheck source=/dev/null
 . "${SCRIPT_DIRECTORY}"/../lib/virtual_box_tools.sh
+MEMORY=1024
+DISK_SIZE=32
 
 while true; do
     case ${1} in
         --memory)
-            MEMORY_IN_MEGABYTE=${2-}
+            MEMORY=${2-}
             shift 2
             ;;
         --disk-size)
-            DISK_SIZE_IN_GIGABYTE=${2-}
+            DISK_SIZE=${2-}
             shift 2
             ;;
         *)
@@ -27,6 +29,7 @@ while true; do
     esac
 done
 
+OPTIND=1
 HOST_NAME="${1}"
 
 if [ "${HOST_NAME}" = "" ]; then
