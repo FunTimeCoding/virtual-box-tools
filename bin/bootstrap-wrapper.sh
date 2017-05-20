@@ -5,7 +5,7 @@ SCRIPT_DIRECTORY=$(cd "${DIRECTORY}" || exit 1; pwd)
 
 usage()
 {
-    echo "Usage: ${0} HOST USER_PASSWORD ROOT_PASSWORD PROXY MASTER MINION_IDENTIFIER"
+    echo "Usage: ${0} HOST USER_PASSWORD ROOT_PASSWORD MASTER MINION_IDENTIFIER [PROXY]"
 }
 
 # shellcheck source=/dev/null
@@ -14,14 +14,18 @@ usage()
 HOST="${1}"
 USER_PASSWORD="${2}"
 ROOT_PASSWORD="${3}"
-PROXY="${4}"
-MASTER="${5}"
-MINION_IDENTIFIER="${6}"
+MASTER="${4}"
+MINION_IDENTIFIER="${5}"
+PROXY="${6}"
 
-if [ "${HOST}" = "" ] || [ "${USER_PASSWORD}" = "" ] || [ "${ROOT_PASSWORD}" = "" ] || [ "${PROXY}" = "" ] || [ "${MASTER}" = "" ] || [ "${MINION_IDENTIFIER}" = "" ]; then
+if [ "${HOST}" = "" ] || [ "${USER_PASSWORD}" = "" ] || [ "${ROOT_PASSWORD}" = "" ] || [ "${MASTER}" = "" ] || [ "${MINION_IDENTIFIER}" = "" ]; then
     usage
 
     exit 1
 fi
 
-"${SCRIPT_DIRECTORY}"/bootstrap.tcl "${HOST}" "${USER_PASSWORD}" "${ROOT_PASSWORD}" "${PROXY}" "${MASTER}" "${MINION_IDENTIFIER}"
+if [ "${PROXY}" = "" ]; then
+    "${SCRIPT_DIRECTORY}"/bootstrap.tcl "${HOST}" "${USER_PASSWORD}" "${ROOT_PASSWORD}" "${MASTER}" "${MINION_IDENTIFIER}"
+else
+    "${SCRIPT_DIRECTORY}"/bootstrap.tcl "${HOST}" "${USER_PASSWORD}" "${ROOT_PASSWORD}" "${MASTER}" "${MINION_IDENTIFIER}" "${PROXY}"
+fi
