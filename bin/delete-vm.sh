@@ -5,17 +5,27 @@ SCRIPT_DIRECTORY=$(cd "${DIRECTORY}" || exit 1; pwd)
 
 usage()
 {
-    echo "Usage: ${0} MACHINE_NAME"
+    echo "Usage: ${0} MACHINE_NAME [--yes]"
 }
 
 # shellcheck source=/dev/null
 . "${SCRIPT_DIRECTORY}"/../lib/virtual_box_tools.sh
 MACHINE_NAME="${1}"
+YES="${2}"
 
 if [ "${MACHINE_NAME}" = "" ]; then
     usage
 
     exit 1
+fi
+
+if [ ! "${YES}" = --yes ]; then
+    echo "Delete ${MACHINE_NAME}? [y/N]"
+    read -r READ
+
+    if [ ! "${READ}" = y ]; then
+        exit 0
+    fi
 fi
 
 FOUND=true
