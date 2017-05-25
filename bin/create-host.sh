@@ -41,8 +41,8 @@ fi
 touch "${SCRIPT_DIRECTORY}/../${HOST_NAME}.cfg"
 chmod 600 "${SCRIPT_DIRECTORY}/../${HOST_NAME}.cfg"
 DOMAIN=$(hostname -d)
-ROOT_PASSWORD=$(pass "host/${HOST_NAME}.${DOMAIN}/root" > /dev/null || true)
-USER_PASSWORD=$(pass "host/${HOST_NAME}.${DOMAIN}/${USER}" > /dev/null || true)
+ROOT_PASSWORD=$(pass "host/${HOST_NAME}.${DOMAIN}/root" 2>/dev/null || true)
+USER_PASSWORD=$(pass "host/${HOST_NAME}.${DOMAIN}/${USER}" 2>/dev/null || true)
 
 if [ "${ROOT_PASSWORD}" = "" ]; then
     ROOT_PASSWORD=$(pass generate "host/${HOST_NAME}.${DOMAIN}/root" --no-symbols 14)
