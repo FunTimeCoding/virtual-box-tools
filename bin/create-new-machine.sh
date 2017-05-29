@@ -114,22 +114,22 @@ if [ ! -f "${NETWORK_BOOT_ARCHIVE}" ]; then
 fi
 
 TRIVIAL_DIRECTORY="${HOME}/tmp/trivial"
-CPIO_ROOT_DIRECTORY="${TRIVIAL_DIRECTORY}/cpio"
-sudo rm -rf "${TRIVIAL_DIRECTORY}"
-mkdir -p "${CPIO_ROOT_DIRECTORY}"
+COPY_ROOT_DIRECTORY="${TRIVIAL_DIRECTORY}/cpio"
+sudo rm --recursive --force "${TRIVIAL_DIRECTORY}"
+mkdir -p "${COPY_ROOT_DIRECTORY}"
 tar xf "${NETWORK_BOOT_ARCHIVE}" --directory "${TRIVIAL_DIRECTORY}"
-cp "${PRESEED_FILE}" "${CPIO_ROOT_DIRECTORY}/preseed.cfg"
+cp "${PRESEED_FILE}" "${COPY_ROOT_DIRECTORY}/preseed.cfg"
 
 if [ "${OPERATING_SYSTEM}" = Darwin ]; then
-    sudo chown root:wheel "${CPIO_ROOT_DIRECTORY}/preseed.cfg"
+    sudo chown root:wheel "${COPY_ROOT_DIRECTORY}/preseed.cfg"
 else
-    sudo chown root:root "${CPIO_ROOT_DIRECTORY}/preseed.cfg"
+    sudo chown root:root "${COPY_ROOT_DIRECTORY}/preseed.cfg"
 fi
 
-cd "${CPIO_ROOT_DIRECTORY}"
+cd "${COPY_ROOT_DIRECTORY}"
 gzip -d < "${TRIVIAL_DIRECTORY}/debian-installer/amd64/initrd.gz" | sudo cpio -i
 find . | sudo cpio -o --format=newc | gzip -9c > "${TRIVIAL_DIRECTORY}/debian-installer/amd64/initrd.gz"
-sudo rm -rf "${CPIO_ROOT_DIRECTORY}"
+sudo rm --recursive --force "${COPY_ROOT_DIRECTORY}"
 cd "${TRIVIAL_DIRECTORY}"
 ln -s debian-installer/amd64/pxelinux.0 debian.pxe
 echo "DEFAULT ${DEBIAN_RELEASE}
@@ -143,11 +143,11 @@ else
     VIRTUAL_BOX_DIRECTORY="${HOME_DIRECTORY}/.config/VirtualBox"
 fi
 
-sudo rm -rf "${VIRTUAL_BOX_DIRECTORY}/TFTP"
+sudo rm --recursive --force "${VIRTUAL_BOX_DIRECTORY}/TFTP"
 sudo mv "${TRIVIAL_DIRECTORY}" "${VIRTUAL_BOX_DIRECTORY}/TFTP"
 
 if [ ! "${SUDO_USER}" = "" ]; then
-    sudo chown -R "${SUDO_USER}:${SUDO_USER}" "${VIRTUAL_BOX_DIRECTORY}/TFTP"
+    sudo chown --recursive  "${SUDO_USER}:${SUDO_USER}" "${VIRTUAL_BOX_DIRECTORY}/TFTP"
 fi
 
 ${VBOXMANAGE} modifyvm "${MACHINE_NAME}" --nic1 nat
