@@ -1,7 +1,7 @@
 pep8 # style check
 pylint # style check
 flake8 # style check
-pyenchant # pylint spellcheck plugin
+pyenchant # pylint spell check plugin
 pytest # test framework
 pytest-cov # pytest coverage plugin
 
