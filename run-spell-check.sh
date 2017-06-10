@@ -29,7 +29,7 @@ done
 TEX_FILES=$(find . -name '*.tex')
 
 for FILE in ${TEX_FILES}; do
-    WORDS=$(hunspell -d "${DICTIONARY}" -p "${SCRIPT_DIRECTORY}/custom.dic" -l -t "${FILE}")
+    WORDS=$(hunspell -d "${DICTIONARY}" -p "${SCRIPT_DIRECTORY}/dict/virtual-box-tools.dic" -l -t "${FILE}")
 
     if [ ! "${WORDS}" = "" ]; then
         echo "${FILE}"
