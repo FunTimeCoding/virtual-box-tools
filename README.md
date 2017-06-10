@@ -19,18 +19,15 @@ Uninstall the project.
 pip3 uninstall virtual-box-tools
 ```
 
+Configuration file location: ~/.virtual-box-tools.yml
 
-## Configuration
-
-This section explains configuration options.
-
-Specify the location of the host config in `~/.virtual-box-tools.yml`. This is optional.
+Optional: Use a host configuration from a different location.
 
 ```yml
 host_file: ~/srv/salt/pillar/host.sls
 ```
 
-If VirtualBox runs as a different user, enable use of `sudo`.
+Optional: Run virtual machines as a different user.
 
 ```yml
 sudo_user: vbox
@@ -41,12 +38,18 @@ sudo_user: vbox
 
 This section explains how to use this project.
 
+Run the main program.
+
+```sh
+bin/vbt
+```
+
 Show help.
 
 ```sh
-vbt --help
-vbt host --help
-vbt service --help
+bin/vbt --help
+bin/vbt host --help
+bin/vbt service --help
 ```
 
 
