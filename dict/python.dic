@@ -2,3 +2,5 @@ pycache
 pyyaml
 shyaml
 pylint
+venv
+htmlcov
