@@ -4,3 +4,4 @@ shyaml
 pylint
 venv
 htmlcov
+pyenchant

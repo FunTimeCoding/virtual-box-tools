@@ -4,3 +4,7 @@ sudo
 netmask
 nameservers
 DHCP
+realpath
+cpio
+libenchant
+hunspell

@@ -8,13 +8,13 @@ fi
 
 DIRECTORY=$(dirname "${0}")
 SCRIPT_DIRECTORY=$(cd "${DIRECTORY}" || exit 1; pwd)
-OPERATING_SYSTEM=$(uname)
+SYSTEM=$(uname)
 DEBIAN_RELEASE=jessie
 MEMORY_IN_MEGABYTE=256
 DISK_SIZE_IN_GIGABYTE=16
 NETWORK_TYPE=hostonly
 
-if [ "${OPERATING_SYSTEM}" = Darwin ]; then
+if [ "${SYSTEM}" = Darwin ]; then
     NETWORK_DEVICE=en0
 else
     NETWORK_DEVICE=eth0
@@ -120,7 +120,7 @@ mkdir -p "${COPY_ROOT_DIRECTORY}"
 tar xf "${NETWORK_BOOT_ARCHIVE}" --directory "${TRIVIAL_DIRECTORY}"
 cp "${PRESEED_FILE}" "${COPY_ROOT_DIRECTORY}/preseed.cfg"
 
-if [ "${OPERATING_SYSTEM}" = Darwin ]; then
+if [ "${SYSTEM}" = Darwin ]; then
     sudo chown root:wheel "${COPY_ROOT_DIRECTORY}/preseed.cfg"
 else
     sudo chown root:root "${COPY_ROOT_DIRECTORY}/preseed.cfg"
@@ -137,7 +137,7 @@ LABEL ${DEBIAN_RELEASE}
 kernel debian-installer/amd64/linux
 append auto initrd=debian-installer/amd64/initrd.gz priority=critical preseed/file=/preseed.cfg" >> "${TRIVIAL_DIRECTORY}/debian-installer/amd64/boot-screens/syslinux.cfg"
 
-if [ "${OPERATING_SYSTEM}" = Darwin ]; then
+if [ "${SYSTEM}" = Darwin ]; then
     VIRTUAL_BOX_DIRECTORY="${HOME_DIRECTORY}/Library/VirtualBox"
 else
     VIRTUAL_BOX_DIRECTORY="${HOME_DIRECTORY}/.config/VirtualBox"
