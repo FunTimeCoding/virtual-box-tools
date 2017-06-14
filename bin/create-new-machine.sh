@@ -13,6 +13,8 @@ DEBIAN_RELEASE=jessie
 MEMORY_IN_MEGABYTE=256
 DISK_SIZE_IN_GIGABYTE=16
 NETWORK_TYPE=hostonly
+PRESEED_FILE=""
+GUARD_KEY=""
 
 if [ "${SYSTEM}" = Darwin ]; then
     NETWORK_DEVICE=en0
@@ -22,15 +24,17 @@ fi
 
 usage()
 {
-    echo "Usage: ${0} [--debian-release jessie|wheezy][--network-device eth0][--network-type bridged|hostonly][--preseed-file FILE] MACHINE_NAME"
-    echo "Debian device examples: eth0, eth1, en0, en1"
-    echo "Defaults"
+    echo "Usage: ${0} [--debian-release DEBIAN_RELEASE][--network-device NETWORK_DEVICE][--network-type NETWORK_TYPE][--preseed-file FILE][--guard-key FILE] MACHINE_NAME"
+    echo "Leave --network-type unspecified to skip network configuration."
+    echo "Network device examples: eth0, en0"
+    echo "Valid Debian releases: jessie, stretch"
+    echo "Valid network types: bridged, hostonly"
+    echo "Defaults:"
     echo "Release: ${DEBIAN_RELEASE}"
     echo "Device: ${NETWORK_DEVICE}"
     echo "Network type: ${NETWORK_TYPE}"
     echo "Memory in megabyte: ${MEMORY_IN_MEGABYTE}"
     echo "Disk size in gigabyte: ${DISK_SIZE_IN_GIGABYTE}"
-    echo "Leave --type unspecified to skip network configuration."
 }
 
 # shellcheck source=/dev/null
@@ -52,6 +56,10 @@ while true; do
             ;;
         --preseed-file)
             PRESEED_FILE=${2-}
+            shift 2
+            ;;
+        --guard-key)
+            GUARD_KEY=${2-}
             shift 2
             ;;
         --memory)
@@ -126,9 +134,19 @@ else
     sudo chown root:root "${COPY_ROOT_DIRECTORY}/preseed.cfg"
 fi
 
+if [ ! "${GUARD_KEY}" = "" ]; then
+    cp "${GUARD_KEY}" "${COPY_ROOT_DIRECTORY}/self-hosted-repository.gpg"
+
+    if [ "${SYSTEM}" = Darwin ]; then
+        sudo chown root:wheel "${COPY_ROOT_DIRECTORY}/self-hosted-repository.gpg"
+    else
+        sudo chown root:root "${COPY_ROOT_DIRECTORY}/self-hosted-repository.gpg"
+    fi
+fi
+
 cd "${COPY_ROOT_DIRECTORY}"
-gzip -d < "${TRIVIAL_DIRECTORY}/debian-installer/amd64/initrd.gz" | sudo cpio -i
-find . | sudo cpio -o --format=newc | gzip -9c > "${TRIVIAL_DIRECTORY}/debian-installer/amd64/initrd.gz"
+gzip -d < "${TRIVIAL_DIRECTORY}/debian-installer/amd64/initrd.gz" | sudo cpio --extract
+find . | sudo cpio --create --format=newc | gzip --best --stdout > "${TRIVIAL_DIRECTORY}/debian-installer/amd64/initrd.gz"
 sudo rm --recursive --force "${COPY_ROOT_DIRECTORY}"
 cd "${TRIVIAL_DIRECTORY}"
 ln -s debian-installer/amd64/pxelinux.0 debian.pxe
