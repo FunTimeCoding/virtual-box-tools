@@ -8,3 +8,6 @@ realpath
 cpio
 libenchant
 hunspell
+wget
+mkdir
+myspell

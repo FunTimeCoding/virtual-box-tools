@@ -5,3 +5,6 @@ pylint
 venv
 htmlcov
 pyenchant
+pygtk
+optparse
+contextlib
