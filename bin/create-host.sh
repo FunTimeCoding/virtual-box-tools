@@ -10,8 +10,8 @@ usage()
 
 # shellcheck source=/dev/null
 . "${SCRIPT_DIRECTORY}"/../lib/virtual_box_tools.sh
-MEMORY=1024
-DISK_SIZE=32
+MEMORY=4096
+DISK_SIZE=64
 
 while true; do
     case ${1} in
