@@ -10,6 +10,7 @@ DIRECTORY=$(dirname "${0}")
 SCRIPT_DIRECTORY=$(cd "${DIRECTORY}" || exit 1; pwd)
 SYSTEM=$(uname)
 DEBIAN_RELEASE=stretch
+CORES=1
 MEMORY_IN_MEGABYTE=4096
 DISK_SIZE_IN_GIGABYTE=64
 NETWORK_TYPE=hostonly
@@ -24,7 +25,7 @@ fi
 
 usage()
 {
-    echo "Usage: ${0} [--debian-release DEBIAN_RELEASE][--network-device NETWORK_DEVICE][--network-type NETWORK_TYPE][--preseed-file FILE][--guard-key FILE] MACHINE_NAME"
+    echo "Usage: ${0} [--debian-release DEBIAN_RELEASE][--network-device NETWORK_DEVICE][--network-type NETWORK_TYPE][--preseed-file FILE][--guard-key FILE][--cores NUMBER][--memory NUMBER][--disk-size NUMBER] MACHINE_NAME"
     echo "Leave --network-type unspecified to skip network configuration."
     echo "Network device examples: eth0, en0"
     echo "Valid Debian releases: jessie, stretch"
@@ -33,6 +34,7 @@ usage()
     echo "Release: ${DEBIAN_RELEASE}"
     echo "Device: ${NETWORK_DEVICE}"
     echo "Network type: ${NETWORK_TYPE}"
+    echo "Cores: ${CORES}"
     echo "Memory in megabyte: ${MEMORY_IN_MEGABYTE}"
     echo "Disk size in gigabyte: ${DISK_SIZE_IN_GIGABYTE}"
 }
@@ -60,6 +62,10 @@ while true; do
             ;;
         --guard-key)
             GUARD_KEY=${2-}
+            shift 2
+            ;;
+        --cores)
+            CORES=${2-}
             shift 2
             ;;
         --memory)
@@ -106,7 +112,7 @@ DISK_SIZE_IN_MEGABYTE=$(echo "${DISK_SIZE_IN_GIGABYTE} * 1024" | bc)
 ${VBOXMANAGE} createmedium disk --filename "${DISK_PATH}" --size "${DISK_SIZE_IN_MEGABYTE}"
 ${VBOXMANAGE} storageattach "${MACHINE_NAME}" --storagectl "${CONTROLLER_NAME}" --port 0 --device 0 --type hdd --medium "${DISK_PATH}"
 ${VBOXMANAGE} storageattach "${MACHINE_NAME}" --storagectl "${CONTROLLER_NAME}" --port 1 --device 0 --type dvddrive --medium emptydrive
-${VBOXMANAGE} modifyvm "${MACHINE_NAME}" --acpi on --memory "${MEMORY_IN_MEGABYTE}" --vram 16
+${VBOXMANAGE} modifyvm "${MACHINE_NAME}" --acpi on --cpus "${CORES}" --memory "${MEMORY_IN_MEGABYTE}" --vram 16
 
 if [ "${PRESEED_FILE}" = "" ]; then
     ${VBOXMANAGE} startvm "${MACHINE_NAME}"
