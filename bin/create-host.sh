@@ -63,5 +63,5 @@ if [ "${USER_PASSWORD}" = "" ]; then
 fi
 
 FULL_NAME=$(getent passwd "${USER}" | cut -d : -f 5 | cut -d , -f 1)
-dt --release "${RELEASE}" --hostname "${HOST_NAME}" --domain "${DOMAIN}" --root-password "${ROOT_PASSWORD}" --user-name "${USER}" --user-password "${USER_PASSWORD}" --user-real-name "${FULL_NAME}" > "${SCRIPT_DIRECTORY}/../${HOST_NAME}.cfg"
+"${HOME}/src/debian-tools/.venv/bin/dt" --release "${RELEASE}" --hostname "${HOST_NAME}" --domain "${DOMAIN}" --root-password "${ROOT_PASSWORD}" --user-name "${USER}" --user-password "${USER_PASSWORD}" --user-real-name "${FULL_NAME}" > "${SCRIPT_DIRECTORY}/../${HOST_NAME}.cfg"
 "${SCRIPT_DIRECTORY}/create-new-machine.sh" --debian-release "${RELEASE}" --preseed-file "${SCRIPT_DIRECTORY}/../${HOST_NAME}.cfg" --network-device vboxnet0 --network-type hostonly --cores "${CORES}" --memory "${MEMORY}" --disk-size "${DISK_SIZE}" "${HOST_NAME}"
