@@ -1,17 +1,5 @@
 #!/bin/sh -e
 
-if [ "$(command -v shyaml || true)" = "" ]; then
-    echo "Command not found: shyaml"
-
-    exit 1
-fi
-
-if [ "$(command -v realpath || true)" = "" ]; then
-    echo "Command not found: realpath"
-
-    exit 1
-fi
-
 function_exists()
 {
     declare -f -F "${1}" > /dev/null
@@ -43,10 +31,13 @@ while true; do
 done
 
 OPTIND=1
+CONFIG=$(realpath "${CONFIG}")
 
 if [ -f "${CONFIG}" ]; then
-    CONFIG=$(realpath "${CONFIG}")
-    SUDO_USER=$(shyaml get-value sudo_user < "${CONFIG}" 2> /dev/null || true)
+    DIRECTORY=$(dirname "${0}")
+    SCRIPT_DIRECTORY=$(cd "${DIRECTORY}" || exit 1; pwd)
+    SHYAML="${SCRIPT_DIRECTORY}/../.venv/bin/shyaml"
+    SUDO_USER=$(${SHYAML} get-value sudo_user < "${CONFIG}" 2> /dev/null || true)
 else
     CONFIG=""
 fi
