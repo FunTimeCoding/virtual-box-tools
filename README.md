@@ -19,7 +19,7 @@ Uninstall the project.
 pip3 uninstall virtual-box-tools
 ```
 
-Configuration file location: ~/.virtual-box-tools.yml
+Configuration file location: ~/.virtual-box-tools.yaml
 
 Optional: Use a host configuration from a different location.
 

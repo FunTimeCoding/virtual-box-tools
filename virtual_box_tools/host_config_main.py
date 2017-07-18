@@ -14,7 +14,7 @@ class HostConfigMain:
         self.parsed_arguments = self.parser.parse_args(arguments)
         print(self.parsed_arguments)
 
-        config = YamlConfig('~/.virtual-box-tools.yml')
+        config = YamlConfig('~/.virtual-box-tools.yaml')
         config_file_path = config.get('host_file')
         self.CANONICAL_NAMES_KEY = 'canonical_name'
         self.CATCH_ALL_DOMAIN_KEY = 'catch_all_domain'

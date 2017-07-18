@@ -7,7 +7,7 @@ function_exists()
     return $?
 }
 
-CONFIG="${HOME}/.virtual-box-tools.yml"
+CONFIG="${HOME}/.virtual-box-tools.yaml"
 
 while true; do
     case ${1} in
