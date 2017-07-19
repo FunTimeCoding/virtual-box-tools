@@ -5,17 +5,29 @@ SCRIPT_DIRECTORY=$(cd "${DIRECTORY}" || exit 1; pwd)
 
 usage()
 {
-    echo "Usage: ${0} [--wait] MACHINE_NAME"
+    echo "Usage: ${0} [--wait][--sleep-seconds NUMBER] MACHINE_NAME"
 }
 
 # shellcheck source=/dev/null
 . "${SCRIPT_DIRECTORY}"/../lib/virtual_box_tools.sh
 WAIT=false
+SLEEP_SECONDS=0
 
-if [ "${1}" = "--wait" ]; then
-    WAIT=true
-    shift
-fi
+while true; do
+    case ${1} in
+        --wait)
+            WAIT=true
+            shift
+            ;;
+        --sleep-seconds)
+            SLEEP_SECONDS=${2-}
+            shift 2
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
 
 MACHINE_NAME="${1}"
 
@@ -55,4 +67,8 @@ if [ "${WAIT}" = true ]; then
     echo "MAC: ${PHYSICAL_ADDRESS}"
 else
     echo "Virtual machine '${MACHINE_NAME}' is starting."
+
+    if [ ! "${SLEEP_SECONDS}" = 0 ]; then
+        sleep "${SLEEP_SECONDS}"
+    fi
 fi
