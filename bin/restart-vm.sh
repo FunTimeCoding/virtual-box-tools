@@ -20,4 +20,5 @@ if [ "${MACHINE_NAME}" = "" ]; then
 fi
 
 "${SCRIPT_DIRECTORY}"/stop-vm.sh --wait "${MACHINE_NAME}"
+sleep 3
 "${SCRIPT_DIRECTORY}"/start-vm.sh --wait "${MACHINE_NAME}"
