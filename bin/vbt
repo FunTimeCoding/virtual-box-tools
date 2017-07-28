@@ -4,6 +4,4 @@ from sys import argv, exit
 from virtual_box_tools.host_config_main import HostConfigMain
 
 if __name__ == '__main__':
-    application = HostConfigMain(argv[1:])
-    exit_code = application.run()
-    exit(exit_code)
+    exit(HostConfigMain(argv[1:]).run())
