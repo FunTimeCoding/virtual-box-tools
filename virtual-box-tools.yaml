@@ -1,3 +1,4 @@
+---
 token: example
 sudo_user: virtualbox
 listen_address: 0.0.0.0
