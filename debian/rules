@@ -1,0 +1,5 @@
+#export DH_VERBOSE=1
+export PYBUILD_NAME=jenkins-job-manager
+
+%:
+	dh $@ --with python3 --buildsystem=pybuild

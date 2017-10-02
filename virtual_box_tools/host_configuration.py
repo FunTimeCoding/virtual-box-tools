@@ -1,14 +1,14 @@
 from argparse import ArgumentDefaultsHelpFormatter
 from collections import OrderedDict
 from os.path import expanduser, isfile
-from sys import exit
+from sys import exit as system_exit, argv
 
 from virtual_box_tools.custom_argument_parser import CustomArgumentParser
 from virtual_box_tools.yaml_config import YamlConfig
 from yaml import load, dump
 
 
-class HostConfigMain:
+class HostConfiguration:
     def __init__(self, arguments: list):
         self.parser = self.create_parser()
         self.parsed_arguments = self.parser.parse_args(arguments)
@@ -29,7 +29,33 @@ class HostConfigMain:
             self.yaml_tree = self.load_config_file()
         else:
             print('File not found: ' + self.host_file_path)
-            exit(1)
+            system_exit(1)
+
+    @staticmethod
+    def main() -> int:
+        return HostConfiguration(argv[1:]).run()
+
+    def run(self) -> int:
+        result = 0
+
+        if 'host' in self.parsed_arguments:
+            if 'add' in self.parsed_arguments:
+                self.add(self.parsed_arguments.name)
+            elif 'delete' in self.parsed_arguments:
+                result = self.delete(self.parsed_arguments.name)
+            elif 'list' in self.parsed_arguments:
+                self.list_hosts()
+            elif 'sort' in self.parsed_arguments:
+                self.sort()
+            else:
+                self.parser.print_help()
+        elif 'service' in self.parsed_arguments:
+            # TODO: Add commands add/list/delete
+            self.parser.print_help()
+        else:
+            self.parser.print_help()
+
+        return result
 
     @staticmethod
     def create_parser() -> CustomArgumentParser:
@@ -38,8 +64,8 @@ class HostConfigMain:
             formatter_class=ArgumentDefaultsHelpFormatter
         )
         subparsers = parser.add_subparsers()
-        HostConfigMain.add_host_parser(subparsers)
-        HostConfigMain.add_service_parser(subparsers)
+        HostConfiguration.add_host_parser(subparsers)
+        HostConfiguration.add_service_parser(subparsers)
 
         parser.add_argument(
             '--dry-run',
@@ -115,28 +141,6 @@ class HostConfigMain:
         service_parser.add_argument('service', action='store_true')
         # service_subparsers = service_parser.add_subparsers()
         # TODO: This is where the service sub commands go.
-
-    def run(self) -> int:
-        result = 0
-
-        if 'host' in self.parsed_arguments:
-            if 'add' in self.parsed_arguments:
-                self.add(self.parsed_arguments.name)
-            elif 'delete' in self.parsed_arguments:
-                result = self.delete(self.parsed_arguments.name)
-            elif 'list' in self.parsed_arguments:
-                self.list_hosts()
-            elif 'sort' in self.parsed_arguments:
-                self.sort()
-            else:
-                self.parser.print_help()
-        elif 'service' in self.parsed_arguments:
-            # TODO: Add commands add/list/delete
-            self.parser.print_help()
-        else:
-            self.parser.print_help()
-
-        return result
 
     def sort(self) -> None:
         self.save_config_file()

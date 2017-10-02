@@ -30,7 +30,7 @@ setup(
             'vbt=virtual_box_tools.virtual_box_tools:'
             'VirtualBoxTools.main',
             'vbt-host-configuration=virtual_box_tools.host_configuration:'
-            'HostConfig.main',
+            'HostConfiguration.main',
             'vbt-web-service=virtual_box_tools.web_service:'
             'WebService.main',
         ],
