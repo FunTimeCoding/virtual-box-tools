@@ -4,3 +4,4 @@ poweroff
 vboxmanage
 nictype
 hostonly
+guestproperty

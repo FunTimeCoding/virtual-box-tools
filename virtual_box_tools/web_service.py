@@ -64,6 +64,8 @@ class WebService:
         if authorization_result != '':
             return authorization_result
 
+        status_code = 200
+
         if request.method == 'GET':
             if name == '':
                 body = json.dumps([{
@@ -81,25 +83,34 @@ class WebService:
                 )
                 return_code = process.get_return_code()
                 standard_output = process.get_standard_output()
+                standard_error = process.get_standard_error()
 
                 if return_code is 0:
                     body = json.dumps({
-                        'name': name,
                         'virtual_address': '127.0.0.1',
                         'physical_address': '00:00:00:00:00',
                         'services': []
                     })
                 else:
-                    body = json.dumps({
-                        'name': name,
-                        'standard_output': standard_output,
-                        'standard_error': process.get_standard_error(),
-                        'return_code': return_code
-                    })
+                    if 'Could not find a registered machine named' \
+                            in standard_error:
+                        status_code = 404
+                        body = json.dumps({
+                            'message': 'Host not found.',
+                        })
+                    else:
+                        status_code = 500
+                        body = json.dumps({
+                            'name': name,
+                            'standard_output': standard_output,
+                            'standard_error': standard_error,
+                            'return_code': return_code
+                        })
 
         elif request.method == 'POST':
             body = 'Host created: ' + str(request.json.get('name'))
         else:
+            status_code = 500
             body = 'Unexpected method: ' + request.method
 
-        return body
+        return body, status_code
