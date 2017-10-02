@@ -40,16 +40,16 @@ class WebService:
     def authorize():
         authorization_header = str(request.headers.get('Authorization'))
         authorization_type = ''
-        authorization_token = ''
+        token = ''
 
         if authorization_header != '':
             authorization = str(request.headers.get('Authorization')).split(' ')
 
             if len(authorization) is 2:
                 authorization_type = authorization[0]
-                authorization_token = authorization[1]
+                token = authorization[1]
 
-        if authorization_token != WebService.token \
+        if token != WebService.token \
                 or authorization_type != 'Token':
             return 'Authorization failed.'
 
@@ -72,29 +72,29 @@ class WebService:
                     'services': []
                 }])
             else:
-                process = CommandProcess([
-                    # 'echo example',
-                    # 'sleep 10',
-                    # 'exit 1',
-                    'echo error 1>&2',
-                    # 'sudo', '-u', WebService.sudo_user,
-                    # 'vboxmanage', 'guestproperty', 'enumerate', name
-                ])
-                exit_code = process.get_exit_code()
+                process = CommandProcess(
+                    arguments=[
+                        'vboxmanage', 'guestproperty', 'enumerate', name
+                    ],
+                    sudo_user=WebService.sudo_user
+                )
+                return_code = process.get_return_code()
                 standard_output = process.get_standard_output()
-                standard_error = process.get_error_output()
 
-                if exit_code is 0:
-                    # body = json.dumps({
-                    #     'name': name,
-                    #     'virtual_address': '127.0.0.1',
-                    #     'physical_address': '00:00:00:00:00',
-                    #     'services': []
-                    # })
-                    body = standard_output + standard_error
+                if return_code is 0:
+                    body = json.dumps({
+                        'name': name,
+                        'virtual_address': '127.0.0.1',
+                        'physical_address': '00:00:00:00:00',
+                        'services': []
+                    })
                 else:
-                    body = 'something went wrong: ' + str(exit_code) + ' ' \
-                           + standard_output + ' ' + standard_error
+                    body = json.dumps({
+                        'name': name,
+                        'standard_output': standard_output,
+                        'standard_error': process.get_standard_error(),
+                        'return_code': return_code
+                    })
 
         elif request.method == 'POST':
             body = 'Host created: ' + str(request.json.get('name'))
