@@ -7,7 +7,7 @@ class CommandProcess:
             arguments = ['sudo', '-u', sudo_user] + arguments
 
         self.process = Popen(args=arguments, stdout=PIPE, stderr=PIPE)
-        output, error = process.communicate()
+        output, error = self.process.communicate()
         self.standard_output = output.decode().strip()
         self.standard_error = error.decode().strip()
 

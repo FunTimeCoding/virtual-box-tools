@@ -56,8 +56,9 @@ class WebService:
         return ''
 
     @staticmethod
+    @app.route('/host', methods=['GET'])
     @app.route('/host/<name>', methods=['GET', 'POST'])
-    def register_object(name: str):
+    def register_object(name: str = ''):
         authorization_result = WebService.authorize()
 
         if authorization_result != '':

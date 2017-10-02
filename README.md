@@ -86,5 +86,5 @@ sudo -u virtualbox vboxmanage showvminfo --machinereadable ${MACHINE_NAME}
 Send a request to the web service.
 
 ```sh
-curl --header 'Authorization: Token example' 192.168.2.128:5000/host
+curl --silent --header 'Authorization: Token example' localhost:5000/host
 ```
