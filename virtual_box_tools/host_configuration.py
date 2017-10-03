@@ -185,17 +185,14 @@ class HostConfiguration:
 
             if self.CANONICAL_NAMES_KEY in attributes:
                 print(
-                    'Canonical names: ' + str(
-                        attributes[self.CANONICAL_NAMES_KEY]
-                    )
+                    'Canonical names: '
+                    + str(attributes[self.CANONICAL_NAMES_KEY])
                 )
 
             if self.CATCH_ALL_DOMAIN_KEY in attributes:
                 print(
-                    'Catch all domains: ' +
-                    str(
-                        attributes[self.CATCH_ALL_DOMAIN_KEY]
-                    )
+                    'Catch all domains: '
+                    + str(attributes[self.CATCH_ALL_DOMAIN_KEY])
                 )
 
     def load_config_file(self) -> dict:
