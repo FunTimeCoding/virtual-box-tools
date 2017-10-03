@@ -3,7 +3,8 @@ from sys import argv
 
 from flask import Flask, request, json
 
-from virtual_box_tools.command_process import CommandProcess
+from virtual_box_tools.command_process import CommandProcess, CommandFailed
+from virtual_box_tools.virtual_box_tools import Commands
 from virtual_box_tools.yaml_config import YamlConfig
 
 
@@ -38,16 +39,16 @@ class WebService:
 
     @staticmethod
     def authorize():
-        authorization_header = str(request.headers.get('Authorization'))
+        header = str(request.headers.get('Authorization'))
         authorization_type = ''
         token = ''
 
-        if authorization_header != '':
-            authorization = str(request.headers.get('Authorization')).split(' ')
+        if header != '':
+            elements = header.split(' ')
 
-            if len(authorization) is 2:
-                authorization_type = authorization[0]
-                token = authorization[1]
+            if len(elements) is 2:
+                authorization_type = elements[0]
+                token = elements[1]
 
         if token != WebService.token \
                 or authorization_type != 'Token':
@@ -62,38 +63,31 @@ class WebService:
         authorization_result = WebService.authorize()
 
         if authorization_result != '':
-            return authorization_result
+            return authorization_result, 401
 
         status_code = 200
 
         if request.method == 'GET':
-            if name == '':
-                body = json.dumps([{
-                    'name': 'example',
-                    'virtual_address': '127.0.0.1',
-                    'physical_address': '00:00:00:00:00',
-                    'services': []
-                }])
-            else:
-                process = CommandProcess(
-                    arguments=[
-                        'vboxmanage', 'guestproperty', 'enumerate', name
-                    ],
-                    sudo_user=WebService.sudo_user
-                )
-                return_code = process.get_return_code()
-                standard_output = process.get_standard_output()
-                standard_error = process.get_standard_error()
+            commands = Commands(WebService.sudo_user)
 
-                if return_code is 0:
+            if name == '':
+                try:
+                    body = json.dumps(commands.list_virtual_machines())
+                except CommandFailed as exception:
+                    status_code = 500
                     body = json.dumps({
-                        'virtual_address': '127.0.0.1',
-                        'physical_address': '00:00:00:00:00',
-                        'services': []
+                        'standard_output': exception.get_standard_output(),
+                        'standard_error': exception.get_standard_error(),
+                        'return_code': exception.get_return_code()
                     })
-                else:
+            else:
+                try:
+                    body = json.dumps(
+                        commands.get_virtual_machine_information(name=name)
+                    )
+                except CommandFailed as exception:
                     if 'Could not find a registered machine named' \
-                            in standard_error:
+                            in exception.get_standard_error():
                         status_code = 404
                         body = json.dumps({
                             'message': 'Host not found.',
@@ -101,10 +95,9 @@ class WebService:
                     else:
                         status_code = 500
                         body = json.dumps({
-                            'name': name,
-                            'standard_output': standard_output,
-                            'standard_error': standard_error,
-                            'return_code': return_code
+                            'standard_output': exception.get_standard_output(),
+                            'standard_error': exception.get_standard_error(),
+                            'return_code': exception.get_return_code()
                         })
 
         elif request.method == 'POST':
