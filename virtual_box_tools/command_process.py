@@ -11,9 +11,14 @@ class CommandFailed(BaseException):
         self.return_code = return_code
         self.standard_output = standard_output
         self.standard_error = standard_error
-        self.message = 'Return code: ' + str(self.return_code) \
-                       + '\nStandard output: ' + self.standard_output \
-                       + '\nStandard error: ' + self.standard_error
+        self.message = 'CommandFailed:' \
+                       + '\nReturn code: ' + str(self.return_code)
+
+        if self.standard_output != '':
+            self.message += '\nStandard output: \n' + self.standard_output
+
+        if self.standard_error != '':
+            self.message += '\nStandard error: \n' + self.standard_error
 
     def get_standard_output(self):
         return self.standard_output
@@ -23,6 +28,9 @@ class CommandFailed(BaseException):
 
     def get_return_code(self):
         return self.return_code
+
+    def __str__(self):
+        return self.message
 
 
 class CommandProcess:

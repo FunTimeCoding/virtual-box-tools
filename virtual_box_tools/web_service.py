@@ -3,7 +3,7 @@ from sys import argv
 
 from flask import Flask, request, json
 
-from virtual_box_tools.command_process import CommandProcess, CommandFailed
+from virtual_box_tools.command_process import CommandFailed
 from virtual_box_tools.virtual_box_tools import Commands
 from virtual_box_tools.yaml_config import YamlConfig
 
@@ -65,45 +65,37 @@ class WebService:
         if authorization_result != '':
             return authorization_result, 401
 
-        status_code = 200
-
         if request.method == 'GET':
             commands = Commands(WebService.sudo_user)
 
             if name == '':
                 try:
-                    body = json.dumps(commands.list_virtual_machines())
+                    return json.dumps(commands.list_hosts())
                 except CommandFailed as exception:
-                    status_code = 500
-                    body = json.dumps({
+                    return json.dumps({
                         'standard_output': exception.get_standard_output(),
                         'standard_error': exception.get_standard_error(),
                         'return_code': exception.get_return_code()
-                    })
+                    }), 500
             else:
                 try:
-                    body = json.dumps(
-                        commands.get_virtual_machine_information(name=name)
+                    return json.dumps(
+                        commands.get_host_information(name=name)
                     )
                 except CommandFailed as exception:
                     if 'Could not find a registered machine named' \
                             in exception.get_standard_error():
-                        status_code = 404
-                        body = json.dumps({
+                        return json.dumps({
                             'message': 'Host not found.',
-                        })
+                        }), 404
                     else:
-                        status_code = 500
-                        body = json.dumps({
+                        return json.dumps({
                             'standard_output': exception.get_standard_output(),
                             'standard_error': exception.get_standard_error(),
                             'return_code': exception.get_return_code()
-                        })
+                        }), 500
 
         elif request.method == 'POST':
-            body = 'Host created: ' + str(request.json.get('name'))
+            return 'Host created: ' + str(request.json.get('name'))
         else:
-            status_code = 500
-            body = 'Unexpected method: ' + request.method
-
-        return body, status_code
+            return 'Unexpected method: ' + request.method, 500
