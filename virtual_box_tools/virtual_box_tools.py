@@ -1,6 +1,9 @@
+from getpass import getuser
+from socket import getfqdn
 from argparse import ArgumentDefaultsHelpFormatter
 from sys import argv
 
+import pwd
 from virtual_box_tools.command_process import CommandProcess, \
     CommandFailed
 from virtual_box_tools.custom_argument_parser import CustomArgumentParser
@@ -28,6 +31,60 @@ class Commands:
             sudo_user=self.sudo_user
         ).get_standard_output()
 
+    def create_host(
+            self, name: str = '',
+            cores: int = 1,
+            memory: int = 4096,
+            disk_size: int = 64,
+            release: str = 'jessie'
+    ):
+        domain = getfqdn()
+        print('Get root password')
+        get_root_password_process = CommandProcess(
+            arguments=['pass', 'host/' + name + '.' + domain + '/root'],
+            sudo_user=self.sudo_user
+        )
+        root_password = get_root_password_process.get_standard_output()
+
+        if root_password == '':
+            print('Generate root password')
+            generate_root_password_process = CommandProcess(
+                arguments=[
+                    'pass', 'generate',
+                    'host/' + name + '.' + domain + '/root',
+                    '--no-symbols', 14
+                ],
+                sudo_user=self.sudo_user
+            )
+            root_password = generate_root_password_process.standard_output()
+
+        user = getuser()
+        print('Get user password')
+        get_user_password_process = CommandProcess(
+            arguments=['pass', 'host/' + name + '.' + domain + '/' + user],
+            sudo_user=self.sudo_user
+        )
+        user_password = get_user_password_process.get_standard_output()
+
+        if user_password == '':
+            print('Generate user password')
+            generate_user_password_process = CommandProcess(
+                arguments=[
+                    'pass', 'generate',
+                    'host/' + name + '.' + domain + '/' + user,
+                    '--no-symbols', 14
+                ],
+                sudo_user=self.sudo_user
+            )
+            user_password = generate_user_password_process.standard_output()
+
+        print(root_password)
+        print(user_password)
+        print(pwd.getpwnam(user)[4])
+
+    def destroy_host(self, name: str = ''):
+        pass
+
 
 class VirtualBoxTools:
     def __init__(self, arguments: list):
@@ -47,7 +104,12 @@ class VirtualBoxTools:
             if 'list' in self.parsed_arguments:
                 print(commands.list_hosts())
             elif 'create' in self.parsed_arguments:
-                print('create stub')
+                try:
+                    print(commands.create_host(
+                        name=self.parsed_arguments.name
+                    ))
+                except CommandFailed as exception:
+                    print(exception)
             elif 'destroy' in self.parsed_arguments:
                 print('destroy stub')
             elif 'show' in self.parsed_arguments:
@@ -61,7 +123,6 @@ class VirtualBoxTools:
                         print('Host not found.')
                     else:
                         print(exception)
-
             else:
                 self.parser.print_help()
         else:
