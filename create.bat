@@ -2,6 +2,9 @@
 
 if not exist tmp mkdir tmp
 
+echo "eth0" > tmp/ethernet-device.txt
+echo nul > tmp/pypirc.txt
+
 set /p USER_NAME="User name: "
 :: TODO: Make files with newlines. This would add a newline.
 ::echo %USER_NAME% > tmp/user-name.txt
