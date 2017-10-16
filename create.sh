@@ -20,7 +20,7 @@ echo "${DOMAIN}" > tmp/domain.txt
 SYSTEM=$(uname)
 
 if [ "${SYSTEM}" = Darwin ]; then
-    FULL_NAME=$(scutil --get HostName)
+    FULL_NAME=$(finger "${USER_NAME}" | awk -F : '{ print $3 }' | head -n 1 | sed 's/^ //')
 else
     FULL_NAME=$(getent passwd "${USER_NAME}" | cut -d : -f 5 | cut -d , -f 1)
 fi
