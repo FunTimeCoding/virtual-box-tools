@@ -17,3 +17,4 @@ set /p DOMAIN="Domain: "
 echo|set /p=%DOMAIN% > tmp/domain.txt
 
 vagrant up
+pause
