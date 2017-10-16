@@ -27,6 +27,8 @@ chmod 700 /home/vagrant/gnu-privacy-guard-home
 export GNUPGHOME=/home/vagrant/gnu-privacy-guard-home
 gpg2 --batch --gen-key /vagrant/tmp/settings.txt
 gpg2 --export --armor "${FULL_NAME}" > "/vagrant/tmp/${USER_NAME}.gpg-public-key.asc"
-gpg2 --export-secret-key --armor "${FULL_NAME}" > "/vagrant/tmp/${USER_NAME}.gpg-private-key.asc"
+echo allow-loopback-pinentry > "${GNUPGHOME}/gpg-agent.conf"
+gpg-connect-agent reloadagent /bye
+gpg2 --batch --passphrase-fd 1 --passphrase-file /vagrant/tmp/password.txt --pinentry-mode loopback --export-secret-key --armor "${FULL_NAME}" > "/vagrant/tmp/${USER_NAME}.gpg-private-key.asc"
 #KEY_IDENTIFIER=$()
 #pass init "${KEY_IDENTIFIER}"
