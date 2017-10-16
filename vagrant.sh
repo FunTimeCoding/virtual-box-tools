@@ -8,10 +8,10 @@ touch /home/vagrant/.virtual-box-tools.yaml
 chmod 600 /home/vagrant/.virtual-box-tools.yaml
 cat /vagrant/virtual-box-tools.yaml > /home/vagrant/.virtual-box-tools.yaml
 
-# Get first line only using head, because create.bat adds a blank line.
-USER_NAME=$(cat /vagrant/tmp/user-name.txt | head -n 1)
-FULL_NAME=$(cat /vagrant/tmp/full-name.txt | head -n 1)
-DOMAIN=$(cat /vagrant/tmp/domain.txt | head -n 1)
+# Get first line only using head, because create.bat adds a blank line. Also remove newline characters.
+USER_NAME=$(cat /vagrant/tmp/user-name.txt | head -n 1 | sed --expression 's/[\r\n]//g')
+FULL_NAME=$(cat /vagrant/tmp/full-name.txt | head -n 1 | sed --expression 's/[\r\n]//g')
+DOMAIN=$(cat /vagrant/tmp/domain.txt | head -n 1 | sed --expression 's/[\r\n]//g')
 EMAIL="${USER_NAME}@${DOMAIN}"
 PASSWORD=$(pwgen 14 1)
 echo "${PASSWORD}" > /vagrant/tmp/password.txt
