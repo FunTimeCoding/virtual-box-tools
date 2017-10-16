@@ -57,6 +57,12 @@ bin/vbt service --help
 
 This section explains commands to help the development of this project.
 
+Configure Git on Windows before cloning. This avoids problems with Vagrant and VirtualBox.
+
+```sh
+git config --global core.autocrlf input
+```
+
 Install the project from a clone.
 
 ```sh
