@@ -5,6 +5,7 @@ tmp
 .tox
 virtual_box_tools.egg-info
 *.pyc
+*.sqlite
 
 # pytest
 .coverage

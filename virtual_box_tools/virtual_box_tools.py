@@ -1,7 +1,7 @@
 from getpass import getuser
 from socket import getfqdn
 from argparse import ArgumentDefaultsHelpFormatter
-from os import name as os_name
+from os import name as os_name, umask
 from sys import exit as system_exit, argv
 import sqlite3
 import string
@@ -44,8 +44,10 @@ class Commands:
 
         return ''.join(random.choice(chars) for x in range(14))
 
-    def get_password_windows(self, user: str, name: str, domain: str):
+    def get_password_sqlite(self, user: str, name: str, domain: str):
+        old_mask = umask(0o077)
         connection = sqlite3.connect('user.sqlite')
+        umask(old_mask)
         cursor = connection.cursor()
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS user (
@@ -79,7 +81,7 @@ class Commands:
 
         return password
 
-    def get_password_unix(self, user: str, name: str, domain: str):
+    def get_password_pass(self, user: str, name: str, domain: str):
         password = ''
 
         try:
@@ -114,29 +116,16 @@ class Commands:
     ):
         domain = getfqdn()
         user = getuser()
-
-        if 'nt' == os_name:
-            root_password = self.get_password_windows(
-                user='root',
-                name=name,
-                domain=domain
-            )
-            user_password = self.get_password_windows(
-                user=user,
-                name=name,
-                domain=domain
-            )
-        else:
-            root_password = self.get_password_unix(
-                user='root',
-                name=name,
-                domain=domain
-            )
-            user_password = self.get_password_unix(
-                user=user,
-                name=name,
-                domain=domain
-            )
+        root_password = self.get_password_sqlite(
+            user='root',
+            name=name,
+            domain=domain
+        )
+        user_password = self.get_password_sqlite(
+            user=user,
+            name=name,
+            domain=domain
+        )
 
         CommandProcess(
             arguments=[
