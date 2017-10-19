@@ -57,8 +57,8 @@ class WebService:
         return ''
 
     @staticmethod
-    @app.route('/host', methods=['GET'])
-    @app.route('/host/<name>', methods=['GET', 'POST'])
+    @app.route('/host', methods=['GET', 'POST'])
+    @app.route('/host/<name>', methods=['GET'])
     def register_object(name: str = ''):
         authorization_result = WebService.authorize()
 
@@ -94,7 +94,6 @@ class WebService:
                             'standard_error': exception.get_standard_error(),
                             'return_code': exception.get_return_code()
                         }), 500
-
         elif request.method == 'POST':
             try:
                 return json.dumps(

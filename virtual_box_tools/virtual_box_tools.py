@@ -137,7 +137,7 @@ class Commands:
         # print(user_password)
         # print(pwd.getpwnam(user)[4])
 
-        return 'Not implemented yet.'
+        return 'Created.'
 
     def destroy_host(self, name: str = ''):
         pass
