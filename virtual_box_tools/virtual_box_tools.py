@@ -3,6 +3,9 @@ from socket import getfqdn
 from argparse import ArgumentDefaultsHelpFormatter
 from sys import argv
 from os import name as os_name
+import sqlite3
+import string
+import random
 
 from virtual_box_tools.command_process import CommandProcess, \
     CommandFailed
@@ -36,26 +39,45 @@ class Commands:
             sudo_user=self.sudo_user
         ).get_standard_output()
 
-    def get_root_password_unix(self, name: str, domain: str):
-        get_root_password_process = CommandProcess(
-            arguments=['pass', 'host/' + name + '.' + domain + '/root'],
-            sudo_user=self.sudo_user
-        )
-        root_password = get_root_password_process.get_standard_output()
+    def generate_password(self):
+        chars = string.ascii_uppercase + string.ascii_lowercase + string.digits
 
-        if root_password == '':
-            print('Generate root password')
-            generate_root_password_process = CommandProcess(
-                arguments=[
-                    'pass', 'generate',
-                    'host/' + name + '.' + domain + '/root',
-                    '--no-symbols', 14
-                ],
-                sudo_user=self.sudo_user
+        return ''.join(random.choice(chars) for x in range(14))
+
+    def get_user_password_windows(self, user: str, name: str, domain: str):
+        connection = sqlite3.connect('user.sqlite')
+        cursor = connection.cursor()
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS user (
+                user_name TEXT NOT NULL,
+                host_name TEXT NOT NULL,
+                domain_name TEXT NOT NULL,
+                password TEXT NOT NULL
             )
-            root_password = generate_root_password_process.standard_output()
+        """)
+        connection.commit()
+        cursor.execute(
+            'SELECT password FROM user'
+            ' WHERE user_name = ?'
+            ' AND host_name = ?'
+            ' AND domain_name = ?',
+            [user, name, domain]
+        )
+        result = cursor.fetchone()
 
-        return root_password
+        if result is None:
+            password = self.generate_password()
+            cursor.execute(
+                'INSERT INTO user VALUES (?, ?, ?, ?)',
+                [user, name, domain, password]
+            )
+            connection.commit()
+        else:
+            password = result[0]
+
+        cursor.close()
+
+        return password
 
     def get_user_password_unix(self, user: str, name: str, domain: str):
         get_user_password_process = CommandProcess(
@@ -89,9 +111,14 @@ class Commands:
         domain = getfqdn()
 
         if 'nt' == os_name:
-            root_password = 'not implemented yet'
+            root_password = self.get_user_password_windows(
+                user='root',
+                name=name,
+                domain=domain
+            )
         else:
-            root_password = self.get_root_password_unix(
+            root_password = self.get_user_password_unix(
+                user='root',
                 name=name,
                 domain=domain
             )
@@ -100,7 +127,11 @@ class Commands:
         user = getuser()
 
         if 'nt' == os_name:
-            user_password = 'not implemented yet'
+            user_password = self.get_user_password_windows(
+                user=user,
+                name=name,
+                domain=domain
+            )
         else:
             user_password = self.get_user_password_unix(
                 user=user,
