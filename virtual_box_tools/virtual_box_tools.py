@@ -2,12 +2,17 @@ from getpass import getuser
 from socket import getfqdn
 from argparse import ArgumentDefaultsHelpFormatter
 from sys import argv
+from os import name as os_name
 
-import pwd
 from virtual_box_tools.command_process import CommandProcess, \
     CommandFailed
 from virtual_box_tools.custom_argument_parser import CustomArgumentParser
 from virtual_box_tools.yaml_config import YamlConfig
+
+if 'nt' == os_name:
+    import virtual_box_tools.windows_password_database as pwd
+else:
+    import pwd
 
 
 class Commands:
@@ -31,15 +36,7 @@ class Commands:
             sudo_user=self.sudo_user
         ).get_standard_output()
 
-    def create_host(
-            self, name: str = '',
-            cores: int = 1,
-            memory: int = 4096,
-            disk_size: int = 64,
-            release: str = 'jessie'
-    ):
-        domain = getfqdn()
-        print('Get root password')
+    def get_root_password_unix(self, name: str, domain: str):
         get_root_password_process = CommandProcess(
             arguments=['pass', 'host/' + name + '.' + domain + '/root'],
             sudo_user=self.sudo_user
@@ -58,8 +55,9 @@ class Commands:
             )
             root_password = generate_root_password_process.standard_output()
 
-        user = getuser()
-        print('Get user password')
+        return root_password
+
+    def get_user_password_unix(self, user: str, name: str, domain: str):
         get_user_password_process = CommandProcess(
             arguments=['pass', 'host/' + name + '.' + domain + '/' + user],
             sudo_user=self.sudo_user
@@ -78,9 +76,43 @@ class Commands:
             )
             user_password = generate_user_password_process.standard_output()
 
+        return user_password
+
+    def create_host(
+            self, name: str = '',
+            cores: int = 1,
+            memory: int = 4096,
+            disk_size: int = 64,
+            release: str = 'jessie'
+    ):
+        print('Get root password')
+        domain = getfqdn()
+
+        if 'nt' == os_name:
+            root_password = 'not implemented yet'
+        else:
+            root_password = self.get_root_password_unix(
+                name=name,
+                domain=domain
+            )
+
+        print('Get user password')
+        user = getuser()
+
+        if 'nt' == os_name:
+            user_password = 'not implemented yet'
+        else:
+            user_password = self.get_user_password_unix(
+                user=user,
+                name=name,
+                domain=domain
+            )
+
         print(root_password)
         print(user_password)
         print(pwd.getpwnam(user)[4])
+
+        return 'some output'
 
     def destroy_host(self, name: str = ''):
         pass
