@@ -107,12 +107,17 @@ class Commands:
             disk_size: int = 64,
             release: str = 'jessie'
     ):
-        print('Get root password')
         domain = getfqdn()
+        user = getuser()
 
         if 'nt' == os_name:
             root_password = self.get_user_password_windows(
                 user='root',
+                name=name,
+                domain=domain
+            )
+            user_password = self.get_user_password_windows(
+                user=user,
                 name=name,
                 domain=domain
             )
@@ -122,28 +127,17 @@ class Commands:
                 name=name,
                 domain=domain
             )
-
-        print('Get user password')
-        user = getuser()
-
-        if 'nt' == os_name:
-            user_password = self.get_user_password_windows(
-                user=user,
-                name=name,
-                domain=domain
-            )
-        else:
             user_password = self.get_user_password_unix(
                 user=user,
                 name=name,
                 domain=domain
             )
 
-        print(root_password)
-        print(user_password)
-        print(pwd.getpwnam(user)[4])
+        # print(root_password)
+        # print(user_password)
+        # print(pwd.getpwnam(user)[4])
 
-        return 'some output'
+        return 'Not implemented yet.'
 
     def destroy_host(self, name: str = ''):
         pass

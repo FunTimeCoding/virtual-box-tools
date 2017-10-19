@@ -65,9 +65,9 @@ class WebService:
         if authorization_result != '':
             return authorization_result, 401
 
-        if request.method == 'GET':
-            commands = Commands(WebService.sudo_user)
+        commands = Commands(WebService.sudo_user)
 
+        if request.method == 'GET':
             if name == '':
                 try:
                     return json.dumps(commands.list_hosts())
@@ -96,6 +96,15 @@ class WebService:
                         }), 500
 
         elif request.method == 'POST':
-            return 'Host created: ' + str(request.json.get('name'))
+            try:
+                return json.dumps(
+                    commands.create_host(str(request.json.get('name')))
+                )
+            except CommandFailed as exception:
+                return json.dumps({
+                    'standard_output': exception.get_standard_output(),
+                    'standard_error': exception.get_standard_error(),
+                    'return_code': exception.get_return_code()
+                }), 500
         else:
             return 'Unexpected method: ' + request.method, 500
