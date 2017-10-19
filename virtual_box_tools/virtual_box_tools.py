@@ -46,7 +46,7 @@ class Commands:
 
     def get_password_sqlite(self, user: str, name: str, domain: str):
         old_mask = umask(0o077)
-        connection = sqlite3.connect('user.sqlite')
+        connection = sqlite3.connect('tmp/user.sqlite')
         umask(old_mask)
         cursor = connection.cursor()
         cursor.execute("""
@@ -134,10 +134,10 @@ class Commands:
                 '--hostname', name,
                 '--domain', domain,
                 '--root-password', root_password,
-                '--user', user,
+                '--user-name', user,
                 '--user-password', user_password,
-                '--full-name', pwd.getpwnam(user)[4],
-                '--output-document', name + '.cfg'
+                '--user-real-name', pwd.getpwnam(user)[4],
+                '--output-document', 'tmp/' + name + '.cfg'
             ],
             sudo_user=self.sudo_user
         )
