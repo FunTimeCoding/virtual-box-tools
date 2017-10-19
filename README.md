@@ -93,4 +93,5 @@ Send a request to the web service.
 
 ```sh
 curl --silent --header 'Authorization: Token example' localhost:5000/host
+curl --silent --header 'Authorization: Token example' --header 'Content-Type: application/json' --request POST --data '{"name": "foo"}' localhost:5000/host
 ```
