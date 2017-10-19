@@ -41,15 +41,27 @@ This section explains how to use this project.
 Run the main program.
 
 ```sh
-bin/vbt
+vbt
 ```
 
 Show help.
 
 ```sh
-bin/vbt --help
-bin/vbt host --help
-bin/vbt service --help
+vbt --help
+vbt host --help
+vbt service --help
+```
+
+Create a host.
+
+```sh
+vbt host create --name example
+```
+
+Run the web service.
+
+```sh
+vbt-web-service
 ```
 
 
@@ -93,7 +105,7 @@ Send a request to the web service.
 
 ```sh
 curl --silent --header 'Authorization: Token example' localhost:5000/host
-curl --silent --header 'Authorization: Token example' --header 'Content-Type: application/json' --request POST --data '{"name": "foo"}' localhost:5000/host
+curl --silent --header 'Authorization: Token example' --header 'Content-Type: application/json' --request POST --data '{"name": "example"}' localhost:5000/host
 ```
 
 Show user entries.
