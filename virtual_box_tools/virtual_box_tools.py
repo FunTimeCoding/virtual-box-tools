@@ -1,8 +1,8 @@
 from getpass import getuser
 from socket import getfqdn
 from argparse import ArgumentDefaultsHelpFormatter
-from sys import argv
 from os import name as os_name
+from sys import exit as system_exit, argv
 import sqlite3
 import string
 import random
@@ -44,7 +44,7 @@ class Commands:
 
         return ''.join(random.choice(chars) for x in range(14))
 
-    def get_user_password_windows(self, user: str, name: str, domain: str):
+    def get_password_windows(self, user: str, name: str, domain: str):
         connection = sqlite3.connect('user.sqlite')
         cursor = connection.cursor()
         cursor.execute("""
@@ -79,26 +79,31 @@ class Commands:
 
         return password
 
-    def get_user_password_unix(self, user: str, name: str, domain: str):
-        get_user_password_process = CommandProcess(
-            arguments=['pass', 'host/' + name + '.' + domain + '/' + user],
-            sudo_user=self.sudo_user
-        )
-        user_password = get_user_password_process.get_standard_output()
+    def get_password_unix(self, user: str, name: str, domain: str):
+        password = ''
 
-        if user_password == '':
-            print('Generate user password')
-            generate_user_password_process = CommandProcess(
-                arguments=[
-                    'pass', 'generate',
-                    'host/' + name + '.' + domain + '/' + user,
-                    '--no-symbols', 14
-                ],
+        try:
+            get_password_process = CommandProcess(
+                arguments=['pass', 'host/' + name + '.' + domain + '/' + user],
                 sudo_user=self.sudo_user
             )
-            user_password = generate_user_password_process.standard_output()
+            password = get_password_process.get_standard_output()
+        except CommandFailed as exception:
+            if 'not in the password store.' in exception.get_standard_error():
+                generate_password_process = CommandProcess(
+                    arguments=[
+                        'pass', 'generate',
+                        'host/' + name + '.' + domain + '/' + user,
+                        '--no-symbols', '14'
+                    ],
+                    sudo_user=self.sudo_user
+                )
+                password = generate_password_process.get_standard_output()
+            else:
+                print(exception)
+                system_exit(1)
 
-        return user_password
+        return password
 
     def create_host(
             self, name: str = '',
@@ -111,31 +116,42 @@ class Commands:
         user = getuser()
 
         if 'nt' == os_name:
-            root_password = self.get_user_password_windows(
+            root_password = self.get_password_windows(
                 user='root',
                 name=name,
                 domain=domain
             )
-            user_password = self.get_user_password_windows(
+            user_password = self.get_password_windows(
                 user=user,
                 name=name,
                 domain=domain
             )
         else:
-            root_password = self.get_user_password_unix(
+            root_password = self.get_password_unix(
                 user='root',
                 name=name,
                 domain=domain
             )
-            user_password = self.get_user_password_unix(
+            user_password = self.get_password_unix(
                 user=user,
                 name=name,
                 domain=domain
             )
 
-        # print(root_password)
-        # print(user_password)
-        # print(pwd.getpwnam(user)[4])
+        CommandProcess(
+            arguments=[
+                'dt',
+                '--release', release,
+                '--hostname', name,
+                '--domain', domain,
+                '--root-password', root_password,
+                '--user', user,
+                '--user-password', user_password,
+                '--full-name', pwd.getpwnam(user)[4],
+                '--output-document', name + '.cfg'
+            ],
+            sudo_user=self.sudo_user
+        )
 
         return 'Created.'
 
