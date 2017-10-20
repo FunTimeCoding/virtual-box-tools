@@ -81,9 +81,9 @@ class WebService:
         if request.method == 'GET':
             if name == '':
                 try:
-                    commands.list_hosts()
-
-                    return ''
+                    return json.dumps(
+                        commands.list_hosts()
+                    )
                 except CommandFailed as exception:
                     return WebService.format_exception(exception), 500
             else:
