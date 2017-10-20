@@ -29,7 +29,7 @@ else
     FIND=find
 fi
 
-INCLUDE_FILTER="^.*(\/bin\/.*|\.py)$"
+INCLUDE_FILTER="^.*(\/bin\/[a-z]*|\.py)$"
 EXCLUDE_FILTER="^.*\/(build|tmp|\.git|\.vagrant|\.idea|\.venv|\.tox)\/.*$"
 
 if [ "${CONTINUOUS_INTEGRATION_MODE}" = true ]; then

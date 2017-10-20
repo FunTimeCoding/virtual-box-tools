@@ -90,9 +90,9 @@ Install the project from a clone.
 Run tests, style check and metrics.
 
 ```sh
-./run-tests.sh
-./run-style-check.sh
-./run-metrics.sh
+./tests.sh
+./style-check.sh
+./metrics.sh
 ```
 
 Build the project.

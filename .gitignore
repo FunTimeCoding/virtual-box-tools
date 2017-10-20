@@ -1,14 +1,13 @@
 build
 tmp
-.venv
 .vagrant
-.tox
-virtual_box_tools.egg-info
-*.pyc
 
-# pytest
+# Python
 .coverage
 .cache
+.venv
+.tox
+*.egg-info
+*.pyc
 
-# project specific
 running-vms.txt
