@@ -57,6 +57,17 @@ class WebService:
         return ''
 
     @staticmethod
+    def format_exception(exception: CommandFailed) -> str:
+        return json.dumps(
+            {
+                'command': exception.get_command(),
+                'standard_output': exception.get_standard_output(),
+                'standard_error': exception.get_standard_error(),
+                'return_code': exception.get_return_code()
+            }
+        )
+
+    @staticmethod
     @app.route('/host', methods=['GET', 'POST'])
     @app.route('/host/<name>', methods=['GET', 'DELETE'])
     def register_object(name: str = ''):
@@ -74,11 +85,7 @@ class WebService:
 
                     return ''
                 except CommandFailed as exception:
-                    return json.dumps({
-                        'standard_output': exception.get_standard_output(),
-                        'standard_error': exception.get_standard_error(),
-                        'return_code': exception.get_return_code()
-                    }), 500
+                    return WebService.format_exception(exception), 500
             else:
                 try:
                     return json.dumps(
@@ -91,30 +98,20 @@ class WebService:
                             'message': 'Host not found.',
                         }), 404
                     else:
-                        return json.dumps({
-                            'standard_output': exception.get_standard_output(),
-                            'standard_error': exception.get_standard_error(),
-                            'return_code': exception.get_return_code()
-                        }), 500
+                        return WebService.format_exception(exception), 500
         elif request.method == 'POST':
             try:
                 return json.dumps(
                     commands.create_host(str(request.json.get('name')))
                 )
             except CommandFailed as exception:
-                return json.dumps({
-                    'standard_output': exception.get_standard_output(),
-                    'standard_error': exception.get_standard_error(),
-                    'return_code': exception.get_return_code()
-                }), 500
+                return WebService.format_exception(exception), 500
+            except FileNotFoundError as exception:
+                return json.dumps({'message': exception.strerror}), 500
         elif request.method == 'DELETE':
             try:
                 return json.dumps(commands.destroy_host(name))
             except CommandFailed as exception:
-                return json.dumps({
-                    'standard_output': exception.get_standard_output(),
-                    'standard_error': exception.get_standard_error(),
-                    'return_code': exception.get_return_code()
-                }), 500
+                return WebService.format_exception(exception), 500
         else:
             return 'Unexpected method: ' + request.method, 500

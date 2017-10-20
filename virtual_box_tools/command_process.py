@@ -4,10 +4,12 @@ from subprocess import Popen, PIPE
 class CommandFailed(BaseException):
     def __init__(
             self,
+            command: list,
             return_code: int,
             standard_output: str,
             standard_error: str
     ):
+        self.command = command
         self.return_code = return_code
         self.standard_output = standard_output
         self.standard_error = standard_error
@@ -20,16 +22,19 @@ class CommandFailed(BaseException):
         if self.standard_error != '':
             self.message += '\nStandard error: \n' + self.standard_error
 
-    def get_standard_output(self):
+    def get_command(self) -> str:
+        return ' '.join(self.command)
+
+    def get_standard_output(self) -> str:
         return self.standard_output
 
-    def get_standard_error(self):
+    def get_standard_error(self) -> str:
         return self.standard_error
 
-    def get_return_code(self):
+    def get_return_code(self) -> int:
         return self.return_code
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.message
 
 
@@ -45,6 +50,7 @@ class CommandProcess:
 
         if self.process.returncode != 0:
             raise CommandFailed(
+                command=arguments,
                 standard_output=self.get_standard_output(),
                 standard_error=self.get_standard_error(),
                 return_code=self.process.returncode
@@ -57,11 +63,11 @@ class CommandProcess:
         if self.standard_output != '':
             print(self.get_standard_output())
 
-    def get_standard_output(self):
+    def get_standard_output(self) -> str:
         return self.standard_output
 
-    def get_standard_error(self):
+    def get_standard_error(self) -> str:
         return self.standard_error
 
-    def get_return_code(self):
+    def get_return_code(self) -> int:
         return self.process.returncode

@@ -44,7 +44,7 @@ class Commands:
 
         return ''.join(random.choice(chars) for x in range(14))
 
-    def get_password_sqlite(self, user: str, name: str, domain: str):
+    def get_password_sqlite(self, user: str, name: str, domain: str) -> str:
         old_mask = umask(0o077)
         connection = sqlite3.connect('tmp/user.sqlite')
         umask(old_mask)
@@ -81,7 +81,7 @@ class Commands:
 
         return password
 
-    def get_password_pass(self, user: str, name: str, domain: str):
+    def get_password_pass(self, user: str, name: str, domain: str) -> str:
         password = ''
 
         try:
@@ -108,7 +108,7 @@ class Commands:
         return password
 
     def create_host(
-            self, name: str = '',
+            self, name: str,
             cores: int = 1,
             memory: int = 4096,
             disk_size: int = 64,
@@ -153,15 +153,17 @@ class Commands:
             sudo_user=self.sudo_user
         )
 
-        return ''
-
-    def destroy_host(self, name: str = ''):
+    def destroy_host(self, name: str):
         CommandProcess(
             arguments=['vboxmanage', 'unregistervm', name, '--delete'],
             sudo_user=self.sudo_user
         )
 
-        return ''
+    def get_host_state(self, name: str):
+        return CommandProcess(
+            arguments=['vboxmanage', 'showvminfo', '--machinereadable', name],
+            sudo_user=self.sudo_user
+        ).get_standard_output()
 
 
 class VirtualBoxTools:
