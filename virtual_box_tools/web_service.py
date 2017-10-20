@@ -106,8 +106,6 @@ class WebService:
                 )
             except CommandFailed as exception:
                 return WebService.format_exception(exception), 500
-            except FileNotFoundError as exception:
-                return json.dumps({'message': exception.strerror}), 500
         elif request.method == 'DELETE':
             try:
                 return json.dumps(commands.destroy_host(name))

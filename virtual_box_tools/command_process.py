@@ -43,17 +43,25 @@ class CommandProcess:
         if sudo_user != '':
             arguments = ['sudo', '-u', sudo_user] + arguments
 
-        self.process = Popen(args=arguments, stdout=PIPE, stderr=PIPE)
-        output, error = self.process.communicate()
-        self.standard_output = output.decode().strip()
-        self.standard_error = error.decode().strip()
+        try:
+            self.process = Popen(args=arguments, stdout=PIPE, stderr=PIPE)
+            output, error = self.process.communicate()
+            self.standard_output = output.decode().strip()
+            self.standard_error = error.decode().strip()
 
-        if self.process.returncode != 0:
+            if self.process.returncode != 0:
+                raise CommandFailed(
+                    command=arguments,
+                    standard_output=self.get_standard_output(),
+                    standard_error=self.get_standard_error(),
+                    return_code=self.process.returncode
+                )
+        except FileNotFoundError as exception:
             raise CommandFailed(
                 command=arguments,
-                standard_output=self.get_standard_output(),
-                standard_error=self.get_standard_error(),
-                return_code=self.process.returncode
+                standard_output='File not found: ' + arguments[0],
+                standard_error=exception.strerror,
+                return_code=-1
             )
 
     def print_output(self) -> None:
