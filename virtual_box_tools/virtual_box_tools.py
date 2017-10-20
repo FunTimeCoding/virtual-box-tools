@@ -115,12 +115,12 @@ class Commands:
             release: str = 'jessie'
     ):
         domain = getfqdn()
-        user = getuser()
         root_password = self.get_password_sqlite(
             user='root',
             name=name,
             domain=domain
         )
+        user = getuser()
         user_password = self.get_password_sqlite(
             user=user,
             name=name,

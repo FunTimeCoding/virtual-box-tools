@@ -21,6 +21,7 @@ def test_exit_code() -> None:
         CommandProcess(['tests/exit.sh'])
         assert False
     except CommandFailed as exception:
+        assert exception.get_command() == 'tests/exit.sh'
         assert exception.get_standard_output() == ''
         assert exception.get_standard_error() == ''
         assert exception.get_return_code() == 1
@@ -31,6 +32,8 @@ def test_standard_output_error_and_exit_code() -> None:
         CommandProcess(['tests/standard-output-error-and-exit.sh'])
         assert False
     except CommandFailed as exception:
+        assert exception.get_command() == \
+               'tests/standard-output-error-and-exit.sh'
         assert exception.get_standard_output() == 'example'
         assert exception.get_standard_error() == 'error'
         assert exception.get_return_code() == 2
