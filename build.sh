@@ -25,6 +25,6 @@ pip3 install --editable .
 ./setup.py bdist_wheel --dist-dir build
 SYSTEM=$(uname)
 
-#if [ "${SYSTEM}" = Linux ]; then
-#    ./package.sh
-#fi
+if [ "${SYSTEM}" = Linux ]; then
+    ./package.sh
+fi

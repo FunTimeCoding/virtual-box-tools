@@ -4,3 +4,5 @@ netboot
 debhelper
 pybuild
 buildsystem
+libyaml
+libxslt

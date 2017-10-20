@@ -1,5 +1,19 @@
 #!/bin/sh -e
 
+if [ "${1}" = --help ]; then
+    echo "Usage: ${0} [--ci-mode]"
+
+    exit 0
+fi
+
+CONTINUOUS_INTEGRATION_MODE=false
+
+if [ "${1}" = --ci-mode ]; then
+    shift
+    mkdir -p build/log
+    CONTINUOUS_INTEGRATION_MODE=true
+fi
+
 DIRECTORY=$(dirname "${0}")
 SCRIPT_DIRECTORY=$(cd "${DIRECTORY}" || exit 1; pwd)
 MARKDOWN_FILES=$(find . -name '*.md')
@@ -16,7 +30,12 @@ for FILE in ${MARKDOWN_FILES}; do
             BLACKLISTED=$(echo "${BLACKLIST}" | grep "${WORD}") || BLACKLISTED=false
 
             if [ "${BLACKLISTED}" = false ]; then
-                grep --line-number --color=always "${WORD}" "${FILE}"
+                if [ "${CONTINUOUS_INTEGRATION_MODE}" = true ]; then
+                    grep --line-number "${WORD}" "${FILE}"
+                else
+                    # The equals character is required.
+                    grep --line-number --color=always "${WORD}" "${FILE}"
+                fi
             else
                 echo "Blacklisted word: ${WORD}"
             fi
@@ -41,12 +60,17 @@ for FILE in ${TEX_FILES}; do
                 BLACKLISTED=$(echo "${BLACKLIST}" | grep "${WORD}") || BLACKLISTED=false
 
                 if [ "${BLACKLISTED}" = false ]; then
-                    grep --line-number --color=always "${WORD}" "${FILE}"
+                    if [ "${CONTINUOUS_INTEGRATION_MODE}" = true ]; then
+                        grep --line-number "${WORD}" "${FILE}"
+                    else
+                        # The equals character is required.
+                        grep --line-number --color=always "${WORD}" "${FILE}"
+                    fi
                 else
                     echo "Skip blacklisted: ${WORD}"
                 fi
             else
-                echo "Skip illegal: ${WORD}"
+                echo "Skip invalid: ${WORD}"
             fi
         done
 

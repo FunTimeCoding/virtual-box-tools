@@ -1,11 +1,5 @@
 #!/bin/sh -e
 
-if [ "$(command -v shellcheck || true)" = "" ]; then
-    echo "Command not found: shellcheck"
-
-    exit 1
-fi
-
 if [ "${1}" = --help ]; then
     echo "Usage: ${0} [--ci-mode]"
 
@@ -113,11 +107,18 @@ PYTHON_FILES=$(${FIND} . -type f -regextype posix-extended -regex "${INCLUDE_FIL
 RETURN_CODE=0
 # shellcheck disable=SC2086
 PYLINT_OUTPUT=$(pylint ${PYTHON_FILES}) || RETURN_CODE=$?
+SYSTEM=$(uname)
+
+if [ "${SYSTEM}" = Darwin ]; then
+    TEE=gtee
+else
+    TEE=tee
+fi
 
 if [ "${CONTINUOUS_INTEGRATION_MODE}" = true ]; then
-    echo  | tee build/log/pylint.txt
-    echo "(NOTICE) Pylint" | tee --append build/log/pylint.txt
-    echo "${PYLINT_OUTPUT}" | tee --append build/log/pylint.txt
+    echo | "${TEE}" build/log/pylint.txt
+    echo "(NOTICE) Pylint" | "${TEE}" --append build/log/pylint.txt
+    echo "${PYLINT_OUTPUT}" | "${TEE}" --append build/log/pylint.txt
 else
     echo
     echo "(NOTICE) Pylint"

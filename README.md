@@ -5,12 +5,13 @@ Tools for VirtualBox to simplify manual usage and automated integration.
 
 ## Setup
 
-This section explains how to install and uninstall this project.
+This section explains how to install and uninstall the project.
 
 Install the project.
 
 ```sh
 pip3 install git+https://git@github.com/FunTimeCoding/virtual-box-tools.git#egg=virtual-box-tools
+pip3 install -i https://testpypi.python.org/pypi virtual-box-tools
 ```
 
 Uninstall the project.
@@ -36,9 +37,9 @@ sudo_user: vbox
 
 ## Usage
 
-This section explains how to use this project.
+This section explains how to use the project.
 
-Run the main program.
+Run the program.
 
 ```sh
 vbt
@@ -73,7 +74,7 @@ vbt-web-service
 
 ## Development
 
-This section explains commands to help the development of this project.
+This section explains how to improve the project.
 
 Configure Git on Windows before cloning. This avoids problems with Vagrant and VirtualBox.
 
@@ -81,24 +82,36 @@ Configure Git on Windows before cloning. This avoids problems with Vagrant and V
 git config --global core.autocrlf input
 ```
 
-Install the project from a clone.
-
-```sh
-./setup.sh
-```
-
-Run tests, style check and metrics.
-
-```sh
-./tests.sh
-./style-check.sh
-./metrics.sh
-```
-
-Build the project.
+Build the project. This installs dependencies.
 
 ```sh
 ./build.sh
+```
+
+Run tests, style check and spell check.
+
+```sh
+./spell-check.sh
+./style-check.sh
+./tests.sh
+```
+
+Build the package.
+
+```sh
+./package.sh
+```
+
+Install the experimental Debian package.
+
+```sh
+sudo dpkg --install build/python3-virtual-box-tools_0.1.0-1_all.deb
+```
+
+Show files the package installed.
+
+```sh
+dpkg-query --listfiles python3-virtual-box-tools
 ```
 
 Run VirtualBox commands as a different user.
