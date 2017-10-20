@@ -5,3 +5,6 @@ vboxmanage
 nictype
 hostonly
 guestproperty
+createvm
+ostype
+unregistervm

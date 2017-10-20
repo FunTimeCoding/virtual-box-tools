@@ -58,6 +58,12 @@ Create a host.
 vbt host create --name example
 ```
 
+Destroy a host.
+
+```sh
+vbt host destroy --name example
+```
+
 Run the web service.
 
 ```sh
@@ -106,6 +112,7 @@ Send a request to the web service.
 ```sh
 curl --silent --header 'Authorization: Token example' localhost:5000/host
 curl --silent --header 'Authorization: Token example' --header 'Content-Type: application/json' --request POST --data '{"name": "example"}' localhost:5000/host
+curl --silent --header 'Authorization: Token example' --request DELETE localhost:5000/host/example
 ```
 
 Show user entries.

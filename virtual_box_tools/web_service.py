@@ -58,7 +58,7 @@ class WebService:
 
     @staticmethod
     @app.route('/host', methods=['GET', 'POST'])
-    @app.route('/host/<name>', methods=['GET'])
+    @app.route('/host/<name>', methods=['GET', 'DELETE'])
     def register_object(name: str = ''):
         authorization_result = WebService.authorize()
 
@@ -70,7 +70,9 @@ class WebService:
         if request.method == 'GET':
             if name == '':
                 try:
-                    return json.dumps(commands.list_hosts())
+                    commands.list_hosts()
+
+                    return ''
                 except CommandFailed as exception:
                     return json.dumps({
                         'standard_output': exception.get_standard_output(),
@@ -99,6 +101,15 @@ class WebService:
                 return json.dumps(
                     commands.create_host(str(request.json.get('name')))
                 )
+            except CommandFailed as exception:
+                return json.dumps({
+                    'standard_output': exception.get_standard_output(),
+                    'standard_error': exception.get_standard_error(),
+                    'return_code': exception.get_return_code()
+                }), 500
+        elif request.method == 'DELETE':
+            try:
+                return json.dumps(commands.destroy_host(name))
             except CommandFailed as exception:
                 return json.dumps({
                     'standard_output': exception.get_standard_output(),

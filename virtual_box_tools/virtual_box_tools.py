@@ -142,10 +142,26 @@ class Commands:
             sudo_user=self.sudo_user
         )
 
-        return 'Created.'
+        CommandProcess(
+            arguments=[
+                'vboxmanage',
+                'createvm',
+                '--name', name,
+                '--register',
+                '--ostype', 'Debian_64'
+            ],
+            sudo_user=self.sudo_user
+        )
+
+        return ''
 
     def destroy_host(self, name: str = ''):
-        pass
+        CommandProcess(
+            arguments=['vboxmanage', 'unregistervm', name, '--delete'],
+            sudo_user=self.sudo_user
+        )
+
+        return ''
 
 
 class VirtualBoxTools:
@@ -167,18 +183,25 @@ class VirtualBoxTools:
                 print(commands.list_hosts())
             elif 'create' in self.parsed_arguments:
                 try:
-                    print(commands.create_host(
-                        name=self.parsed_arguments.name
-                    ))
+                    print(
+                        commands.create_host(name=self.parsed_arguments.name)
+                    )
                 except CommandFailed as exception:
                     print(exception)
             elif 'destroy' in self.parsed_arguments:
-                print('destroy stub')
+                try:
+                    print(
+                        commands.destroy_host(name=self.parsed_arguments.name)
+                    )
+                except CommandFailed as exception:
+                    print(exception)
             elif 'show' in self.parsed_arguments:
                 try:
-                    print(commands.get_host_information(
-                        self.parsed_arguments.name
-                    ))
+                    print(
+                        commands.get_host_information(
+                            self.parsed_arguments.name
+                        )
+                    )
                 except CommandFailed as exception:
                     if 'Could not find a registered machine named' \
                             in exception.get_standard_error():
