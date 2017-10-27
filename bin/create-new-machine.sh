@@ -131,7 +131,7 @@ TRIVIAL_DIRECTORY="${HOME}/tmp/trivial"
 COPY_ROOT_DIRECTORY="${TRIVIAL_DIRECTORY}/cpio"
 sudo rm --recursive --force "${TRIVIAL_DIRECTORY}"
 mkdir -p "${COPY_ROOT_DIRECTORY}"
-tar xf "${NETWORK_BOOT_ARCHIVE}" --directory "${TRIVIAL_DIRECTORY}"
+tar --extract --file "${NETWORK_BOOT_ARCHIVE}" --directory "${TRIVIAL_DIRECTORY}"
 cp "${PRESEED_FILE}" "${COPY_ROOT_DIRECTORY}/preseed.cfg"
 
 if [ "${SYSTEM}" = Darwin ]; then
