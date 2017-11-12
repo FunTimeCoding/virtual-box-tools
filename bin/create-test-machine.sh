@@ -48,41 +48,46 @@ if [ ! -f tmp/netboot.tar.gz ]; then
 fi
 
 if [ "${SYSTEM}" = Darwin ]; then
-    CONFIG_DIRECTORY="${HOME}/Library/VirtualBox"
+    DIRECTORY="${HOME}/Library/VirtualBox"
 else
-    CONFIG_DIRECTORY="${HOME}/.config/VirtualBox"
+    DIRECTORY="${HOME}/.config/VirtualBox"
 fi
 
-rm -rf "${CONFIG_DIRECTORY}/TFTP"
-mkdir -p "${CONFIG_DIRECTORY}/TFTP"
+rm -rf "${DIRECTORY}/TFTP"
+mkdir -p "${DIRECTORY}/TFTP"
 
-if [ ! -d "${CONFIG_DIRECTORY}/TFTP/debian-installer" ]; then
-    tar --extract --file tmp/netboot.tar.gz --directory "${CONFIG_DIRECTORY}/TFTP"
+if [ ! -d "${DIRECTORY}/TFTP/debian-installer" ]; then
+    tar --extract --file tmp/netboot.tar.gz --directory "${DIRECTORY}/TFTP"
 fi
 
 vboxmanage modifyvm example --nic1 nat --boot1 net --nattftpfile1 /pxelinux.0
+
 # TODO: Generate config and move to a directory in this project.
-pushd "${HOME}/src/qemu-tools/tmp/web"
-nohup python3 -m http.server &
-WEB_SERVER="${!}"
+#pushd "${HOME}/src/qemu-tools/tmp/web"
+#nohup python3 -m http.server &
+#WEB_SERVER="${!}"
 
 kill_web_server()
 {
-    kill "${WEB_SERVER}" || true
+    #kill "${WEB_SERVER}" || true
     remove_machine
 }
 
 trap kill_web_server EXIT
-popd
+
+#popd
+
 vboxmanage startvm example
+
 #sleep 30
+
 echo "Press enter to continue once the machine is waiting for input."
 read -r READ
 vboxmanage controlvm example keyboardputscancode 01 81
 # Install requires more additional arguments. Auto is more simple.
 #bin/input.sh example "install "
 #bin/input.sh example preseed/url=http://${ADDRESS}:8000/preseed.cfg
-#bin/input.sh example "auto url=http://${ADDRESS}:8000/preseed.cfg"
+bin/input.sh example "auto url=http://${ADDRESS}:8000/web/preseed.cfg"
 
 # TODO: Why is the installer stuck?
 #bin/input.sh example "install "
@@ -100,7 +105,8 @@ vboxmanage controlvm example keyboardputscancode 01 81
 #bin/input.sh example "\n"
 vboxmanage controlvm example keyboardputscancode 1c 9c
 #sleep 600
+
 echo "Press enter to continue once the machine is shut down."
 read -r READ
-vboxmanage modifyvm example --boot1 disk
-vboxmanage modifyvm example --nic1 hostonly --hostonlyadapter1 vboxnet0
+#vboxmanage modifyvm example --boot1 disk
+#vboxmanage modifyvm example --nic1 hostonly --hostonlyadapter1 vboxnet0
