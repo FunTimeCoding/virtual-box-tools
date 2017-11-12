@@ -14,6 +14,7 @@ vboxmanage createmedium disk --filename tmp/example.vdi --size 4096
 vboxmanage storageattach example --storagectl "SATA controller" --port 0 --device 0 --type hdd --medium tmp/example.vdi
 vboxmanage storageattach example --storagectl "SATA controller" --port 1 --device 0 --type dvddrive --medium emptydrive
 vboxmanage modifyvm example --acpi on --cpus 1 --memory 1024 --vram 16
+rm tmp/netboot.tar.gz
 
 if [ ! -f tmp/netboot.tar.gz ]; then
     wget --output-document tmp/netboot.tar.gz http://ftp.debian.org/debian/dists/stretch/main/installer-amd64/current/images/netboot/netboot.tar.gz
@@ -27,6 +28,7 @@ else
     CONFIG_DIRECTORY="${HOME}/.config/VirtualBox"
 fi
 
+rm -rf "${CONFIG_DIRECTORY}/TFTP"
 mkdir -p "${CONFIG_DIRECTORY}/TFTP"
 
 if [ ! -d "${CONFIG_DIRECTORY}/TFTP/debian-installer" ]; then
