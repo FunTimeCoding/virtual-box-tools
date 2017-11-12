@@ -37,7 +37,7 @@ fi
 
 vboxmanage modifyvm example --nic1 nat --boot1 net --nattftpfile1 /pxelinux.0
 
-pushd ~/src/qemu-tools/tmp/web
+pushd "${HOME}/src/qemu-tools/tmp/web"
 nohup python3 -m http.server &
 WEB_SERVER="${!}"
 popd
@@ -48,8 +48,8 @@ vboxmanage controlvm example keyboardputscancode 01 81
 # Install requires more additional arguments. Auto is more simple.
 #bin/input.sh example "install "
 #bin/input.sh example preseed/url=http://${ADDRESS}:8000/preseed.cfg
-bin/input.sh example "auto url=http://${ADDRESS}:8000/preseed.cfg"
-vboxmanage controlvm example keyboardputscancode 1c 9c
+bin/input.sh example "auto url=http://${ADDRESS}:8000/preseed.cfg\n"
+#vboxmanage controlvm example keyboardputscancode 1c 9c
 sleep 600
 vboxmanage modifyvm example --boot1 disk
 vboxmanage modifyvm example --nic1 hostonly --hostonlyadapter1 vboxnet0
