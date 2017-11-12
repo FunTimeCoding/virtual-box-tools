@@ -1,4 +1,4 @@
-pep8 # style check
+pycodestyle # style check
 pylint # style check
 flake8 # style check
 pyenchant # pylint spell check plugin
