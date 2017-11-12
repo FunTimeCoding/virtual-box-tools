@@ -82,7 +82,20 @@ vboxmanage controlvm example keyboardputscancode 01 81
 # Install requires more additional arguments. Auto is more simple.
 #bin/input.sh example "install "
 #bin/input.sh example preseed/url=http://${ADDRESS}:8000/preseed.cfg
-bin/input.sh example "auto url=http://${ADDRESS}:8000/preseed.cfg"
+#bin/input.sh example "auto url=http://${ADDRESS}:8000/preseed.cfg"
+
+# TODO: Why is the installer stuck?
+#bin/input.sh example "install "
+#bin/input.sh example "preseed/url=http://${ADDRESS}:8000/preseed.cfg "
+#bin/input.sh example "debian-installer=en_US auto locale=en_US "
+#bin/input.sh example "kbd-chooser/method=us "
+#bin/input.sh example "netcfg/get_hostname=example "
+#bin/input.sh example "netcfg/get_domain=example.org fb=false "
+#bin/input.sh example "debconf/frontend=noninteractive "
+#bin/input.sh example "console-setup/ask_detect=false "
+#bin/input.sh example "console-keymaps-at/keymap=us "
+#bin/input.sh example "keyboard-configuration/xkb-keymap=us"
+
 # TODO: Fix send \n.
 #bin/input.sh example "\n"
 vboxmanage controlvm example keyboardputscancode 1c 9c
