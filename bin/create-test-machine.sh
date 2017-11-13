@@ -34,15 +34,7 @@ else
     DATE=date
 fi
 
-if [ -f tmp/netboot.tar.gz ] ;then
-    MODIFIED=$(${STAT} --format=%Y tmp/netboot.tar.gz)
-    ONE_HOUR_AGO=$(${DATE} -d "-1 hour" +%s)
-
-    if [ "${MODIFIED}" -lt "${ONE_HOUR_AGO}" ]; then
-        rm tmp/netboot.tar.gz
-    fi
-fi
-
+# TODO: Creation time is not stored in the file system. Periodically delete it.
 if [ ! -f tmp/netboot.tar.gz ]; then
     wget --output-document tmp/netboot.tar.gz http://ftp.debian.org/debian/dists/stretch/main/installer-amd64/current/images/netboot/netboot.tar.gz
 fi
@@ -61,52 +53,25 @@ if [ ! -d "${DIRECTORY}/TFTP/debian-installer" ]; then
 fi
 
 vboxmanage modifyvm example --nic1 nat --boot1 net --nattftpfile1 /pxelinux.0
-
 # TODO: Generate config and move to a directory in this project.
-#pushd "${HOME}/src/qemu-tools/tmp/web"
-#nohup python3 -m http.server &
-#WEB_SERVER="${!}"
+pushd "${HOME}/src/qemu-tools/tmp/web"
+nohup python3 -m http.server &
+WEB_SERVER="${!}"
 
-kill_web_server()
+clean_up()
 {
-    #kill "${WEB_SERVER}" || true
+    kill "${WEB_SERVER}" || true
     remove_machine
 }
 
-trap kill_web_server EXIT
-
-#popd
-
+trap clean_up EXIT
+popd
 vboxmanage startvm example
-
-#sleep 30
-
-echo "Press enter to continue once the machine is waiting for input."
-read -r READ
+sleep 30
 vboxmanage controlvm example keyboardputscancode 01 81
-# Install requires more additional arguments. Auto is more simple.
-#bin/input.sh example "install "
-#bin/input.sh example preseed/url=http://${ADDRESS}:8000/preseed.cfg
-bin/input.sh example "auto url=http://${ADDRESS}:8000/web/preseed.cfg"
-
-# TODO: Why is the installer stuck?
-#bin/input.sh example "install "
-#bin/input.sh example "preseed/url=http://${ADDRESS}:8000/preseed.cfg "
-#bin/input.sh example "debian-installer=en_US auto locale=en_US "
-#bin/input.sh example "kbd-chooser/method=us "
-#bin/input.sh example "netcfg/get_hostname=example "
-#bin/input.sh example "netcfg/get_domain=example.org fb=false "
-#bin/input.sh example "debconf/frontend=noninteractive "
-#bin/input.sh example "console-setup/ask_detect=false "
-#bin/input.sh example "console-keymaps-at/keymap=us "
-#bin/input.sh example "keyboard-configuration/xkb-keymap=us"
-
-# TODO: Fix send \n.
-#bin/input.sh example "\n"
+bin/input.sh example "auto url=http://${ADDRESS}:8000/preseed.cfg"
+# TODO: Use input.sh to send \n.
 vboxmanage controlvm example keyboardputscancode 1c 9c
-#sleep 600
-
-echo "Press enter to continue once the machine is shut down."
-read -r READ
-#vboxmanage modifyvm example --boot1 disk
-#vboxmanage modifyvm example --nic1 hostonly --hostonlyadapter1 vboxnet0
+sleep 600
+vboxmanage modifyvm example --boot1 disk
+vboxmanage modifyvm example --nic1 hostonly --hostonlyadapter1 vboxnet0
