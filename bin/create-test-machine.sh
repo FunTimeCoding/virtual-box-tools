@@ -11,6 +11,14 @@ usage()
 # shellcheck source=/dev/null
 . "${SCRIPT_DIRECTORY}"/../lib/virtual_box_tools.sh
 
+ADDRESS="${1}"
+
+if [ "${ADDRESS}" = "" ]; then
+    echo "Usage: ${0} ADDRESS"
+
+    exit 1
+fi
+
 remove_machine()
 {
     bin/stop-vm.sh --force example || true
@@ -21,13 +29,6 @@ remove_machine()
 }
 
 remove_machine
-ADDRESS="${1}"
-
-if [ "${ADDRESS}" = "" ]; then
-    echo "Usage: ${0} ADDRESS"
-
-    exit 1
-fi
 
 ${VBOXMANAGE} createvm --name example --register --ostype Debian_64
 ${VBOXMANAGE} storagectl example --name "SATA controller" --add sata
