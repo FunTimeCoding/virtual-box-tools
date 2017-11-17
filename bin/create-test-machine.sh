@@ -61,7 +61,8 @@ WEB_SERVER="${!}"
 clean_up()
 {
     kill "${WEB_SERVER}" || true
-    remove_machine
+    # Machine should stay after build is done.
+    #remove_machine
 }
 
 trap clean_up EXIT
