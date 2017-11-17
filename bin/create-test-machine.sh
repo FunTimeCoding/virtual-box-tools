@@ -42,12 +42,18 @@ if [ ! -f tmp/netboot.tar.gz ]; then
     wget --output-document tmp/netboot.tar.gz http://ftp.debian.org/debian/dists/stretch/main/installer-amd64/current/images/netboot/netboot.tar.gz
 fi
 
+if [ "${SUDO_USER}" = "" ]; then
+    HOME_DIRECTORY="${HOME}"
+else
+    HOME_DIRECTORY="/home/${SUDO_USER}"
+fi
+
 SYSTEM=$(uname)
 
 if [ "${SYSTEM}" = Darwin ]; then
-    DIRECTORY="${HOME}/Library/VirtualBox"
+    DIRECTORY="${HOME_DIRECTORY}/Library/VirtualBox"
 else
-    DIRECTORY="${HOME}/.config/VirtualBox"
+    DIRECTORY="${HOME_DIRECTORY}/.config/VirtualBox"
 fi
 
 rm -rf "${DIRECTORY}/TFTP"
