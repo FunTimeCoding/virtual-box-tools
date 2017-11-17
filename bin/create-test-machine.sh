@@ -30,22 +30,22 @@ remove_machine()
 
 remove_machine
 
+if [ "${SUDO_USER}" = "" ]; then
+    HOME_DIRECTORY="${HOME}"
+else
+    HOME_DIRECTORY="/home/${SUDO_USER}"
+fi
+
 ${VBOXMANAGE} createvm --name example --register --ostype Debian_64
 ${VBOXMANAGE} storagectl example --name "SATA controller" --add sata
-${VBOXMANAGE} createmedium disk --filename tmp/example.vdi --size 4096
-${VBOXMANAGE} storageattach example --storagectl "SATA controller" --port 0 --device 0 --type hdd --medium tmp/example.vdi
+${VBOXMANAGE} createmedium disk --filename "${HOME_DIRECTORY}/VirtualBox VMs/example/example.vdi" --size 4096
+${VBOXMANAGE} storageattach example --storagectl "SATA controller" --port 0 --device 0 --type hdd --medium "${HOME_DIRECTORY}/VirtualBox VMs/example/example.vdi"
 ${VBOXMANAGE} storageattach example --storagectl "SATA controller" --port 1 --device 0 --type dvddrive --medium emptydrive
 ${VBOXMANAGE} modifyvm example --acpi on --cpus 1 --memory 1024 --vram 16
 
 # TODO: Creation time is not stored in the file system. Periodically delete it.
 if [ ! -f tmp/netboot.tar.gz ]; then
     wget --output-document tmp/netboot.tar.gz http://ftp.debian.org/debian/dists/stretch/main/installer-amd64/current/images/netboot/netboot.tar.gz
-fi
-
-if [ "${SUDO_USER}" = "" ]; then
-    HOME_DIRECTORY="${HOME}"
-else
-    HOME_DIRECTORY="/home/${SUDO_USER}"
 fi
 
 SYSTEM=$(uname)
