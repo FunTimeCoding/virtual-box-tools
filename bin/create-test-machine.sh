@@ -76,7 +76,7 @@ ${VBOXMANAGE} modifyvm example --nic1 nat --boot1 net --nattftpfile1 /pxelinux.0
 DOMAIN=$(hostname)
 mkdir -p tmp/web
 "${HOME}/src/debian-tools/.venv/bin/dt" --hostname example --domain shiin.org --root-password root --user-name example --user-password example --user-real-name "Example User" --release stretch --output-document tmp/web/example.cfg
-pushd tmp/web
+cd tmp/web
 nohup python3 -m http.server &
 WEB_SERVER="${!}"
 
@@ -88,7 +88,7 @@ clean_up()
 }
 
 trap clean_up EXIT
-popd
+cd ../..
 ${VBOXMANAGE} startvm example
 sleep 30
 ${VBOXMANAGE} controlvm example keyboardputscancode 01 81
