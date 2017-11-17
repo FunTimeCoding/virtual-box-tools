@@ -56,11 +56,20 @@ else
     DIRECTORY="${HOME_DIRECTORY}/.config/VirtualBox"
 fi
 
-rm -rf "${DIRECTORY}/TFTP"
-mkdir -p "${DIRECTORY}/TFTP"
+if [ "${SUDO_USER}" = "" ]; then
+    rm -rf "${DIRECTORY}/TFTP"
+    mkdir -p "${DIRECTORY}/TFTP"
 
-if [ ! -d "${DIRECTORY}/TFTP/debian-installer" ]; then
-    tar --extract --file tmp/netboot.tar.gz --directory "${DIRECTORY}/TFTP"
+    if [ ! -d "${DIRECTORY}/TFTP/debian-installer" ]; then
+        tar --extract --file tmp/netboot.tar.gz --directory "${DIRECTORY}/TFTP"
+    fi
+else
+    sudo -u "${SUDO_USER}" rm -rf "${DIRECTORY}/TFTP"
+    sudo -u "${SUDO_USER}" mkdir -p "${DIRECTORY}/TFTP"
+
+    if [ ! -d "${DIRECTORY}/TFTP/debian-installer" ]; then
+        sudo -u "${SUDO_USER}" tar --extract --file tmp/netboot.tar.gz --directory "${DIRECTORY}/TFTP"
+    fi
 fi
 
 ${VBOXMANAGE} modifyvm example --nic1 nat --boot1 net --nattftpfile1 /pxelinux.0
