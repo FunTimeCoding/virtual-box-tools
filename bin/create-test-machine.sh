@@ -89,7 +89,7 @@ clean_up()
 
 trap clean_up EXIT
 cd ../..
-${VBOXMANAGE} startvm example
+${VBOXMANAGE} startvm example --type headless
 sleep 30
 ${VBOXMANAGE} controlvm example keyboardputscancode 01 81
 bin/input.sh example "auto url=http://${ADDRESS}:8000/preseed.cfg"
