@@ -72,7 +72,7 @@ else
     fi
 fi
 
-${VBOXMANAGE} modifyvm example --nic1 nat --boot1 net --nattftpfile1 /pxelinux.0 --natpf1 http,tcp,,8000,,8000
+${VBOXMANAGE} modifyvm example --nic1 nat --boot1 net --nattftpfile1 /pxelinux.0
 DOMAIN=$(hostname)
 mkdir -p tmp/web
 "${HOME}/src/debian-tools/.venv/bin/dt" --hostname example --domain shiin.org --root-password root --user-name example --user-password example --user-real-name "Example User" --release stretch --output-document tmp/web/example.cfg
@@ -96,5 +96,4 @@ bin/input.sh example "auto url=http://${ADDRESS}:8000/example.cfg"
 # TODO: Use input.sh to send \n.
 ${VBOXMANAGE} controlvm example keyboardputscancode 1c 9c
 sleep 600
-${VBOXMANAGE} modifyvm example --boot1 disk
-${VBOXMANAGE} modifyvm example --nic1 hostonly --hostonlyadapter1 vboxnet0
+${VBOXMANAGE} modifyvm example --boot1 disk --nic1 hostonly --hostonlyadapter1 vboxnet0
