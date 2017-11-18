@@ -72,7 +72,7 @@ else
     fi
 fi
 
-${VBOXMANAGE} modifyvm example --nic1 nat --boot1 net --nattftpfile1 /pxelinux.0 --natpf1 http,tcp,,8000,,8000
+${VBOXMANAGE} modifyvm example --nic1 nat --boot1 net --nattftpfile1 /pxelinux.0
 DOMAIN=$(hostname)
 mkdir -p tmp/web
 "${HOME}/src/debian-tools/.venv/bin/dt" --hostname example --domain shiin.org --root-password root --user-name example --user-password example --user-real-name "Example User" --release stretch --output-document tmp/web/example.cfg
