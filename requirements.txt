@@ -6,6 +6,7 @@ pytest # test framework
 pytest-cov # pytest coverage plugin
 pyyaml # YAML parser
 Flask # web framework
+wheel # packaging tool
 
 # helper classes
 git+https://git@github.com/FunTimeCoding/python-utility.git#egg=python-utility
