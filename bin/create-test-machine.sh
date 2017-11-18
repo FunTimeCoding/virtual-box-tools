@@ -92,7 +92,7 @@ cd ../..
 ${VBOXMANAGE} startvm example --type headless
 sleep 30
 ${VBOXMANAGE} controlvm example keyboardputscancode 01 81
-bin/input.sh example "auto url=http://${ADDRESS}:8000/preseed.cfg"
+bin/input.sh example "auto url=http://${ADDRESS}:8000/example.cfg"
 # TODO: Use input.sh to send \n.
 ${VBOXMANAGE} controlvm example keyboardputscancode 1c 9c
 sleep 600
