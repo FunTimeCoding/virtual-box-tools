@@ -88,7 +88,7 @@ clean_up()
     #remove_machine
 }
 
-trap clean_up EXIT
+trap clean_up EXIT INT
 cd ../..
 ${VBOXMANAGE} startvm example --type headless
 sleep 30
