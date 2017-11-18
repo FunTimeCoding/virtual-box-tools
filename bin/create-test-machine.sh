@@ -82,6 +82,7 @@ WEB_SERVER="${!}"
 
 clean_up()
 {
+    echo "Clean up triggered."
     kill "${WEB_SERVER}" || true
     # Machine should stay after build is done.
     #remove_machine
