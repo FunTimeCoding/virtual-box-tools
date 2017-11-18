@@ -5,7 +5,7 @@ SCRIPT_DIRECTORY=$(cd "${DIRECTORY}" || exit 1; pwd)
 
 usage()
 {
-    echo "Usage: ${0} [--cores NUMBER][--memory NUMBER][--disk-size NUMBER][--release RELEASE] HOST_NAME"
+    echo "Usage: ${0} [--cores NUMBER][--memory NUMBER][--disk-size NUMBER] HOST_NAME"
 }
 
 # shellcheck source=/dev/null
@@ -13,7 +13,6 @@ usage()
 CORES=1
 MEMORY=4096
 DISK_SIZE=64
-RELEASE=jessie
 
 while true; do
     case ${1} in
@@ -27,10 +26,6 @@ while true; do
             ;;
         --disk-size)
             DISK_SIZE=${2-}
-            shift 2
-            ;;
-        --release)
-            RELEASE=${2-}
             shift 2
             ;;
         *)
@@ -64,6 +59,6 @@ fi
 
 FULL_NAME=$(getent passwd "${USER}" | cut -d : -f 5 | cut -d , -f 1)
 
-"${HOME}/src/debian-tools/.venv/bin/dt" --release "${RELEASE}" --hostname "${HOST_NAME}" --domain "${DOMAIN}" --root-password "${ROOT_PASSWORD}" --user-name "${USER}" --user-password "${USER_PASSWORD}" --user-real-name "${FULL_NAME}" > "${SCRIPT_DIRECTORY}/../${HOST_NAME}.cfg"
+"${HOME}/src/debian-tools/.venv/bin/dt" --hostname "${HOST_NAME}" --domain "${DOMAIN}" --root-password "${ROOT_PASSWORD}" --user-name "${USER}" --user-password "${USER_PASSWORD}" --user-real-name "${FULL_NAME}" --output-document "${SCRIPT_DIRECTORY}/../${HOST_NAME}.cfg"
 
-"${SCRIPT_DIRECTORY}/create-new-machine.sh" --debian-release "${RELEASE}" --preseed-file "${SCRIPT_DIRECTORY}/../${HOST_NAME}.cfg" --network-device vboxnet0 --network-type hostonly --cores "${CORES}" --memory "${MEMORY}" --disk-size "${DISK_SIZE}" "${HOST_NAME}"
+"${SCRIPT_DIRECTORY}/create-new-machine.sh" --preseed-file "${SCRIPT_DIRECTORY}/../${HOST_NAME}.cfg" --network-device vboxnet0 --network-type hostonly --cores "${CORES}" --memory "${MEMORY}" --disk-size "${DISK_SIZE}" "${HOST_NAME}"
