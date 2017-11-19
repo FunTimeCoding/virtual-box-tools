@@ -8,3 +8,4 @@ guestproperty
 createvm
 ostype
 unregistervm
+vboxnet

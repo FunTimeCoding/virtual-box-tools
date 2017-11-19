@@ -96,7 +96,6 @@ ${VBOXMANAGE} controlvm example keyboardputscancode 01 81
 sleep 1
 bin/input.sh example "auto url=http://${ADDRESS}:8000/example.cfg"
 sleep 1
-# TODO: Use input.sh to send \n.
 ${VBOXMANAGE} controlvm example keyboardputscancode 1c 9c
 sleep 600
 ${VBOXMANAGE} modifyvm example --boot1 disk --nic1 hostonly --hostonlyadapter1 vboxnet0
