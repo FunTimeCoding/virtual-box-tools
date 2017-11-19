@@ -121,10 +121,9 @@ sleep 1
 sleep 1
 # TODO: Use input.sh to send return (\n).
 ${VBOXMANAGE} controlvm "${MACHINE_NAME}" keyboardputscancode 1c 9c
-echo
 
 for MINUTE in $(seq 1 45); do
-    echo -n .
+    printf .
     sleep 60
     STATE=$("${SCRIPT_DIRECTORY}/get-vm-state.sh" "${MACHINE_NAME}")
 
@@ -133,6 +132,7 @@ for MINUTE in $(seq 1 45); do
     fi
 done
 
+echo
 ${VBOXMANAGE} modifyvm "${MACHINE_NAME}" --boot1 disk
 
 if [ "${BRIDGE_DEVICE}" = "" ]; then
