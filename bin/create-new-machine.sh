@@ -117,6 +117,17 @@ sleep 20
 # TODO: Use input.sh to send escape.
 ${VBOXMANAGE} controlvm "${MACHINE_NAME}" keyboardputscancode 01 81
 sleep 1
+
+# TODO: Find a non-abbreviated name for macos.
+# Suggestions: mac-tools, darwin-tools, mac-operating-system-tools
+if [ "${DARWIN}" = Darwin ]; then
+    INTERFACE=$("${HOME}/src/macos-tools/bin/show-network-interfaces.sh" | head -1)
+    ADDRESS=$("${HOME}/src/macos-tools/bin/show-address.sh" "${INTERFACE}")
+else
+    INTERFACE=$("${HOME}/src/linux-tools/bin/show-network-interfaces.sh" | head -1)
+    ADDRESS=$("${HOME}/src/linux-tools/bin/show-address.sh" "${INTERFACE}")
+fi
+
 "${SCRIPT_DIRECTORY}/input.sh" "${MACHINE_NAME}" "auto url=http://${ADDRESS}:8000/${MACHINE_NAME}.cfg"
 sleep 1
 # TODO: Use input.sh to send return (\n).
