@@ -5,7 +5,7 @@ SCRIPT_DIRECTORY=$(cd "${DIRECTORY}" || exit 1; pwd)
 
 usage()
 {
-    echo "Usage: ${0} MACHINE_NAME [enable|disable]"
+    echo "Usage: ${0} ADDRESS"
 }
 
 # shellcheck source=/dev/null
@@ -14,7 +14,7 @@ usage()
 ADDRESS="${1}"
 
 if [ "${ADDRESS}" = "" ]; then
-    echo "Usage: ${0} ADDRESS"
+    usage
 
     exit 1
 fi
