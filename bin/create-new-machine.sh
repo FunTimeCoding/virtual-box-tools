@@ -93,11 +93,11 @@ if [ "${SUDO_USER}" = "" ]; then
         tar --extract --file "${SCRIPT_DIRECTORY}/../tmp/netboot.tar.gz" --directory "${CONFIGURATION_DIRECTORY}/TFTP"
     fi
 else
-    sudo -u "${SUDO_USER}" rm -rf "${CONFIGURATION_DIRECTORY}/TFTP"
-    sudo -u "${SUDO_USER}" mkdir -p "${CONFIGURATION_DIRECTORY}/TFTP"
+    ${SUDO} rm -rf "${CONFIGURATION_DIRECTORY}/TFTP"
+    ${SUDO} mkdir -p "${CONFIGURATION_DIRECTORY}/TFTP"
 
     if [ ! -d "${CONFIGURATION_DIRECTORY}/TFTP/debian-installer" ]; then
-        sudo -u "${SUDO_USER}" tar --extract --file "${SCRIPT_DIRECTORY}/../tmp/netboot.tar.gz" --directory "${CONFIGURATION_DIRECTORY}/TFTP"
+        ${SUDO} tar --extract --file "${SCRIPT_DIRECTORY}/../tmp/netboot.tar.gz" --directory "${CONFIGURATION_DIRECTORY}/TFTP"
     fi
 fi
 
@@ -113,7 +113,7 @@ clean_up()
 
 trap clean_up EXIT INT
 ${VBOXMANAGE} startvm "${MACHINE_NAME}" --type headless
-sleep 30
+sleep 20
 # TODO: Use input.sh to send escape.
 ${VBOXMANAGE} controlvm "${MACHINE_NAME}" keyboardputscancode 01 81
 sleep 1

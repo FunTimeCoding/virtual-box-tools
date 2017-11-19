@@ -64,11 +64,11 @@ if [ "${SUDO_USER}" = "" ]; then
         tar --extract --file tmp/netboot.tar.gz --directory "${DIRECTORY}/TFTP"
     fi
 else
-    sudo -u "${SUDO_USER}" rm -rf "${DIRECTORY}/TFTP"
-    sudo -u "${SUDO_USER}" mkdir -p "${DIRECTORY}/TFTP"
+    ${SUDO} rm -rf "${DIRECTORY}/TFTP"
+    ${SUDO} mkdir -p "${DIRECTORY}/TFTP"
 
     if [ ! -d "${DIRECTORY}/TFTP/debian-installer" ]; then
-        sudo -u "${SUDO_USER}" tar --extract --file tmp/netboot.tar.gz --directory "${DIRECTORY}/TFTP"
+        ${SUDO} tar --extract --file tmp/netboot.tar.gz --directory "${DIRECTORY}/TFTP"
     fi
 fi
 
