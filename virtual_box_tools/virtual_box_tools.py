@@ -1,11 +1,16 @@
 from getpass import getuser
 from socket import getfqdn
 from argparse import ArgumentDefaultsHelpFormatter
-from os import name as os_name, umask
+from os import name as os_name, umask, makedirs
+from os.path import expanduser, exists
 from sys import exit as system_exit, argv
+from sys import platform
+import tarfile
 import sqlite3
 import string
 import random
+import urllib.request
+import shutil
 
 from virtual_box_tools.command_process import CommandProcess, \
     CommandFailed
@@ -112,7 +117,6 @@ class Commands:
             cores: int = 1,
             memory: int = 4096,
             disk_size: int = 64,
-            release: str = 'jessie'
     ):
         domain = getfqdn()
         root_password = self.get_password_sqlite(
@@ -126,11 +130,9 @@ class Commands:
             name=name,
             domain=domain
         )
-
         CommandProcess(
             arguments=[
                 'dt',
-                '--release', release,
                 '--hostname', name,
                 '--domain', domain,
                 '--root-password', root_password,
@@ -141,17 +143,117 @@ class Commands:
             ],
             sudo_user=self.sudo_user
         )
-
         CommandProcess(
             arguments=[
-                'vboxmanage',
-                'createvm',
+                'vboxmanage', 'createvm',
                 '--name', name,
                 '--register',
                 '--ostype', 'Debian_64'
             ],
             sudo_user=self.sudo_user
         )
+        controller_name = 'SATA controller'
+        CommandProcess(
+            arguments=[
+                'vboxmanage', 'storagectl', name,
+                '--name', controller_name,
+                '--register',
+                '--ostype', 'Debian_64'
+            ],
+            sudo_user=self.sudo_user
+        )
+
+        user_home = expanduser('~')
+
+        if self.sudo_user == '':
+            home_directory = user_home
+        else:
+            home_directory = '/home/' + self.sudo_user
+
+        disk_path = home_directory + '/VirtualBox VMs/' + name + '/' + name + '.vdi'
+        disk_size_in_megabytes = disk_size * 1024
+        CommandProcess(
+            arguments=[
+                'vboxmanage', 'createmedium',
+                'disk',
+                '--filename', disk_path,
+                '--name', controller_name,
+                '--size', str(disk_size_in_megabytes)
+            ],
+            sudo_user=self.sudo_user
+        )
+        CommandProcess(
+            arguments=[
+                'vboxmanage', 'storageattach', name,
+                '--storagectl',
+                controller_name,
+                '--port', '0',
+                '--device', '0',
+                '--type', 'hdd',
+                '--medium', disk_path
+            ],
+            sudo_user=self.sudo_user
+        )
+        CommandProcess(
+            arguments=[
+                'vboxmanage', 'storageattach', name,
+                '--storagectl',
+                controller_name,
+                '--port', '1',
+                '--device', '0',
+                '--type', 'dvddrive',
+                '--medium', 'emptydrive'
+            ],
+            sudo_user=self.sudo_user
+        )
+        CommandProcess(
+            arguments=[
+                'vboxmanage', 'modifyvm', name,
+                '--acpi', 'on',
+                '--cpus', str(cores),
+                '--memory', str(memory),
+                '--vram', '16'
+            ],
+            sudo_user=self.sudo_user
+        )
+
+        temporary_directory = user_home + '/tmp'
+
+        if not exists(temporary_directory):
+            makedirs(temporary_directory)
+
+        archive = temporary_directory + '/netboot.tar.gz'
+
+        if not exists(archive):
+            with urllib.request.urlopen(
+                    'http://ftp.debian.org/debian/dists/stretch/main'
+                    '/installer-amd64/current/images/netboot/netboot.tar.gz'
+            ) as response, open(archive, 'wb') as out_file:
+                shutil.copyfileobj(response, out_file)
+
+        if platform == 'darwin':
+            configuration_directory = home_directory + '/Library/VirtualBox'
+        else:
+            configuration_directory = home_directory + '/.config/VirtualBox'
+
+        trivial_directory = configuration_directory + '/TFTP'
+
+        if exists(trivial_directory):
+            CommandProcess(
+                arguments=[
+                    'rm', '-rf', trivial_directory,
+                ],
+                sudo_user=self.sudo_user
+            )
+
+        CommandProcess(
+            arguments=[
+                'mkdir', '-p', trivial_directory,
+            ],
+            sudo_user=self.sudo_user
+        )
+        open_archive = tarfile.open(archive, 'r:gz')
+        open_archive.extractall(trivial_directory)
 
     def destroy_host(self, name: str):
         CommandProcess(

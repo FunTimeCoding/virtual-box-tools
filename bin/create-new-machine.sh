@@ -57,7 +57,6 @@ fi
 ${VBOXMANAGE} createvm --name "${MACHINE_NAME}" --register --ostype Debian_64
 CONTROLLER_NAME="SATA Controller"
 ${VBOXMANAGE} storagectl "${MACHINE_NAME}" --name "${CONTROLLER_NAME}" --add sata
-DISK_NAME="${MACHINE_NAME}.vdi"
 
 if [ "${SUDO_USER}" = "" ]; then
     HOME_DIRECTORY="${HOME}"
@@ -65,7 +64,7 @@ else
     HOME_DIRECTORY="/home/${SUDO_USER}"
 fi
 
-DISK_PATH="${HOME_DIRECTORY}/VirtualBox VMs/${MACHINE_NAME}/${DISK_NAME}"
+DISK_PATH="${HOME_DIRECTORY}/VirtualBox VMs/${MACHINE_NAME}/${MACHINE_NAME}.vdi"
 DISK_SIZE_IN_MEGABYTES=$(echo "${DISK_SIZE_IN_GIGABYTES} * 1024" | bc)
 ${VBOXMANAGE} createmedium disk --filename "${DISK_PATH}" --size "${DISK_SIZE_IN_MEGABYTES}"
 ${VBOXMANAGE} storageattach "${MACHINE_NAME}" --storagectl "${CONTROLLER_NAME}" --port 0 --device 0 --type hdd --medium "${DISK_PATH}"

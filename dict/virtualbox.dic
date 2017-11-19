@@ -9,3 +9,12 @@ createvm
 ostype
 unregistervm
 vboxnet
+storagectl
+createmedium
+showvminfo
+machinereadable
+storageattach
+emptydrive
+vram
+acpi
+modifyvm
