@@ -3,8 +3,7 @@ from socket import getfqdn
 from argparse import ArgumentDefaultsHelpFormatter
 from os import name as operating_system_name, umask, makedirs
 from os.path import expanduser, exists
-from sys import exit as system_exit, argv
-from sys import platform
+from sys import exit as system_exit, argv, platform, stderr
 from time import sleep
 import tarfile
 import sqlite3
@@ -428,11 +427,49 @@ class Commands:
         )
         sleep(1)
 
-        # TODO: Replace 127.0.0.1 with a useful address.
-        for line in ScanCode.scan(
-                                'auto url=http://127.0.0.1:8000'
-                                '/' + name + '.cfg'
-        ).splitlines():
+        if platform == 'darwin':
+            interfaces = []
+
+            for line in CommandProcess(
+                    arguments=['networksetup', '-listallhardwareports']
+            ).get_standard_output().splitlines():
+                pass
+                elements = line.split(':')
+
+                if 'Device' == elements[0]:
+                    interfaces += [elements[1].strip()]
+
+            if len(interfaces) == 0:
+                raise Exception('Could not determine first network interface.')
+
+            address = CommandProcess(
+                arguments=['ipconfig', '-getifaddr', interfaces[0]]
+            ).get_standard_output()
+        elif platform == 'linux':
+            interfaces = []
+
+            for line in CommandProcess(
+                    arguments=['ip', '-o', 'link', 'show']
+            ).get_standard_output().splitlines():
+                elements = line.split(':')
+                interface = elements[1].strip()
+
+                if interface != 'lo':
+                    interfaces += [interface]
+
+            if len(interfaces) == 0:
+                raise Exception('Could not determine first network interface.')
+
+            address = CommandProcess(
+                arguments=['ifdata', '-pa', interfaces[0]]
+            ).get_standard_output()
+        elif platform == 'windows':
+            raise Exception('Not implemented yet')
+        else:
+            raise Exception('Unexpected platform: ' + platform)
+
+        command = 'auto url=http://' + address + ':8000/' + name + '.cfg'
+        for line in ScanCode.scan(command).splitlines():
             CommandProcess(
                 arguments=[
                               'vboxmanage', 'controlvm', name,
