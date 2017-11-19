@@ -6,13 +6,13 @@ SYSTEM=$(uname)
 CORES=1
 MEMORY_IN_MEGABYTES=4096
 DISK_SIZE_IN_GIGABYTES=64
-BRIDGE_DEVICE=""
+BRIDGE_INTERFACE=""
 
 usage()
 {
-    echo "Usage: ${0} [--cores NUMBER][--memory NUMBER][--disk-size NUMBER][--bridge-device BRIDGE_DEVICE] MACHINE_NAME"
+    echo "Usage: ${0} [--cores NUMBER][--memory NUMBER][--disk-size NUMBER][--bridge-interface BRIDGE_INTERFACE] MACHINE_NAME"
     echo "Leave --network-type unspecified to skip network configuration."
-    echo "If bridge device is not defined, the machine will be connected to the host only network vboxnet0."
+    echo "If bridge interface is not defined, the machine will be connected to the host only network vboxnet0."
     echo "Defaults:"
     echo "Cores: ${CORES}"
     echo "Memory in megabytes: ${MEMORY_IN_MEGABYTES}"
@@ -36,8 +36,8 @@ while true; do
             DISK_SIZE_IN_GIGABYTES=${2-}
             shift 2
             ;;
-        --bridge-device)
-            BRIDGE_DEVICE=${2-}
+        --bridge-interface)
+            BRIDGE_INTERFACE=${2-}
             shift 2
             ;;
         *)
@@ -145,8 +145,8 @@ done
 echo
 ${VBOXMANAGE} modifyvm "${MACHINE_NAME}" --boot1 disk
 
-if [ "${BRIDGE_DEVICE}" = "" ]; then
+if [ "${BRIDGE_INTERFACE}" = "" ]; then
     ${VBOXMANAGE} modifyvm "${MACHINE_NAME}" --nic1 hostonly --hostonlyadapter1 vboxnet0
 else
-    ${VBOXMANAGE} modifyvm "${MACHINE_NAME}" --nic1 bridged --bridgeadapter1 "${BRIDGE_DEVICE}"
+    ${VBOXMANAGE} modifyvm "${MACHINE_NAME}" --nic1 bridged --bridgeadapter1 "${BRIDGE_INTERFACE}"
 fi

@@ -1,7 +1,7 @@
 from getpass import getuser
 from socket import getfqdn
 from argparse import ArgumentDefaultsHelpFormatter
-from os import name as operating_system_name, umask, makedirs
+from os import name as operating_system_name, umask, makedirs, chdir
 from os.path import expanduser, exists
 from sys import exit as system_exit, argv, platform, stderr
 from time import sleep
@@ -11,6 +11,9 @@ import string
 import random
 import urllib.request
 import shutil
+import http.server
+import socketserver
+import threading
 
 from virtual_box_tools.scan_code import ScanCode
 from virtual_box_tools.command_process import CommandProcess, \
@@ -22,6 +25,10 @@ if 'nt' == operating_system_name:
     import virtual_box_tools.windows_password_database as pwd
 else:
     import pwd
+
+
+class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
+    pass
 
 
 class VirtualBoxTools:
@@ -468,7 +475,21 @@ class Commands:
         else:
             raise Exception('Unexpected platform: ' + platform)
 
+        web_directory = temporary_directory + '/web'
+
+        if not exists(web_directory):
+            raise Exception('Web directory does not exist: ' + web_directory)
+
+        chdir(web_directory)
+        server = ThreadedTCPServer(
+            (address, 8000),
+            http.server.SimpleHTTPRequestHandler
+        )
+        server_thread = threading.Thread(target=server.serve_forever)
+        server_thread.daemon = True
+        server_thread.start()
         command = 'auto url=http://' + address + ':8000/' + name + '.cfg'
+
         for line in ScanCode.scan(command).splitlines():
             CommandProcess(
                 arguments=[
@@ -495,6 +516,9 @@ class Commands:
                 print('.', end='')
             else:
                 break
+
+        server.shutdown()
+        server.server_close()
 
         if bridge_interface == '':
             CommandProcess(
