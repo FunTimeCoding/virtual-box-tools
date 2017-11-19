@@ -157,8 +157,7 @@ class Commands:
             arguments=[
                 'vboxmanage', 'storagectl', name,
                 '--name', controller_name,
-                '--register',
-                '--ostype', 'Debian_64'
+                '--add', 'sata'
             ],
             sudo_user=self.sudo_user
         )
@@ -174,10 +173,8 @@ class Commands:
         disk_size_in_megabytes = disk_size * 1024
         CommandProcess(
             arguments=[
-                'vboxmanage', 'createmedium',
-                'disk',
+                'vboxmanage', 'createmedium', 'disk',
                 '--filename', disk_path,
-                '--name', controller_name,
                 '--size', str(disk_size_in_megabytes)
             ],
             sudo_user=self.sudo_user
@@ -287,16 +284,12 @@ class VirtualBoxTools:
                 print(commands.list_hosts())
             elif 'create' in self.parsed_arguments:
                 try:
-                    print(
-                        commands.create_host(name=self.parsed_arguments.name)
-                    )
+                    commands.create_host(name=self.parsed_arguments.name)
                 except CommandFailed as exception:
                     print(exception)
             elif 'destroy' in self.parsed_arguments:
                 try:
-                    print(
-                        commands.destroy_host(name=self.parsed_arguments.name)
-                    )
+                    commands.destroy_host(name=self.parsed_arguments.name)
                 except CommandFailed as exception:
                     print(exception)
             elif 'show' in self.parsed_arguments:
