@@ -1,11 +1,5 @@
 #!/bin/sh -e
 
-if [ "$(command -v expect || true)" = "" ]; then
-    echo "Command not found: expect"
-
-    exit 1
-fi
-
 DIRECTORY=$(dirname "${0}")
 SCRIPT_DIRECTORY=$(cd "${DIRECTORY}" || exit 1; pwd)
 
