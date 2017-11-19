@@ -25,6 +25,143 @@ else:
     import pwd
 
 
+class VirtualBoxTools:
+    DEFAULT_CORES = 1
+    DEFAULT_MEMORY = 4096
+    DEFAULT_DISK_SIZE = 64
+
+    def __init__(self, arguments: list):
+        self.parser = self.create_parser()
+        self.parsed_arguments = self.parser.parse_args(arguments)
+        config = YamlConfig('~/.virtual-box-tools.yaml')
+        self.sudo_user = config.get('sudo_user')
+
+    @staticmethod
+    def main() -> int:
+        return VirtualBoxTools(argv[1:]).run()
+
+    def run(self) -> int:
+        if 'host' in self.parsed_arguments:
+            commands = Commands(self.sudo_user)
+
+            if 'list' in self.parsed_arguments:
+                print(commands.list_hosts())
+            elif 'create' in self.parsed_arguments:
+                try:
+                    commands.create_host(
+                        name=self.parsed_arguments.name,
+                        cores=self.parsed_arguments.cores,
+                        memory=self.parsed_arguments.memory,
+                        disk_size=self.parsed_arguments.disk_size,
+                        bridge_interface=self.parsed_arguments.bridge_interface
+                    )
+                except CommandFailed as exception:
+                    print(exception)
+            elif 'destroy' in self.parsed_arguments:
+                try:
+                    commands.destroy_host(name=self.parsed_arguments.name)
+                except CommandFailed as exception:
+                    print(exception)
+            elif 'stop' in self.parsed_arguments:
+                try:
+                    commands.stop_host(name=self.parsed_arguments.name)
+                except CommandFailed as exception:
+                    print(exception)
+            elif 'show' in self.parsed_arguments:
+                try:
+                    print(
+                        commands.get_host_information(
+                            self.parsed_arguments.name
+                        )
+                    )
+                except CommandFailed as exception:
+                    if 'Could not find a registered machine named' \
+                            in exception.get_standard_error():
+                        print('Host not found.')
+                    else:
+                        print(exception)
+            else:
+                self.parser.print_help()
+        else:
+            self.parser.print_help()
+
+        return 0
+
+    @staticmethod
+    def create_parser() -> CustomArgumentParser:
+        parser = CustomArgumentParser(
+            description='Wrapper around VirtualBox to simplify operations',
+            formatter_class=ArgumentDefaultsHelpFormatter
+        )
+        subparsers = parser.add_subparsers()
+        VirtualBoxTools.add_host_parser(subparsers)
+
+        return parser
+
+    @staticmethod
+    def add_host_parser(subparsers) -> None:
+        host_parent = CustomArgumentParser(add_help=False)
+        host_parser = subparsers.add_parser(
+            'host',
+            parents=[host_parent],
+            help='manage hosts'
+        )
+        host_parser.add_argument('host', action='store_true')
+        host_subparsers = host_parser.add_subparsers()
+
+        create_parent = CustomArgumentParser(add_help=False)
+        create_parent.add_argument('--name', required=True)
+        create_parent.add_argument(
+            '--cores',
+            default=VirtualBoxTools.DEFAULT_CORES
+        )
+        create_parent.add_argument(
+            '--memory',
+            default=VirtualBoxTools.DEFAULT_MEMORY
+        )
+        create_parent.add_argument(
+            '--disk-size',
+            default=VirtualBoxTools.DEFAULT_DISK_SIZE
+        )
+        create_parent.add_argument('--bridge-interface')
+        create_parser = host_subparsers.add_parser(
+            'create',
+            parents=[create_parent],
+            help='create a host'
+        )
+        create_parser.add_argument('create', action='store_true')
+
+        destroy_parent = CustomArgumentParser(add_help=False)
+        destroy_parent.add_argument('--name', required=True)
+        destroy_parser = host_subparsers.add_parser(
+            'destroy',
+            parents=[destroy_parent],
+            help='destroy a host'
+        )
+        destroy_parser.add_argument('destroy', action='store_true')
+
+        show_parent = CustomArgumentParser(add_help=False)
+        show_parent.add_argument('--name', required=True)
+        show_parser = host_subparsers.add_parser(
+            'show',
+            parents=[show_parent],
+            help='show a host'
+        )
+        show_parser.add_argument('show', action='store_true')
+
+        stop_parent = CustomArgumentParser(add_help=False)
+        stop_parent.add_argument('--name', required=True)
+        stop_parser = host_subparsers.add_parser(
+            'stop',
+            parents=[stop_parent],
+            help='stop a host'
+        )
+        stop_parser.add_argument('stop', action='store_true')
+
+        list_parser = host_subparsers.add_parser('list', help='list hosts')
+        list_parser.add_argument('list', action='store_true')
+
+
 class Commands:
     def __init__(self, sudo_user: str):
         self.sudo_user = sudo_user
@@ -41,10 +178,12 @@ class Commands:
         return hosts
 
     def get_host_information(self, name: str) -> []:
-        return CommandProcess(
-            arguments=['vboxmanage', 'guestproperty', 'enumerate', name],
-            sudo_user=self.sudo_user
-        ).get_standard_output()
+        # TODO: Filter virtual and hardware addresses out.
+        # return CommandProcess(
+        #     arguments=['vboxmanage', 'guestproperty', 'enumerate', name],
+        #     sudo_user=self.sudo_user
+        # ).get_standard_output()
+        return self.get_host_state(name)
 
     def generate_password(self):
         chars = string.ascii_uppercase + string.ascii_lowercase + string.digits
@@ -116,9 +255,10 @@ class Commands:
 
     def create_host(
             self, name: str,
-            cores: int = 1,
-            memory: int = 4096,
-            disk_size: int = 64,
+            cores: int = VirtualBoxTools.DEFAULT_CORES,
+            memory: int = VirtualBoxTools.DEFAULT_MEMORY,
+            disk_size: int = VirtualBoxTools.DEFAULT_DISK_SIZE,
+            bridge_interface: str = ''
     ):
         domain = getfqdn()
         root_password = self.get_password_sqlite(
@@ -238,19 +378,28 @@ class Commands:
         trivial_directory = configuration_directory + '/TFTP'
 
         if exists(trivial_directory):
+            # Cover the Windows case because rm is not the same there.
+            if self.sudo_user == '':
+                shutil.rmtree(trivial_directory)
+            else:
+                CommandProcess(
+                    arguments=[
+                        'rm', '-rf', trivial_directory,
+                    ],
+                    sudo_user=self.sudo_user
+                )
+
+        # Cover the Windows case because mkdir is not the same there.
+        if self.sudo_user == '':
+            makedirs(trivial_directory)
+        else:
             CommandProcess(
                 arguments=[
-                    'rm', '-rf', trivial_directory,
+                    'mkdir', '-p', trivial_directory,
                 ],
                 sudo_user=self.sudo_user
             )
 
-        CommandProcess(
-            arguments=[
-                'mkdir', '-p', trivial_directory,
-            ],
-            sudo_user=self.sudo_user
-        )
         open_archive = tarfile.open(archive, 'r:gz')
         open_archive.extractall(trivial_directory)
         CommandProcess(
@@ -279,8 +428,10 @@ class Commands:
         )
         sleep(1)
 
+        # TODO: Replace 127.0.0.1 with a useful address.
         for line in ScanCode.scan(
-                'auto url=http://127.0.0.1:8000/${MACHINE_NAME}.cfg'
+                                'auto url=http://127.0.0.1:8000'
+                                '/' + name + '.cfg'
         ).splitlines():
             CommandProcess(
                 arguments=[
@@ -298,13 +449,41 @@ class Commands:
             ],
             sudo_user=self.sudo_user
         )
-        state = self.get_host_state(name)
-        print(state)
 
-        # while True:
-        #     state = self.get_host_state(name)
-        #     print(state)
-        #     sleep(60)
+        while True:
+            sleep(60)
+            state = self.get_host_state(name)
+
+            if 'running' == state:
+                print('.', end='')
+            else:
+                break
+
+        if bridge_interface == '':
+            CommandProcess(
+                arguments=[
+                    'vboxmanage', 'modifyvm', name,
+                    '--nic1', 'hostonly',
+                    '--hostonlyadapter1', 'vboxnet0'
+                ],
+                sudo_user=self.sudo_user
+            )
+        else:
+            CommandProcess(
+                arguments=[
+                    'vboxmanage', 'modifyvm', name,
+                    '--nic1', 'bridged',
+                    '--bridgeadapter1', bridge_interface
+                ],
+                sudo_user=self.sudo_user
+            )
+
+    # TODO: implement poweroff
+    def stop_host(self, name: str):
+        CommandProcess(
+            arguments=['vboxmanage', 'controlvm', name, 'acpipowerbutton'],
+            sudo_user=self.sudo_user
+        )
 
     def destroy_host(self, name: str):
         CommandProcess(
@@ -313,107 +492,15 @@ class Commands:
         )
 
     def get_host_state(self, name: str):
-        return CommandProcess(
+        output = CommandProcess(
             arguments=['vboxmanage', 'showvminfo', '--machinereadable', name],
             sudo_user=self.sudo_user
         ).get_standard_output()
 
+        for line in output.splitlines():
+            elements = line.split('=')
 
-class VirtualBoxTools:
-    def __init__(self, arguments: list):
-        self.parser = self.create_parser()
-        self.parsed_arguments = self.parser.parse_args(arguments)
-        config = YamlConfig('~/.virtual-box-tools.yaml')
-        self.sudo_user = config.get('sudo_user')
+            if 'VMState' == elements[0]:
+                return elements[1].replace('"', '')
 
-    @staticmethod
-    def main() -> int:
-        return VirtualBoxTools(argv[1:]).run()
-
-    def run(self) -> int:
-        if 'host' in self.parsed_arguments:
-            commands = Commands(self.sudo_user)
-
-            if 'list' in self.parsed_arguments:
-                print(commands.list_hosts())
-            elif 'create' in self.parsed_arguments:
-                try:
-                    commands.create_host(name=self.parsed_arguments.name)
-                except CommandFailed as exception:
-                    print(exception)
-            elif 'destroy' in self.parsed_arguments:
-                try:
-                    commands.destroy_host(name=self.parsed_arguments.name)
-                except CommandFailed as exception:
-                    print(exception)
-            elif 'show' in self.parsed_arguments:
-                try:
-                    print(
-                        commands.get_host_information(
-                            self.parsed_arguments.name
-                        )
-                    )
-                except CommandFailed as exception:
-                    if 'Could not find a registered machine named' \
-                            in exception.get_standard_error():
-                        print('Host not found.')
-                    else:
-                        print(exception)
-            else:
-                self.parser.print_help()
-        else:
-            self.parser.print_help()
-
-        return 0
-
-    @staticmethod
-    def create_parser() -> CustomArgumentParser:
-        parser = CustomArgumentParser(
-            description='Wrapper around VirtualBox to simplify operations',
-            formatter_class=ArgumentDefaultsHelpFormatter
-        )
-        subparsers = parser.add_subparsers()
-        VirtualBoxTools.add_host_parser(subparsers)
-
-        return parser
-
-    @staticmethod
-    def add_host_parser(subparsers) -> None:
-        host_parent = CustomArgumentParser(add_help=False)
-        host_parser = subparsers.add_parser(
-            'host',
-            parents=[host_parent],
-            help='manage hosts'
-        )
-        host_parser.add_argument('host', action='store_true')
-        host_subparsers = host_parser.add_subparsers()
-
-        create_parent = CustomArgumentParser(add_help=False)
-        create_parent.add_argument('--name', required=True)
-        create_parser = host_subparsers.add_parser(
-            'create',
-            parents=[create_parent],
-            help='create a host'
-        )
-        create_parser.add_argument('create', action='store_true')
-
-        destroy_parent = CustomArgumentParser(add_help=False)
-        destroy_parent.add_argument('--name', required=True)
-        destroy_parser = host_subparsers.add_parser(
-            'destroy',
-            parents=[destroy_parent],
-            help='destroy a host'
-        )
-        destroy_parser.add_argument('destroy', action='store_true')
-
-        show_parent = CustomArgumentParser(add_help=False)
-        show_parent.add_argument('--name', required=True)
-        show_parser = host_subparsers.add_parser(
-            'show',
-            parents=[show_parent],
-            help='show a host'
-        )
-        show_parser.add_argument('show', action='store_true')
-
-        list_parser = host_subparsers.add_parser('list', help='list hosts')
-        list_parser.add_argument('list', action='store_true')
+        return 'unknown'

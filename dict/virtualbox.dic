@@ -23,3 +23,6 @@ dvddrive
 startvm
 controlvm
 keyboardputscancode
+acpipowerbutton
+hostonlyadapter
+bridgeadapter
