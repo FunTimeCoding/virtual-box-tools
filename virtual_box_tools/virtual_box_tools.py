@@ -278,6 +278,8 @@ class Commands:
             name=name,
             domain=domain
         )
+        user_home = expanduser('~')
+        # TODO: Decide whether to create the preseed file in this project.
         CommandProcess(
             arguments=[
                 'dt',
@@ -287,7 +289,7 @@ class Commands:
                 '--user-name', user,
                 '--user-password', user_password,
                 '--user-real-name', pwd.getpwnam(user)[4],
-                '--output-document', 'tmp/' + name + '.cfg'
+                '--output-document', user_home + '/tmp/web/' + name + '.cfg'
             ],
             sudo_user=self.sudo_user
         )
@@ -309,8 +311,6 @@ class Commands:
             ],
             sudo_user=self.sudo_user
         )
-
-        user_home = expanduser('~')
 
         if self.sudo_user == '':
             home_directory = user_home
