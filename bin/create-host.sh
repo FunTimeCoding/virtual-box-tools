@@ -43,8 +43,6 @@ if [ "${HOST_NAME}" = "" ]; then
     exit 1
 fi
 
-touch "${SCRIPT_DIRECTORY}/../${HOST_NAME}.cfg"
-chmod 600 "${SCRIPT_DIRECTORY}/../${HOST_NAME}.cfg"
 DOMAIN=$(hostname -d)
 ROOT_PASSWORD=$(pass "host/${HOST_NAME}.${DOMAIN}/root" 2>/dev/null || true)
 USER_PASSWORD=$(pass "host/${HOST_NAME}.${DOMAIN}/${USER}" 2>/dev/null || true)
@@ -58,7 +56,6 @@ if [ "${USER_PASSWORD}" = "" ]; then
 fi
 
 FULL_NAME=$(getent passwd "${USER}" | cut -d : -f 5 | cut -d , -f 1)
-
-"${HOME}/src/debian-tools/.venv/bin/dt" --hostname "${HOST_NAME}" --domain "${DOMAIN}" --root-password "${ROOT_PASSWORD}" --user-name "${USER}" --user-password "${USER_PASSWORD}" --user-real-name "${FULL_NAME}" --output-document "${SCRIPT_DIRECTORY}/../${HOST_NAME}.cfg"
-
-"${SCRIPT_DIRECTORY}/create-new-machine.sh" --preseed-file "${SCRIPT_DIRECTORY}/../${HOST_NAME}.cfg" --network-device vboxnet0 --network-type hostonly --cores "${CORES}" --memory "${MEMORY}" --disk-size "${DISK_SIZE}" "${HOST_NAME}"
+mkdir -p "${SCRIPT_DIRECTORY}/../tmp/web"
+"${HOME}/src/debian-tools/.venv/bin/dt" --hostname "${HOST_NAME}" --domain "${DOMAIN}" --root-password "${ROOT_PASSWORD}" --user-name "${USER}" --user-password "${USER_PASSWORD}" --user-real-name "${FULL_NAME}" --output-document "${SCRIPT_DIRECTORY}/../tmp/web/${HOST_NAME}.cfg"
+"${SCRIPT_DIRECTORY}/create-new-machine.sh" --cores "${CORES}" --memory "${MEMORY}" --disk-size "${DISK_SIZE}" "${HOST_NAME}"
