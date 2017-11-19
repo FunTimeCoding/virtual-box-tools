@@ -443,7 +443,7 @@ class Commands:
                 raise Exception('Could not determine first network interface.')
 
             address = CommandProcess(
-                arguments=['ipconfig', '-getifaddr', interfaces[0]]
+                arguments=['ipconfig', 'getifaddr', interfaces[0]]
             ).get_standard_output()
         elif platform == 'linux':
             interfaces = []
