@@ -18,3 +18,8 @@ emptydrive
 vram
 acpi
 modifyvm
+nattftpfile
+dvddrive
+startvm
+controlvm
+keyboardputscancode

@@ -1,10 +1,11 @@
 from getpass import getuser
 from socket import getfqdn
 from argparse import ArgumentDefaultsHelpFormatter
-from os import name as os_name, umask, makedirs
+from os import name as operating_system_name, umask, makedirs
 from os.path import expanduser, exists
 from sys import exit as system_exit, argv
 from sys import platform
+from time import sleep
 import tarfile
 import sqlite3
 import string
@@ -12,12 +13,13 @@ import random
 import urllib.request
 import shutil
 
+from virtual_box_tools.scan_code import ScanCode
 from virtual_box_tools.command_process import CommandProcess, \
     CommandFailed
 from virtual_box_tools.custom_argument_parser import CustomArgumentParser
 from virtual_box_tools.yaml_config import YamlConfig
 
-if 'nt' == os_name:
+if 'nt' == operating_system_name:
     import virtual_box_tools.windows_password_database as pwd
 else:
     import pwd
@@ -169,13 +171,13 @@ class Commands:
         else:
             home_directory = '/home/' + self.sudo_user
 
-        disk_path = home_directory + '/VirtualBox VMs/' + name + '/' + name + '.vdi'
-        disk_size_in_megabytes = disk_size * 1024
+        disk_path = home_directory + '/VirtualBox VMs' \
+                                     '/' + name + '/' + name + '.vdi'
         CommandProcess(
             arguments=[
                 'vboxmanage', 'createmedium', 'disk',
                 '--filename', disk_path,
-                '--size', str(disk_size_in_megabytes)
+                '--size', str(disk_size * 1024)
             ],
             sudo_user=self.sudo_user
         )
@@ -251,6 +253,58 @@ class Commands:
         )
         open_archive = tarfile.open(archive, 'r:gz')
         open_archive.extractall(trivial_directory)
+        CommandProcess(
+            arguments=[
+                'vboxmanage', 'modifyvm', name,
+                '--nic1', 'nat',
+                '--boot1', 'net',
+                '--nattftpfile1', '/pxelinux.0'
+            ],
+            sudo_user=self.sudo_user
+        )
+        CommandProcess(
+            arguments=[
+                'vboxmanage', 'startvm', name,
+                '--type', 'headless'
+            ],
+            sudo_user=self.sudo_user
+        )
+        sleep(20)
+        CommandProcess(
+            arguments=[
+                'vboxmanage', 'controlvm', name,
+                'keyboardputscancode', '01', '81'
+            ],
+            sudo_user=self.sudo_user
+        )
+        sleep(1)
+
+        for line in ScanCode.scan(
+                'auto url=http://127.0.0.1:8000/${MACHINE_NAME}.cfg'
+        ).splitlines():
+            CommandProcess(
+                arguments=[
+                              'vboxmanage', 'controlvm', name,
+                              'keyboardputscancode',
+                          ] + line.split(' '),
+                sudo_user=self.sudo_user
+            )
+
+        sleep(1)
+        CommandProcess(
+            arguments=[
+                'vboxmanage', 'controlvm', name,
+                'keyboardputscancode', '1c', '9c'
+            ],
+            sudo_user=self.sudo_user
+        )
+        state = self.get_host_state(name)
+        print(state)
+
+        # while True:
+        #     state = self.get_host_state(name)
+        #     print(state)
+        #     sleep(60)
 
     def destroy_host(self, name: str):
         CommandProcess(

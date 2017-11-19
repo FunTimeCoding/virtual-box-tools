@@ -6,3 +6,4 @@ pybuild
 buildsystem
 libyaml
 libxslt
+pxelinux
