@@ -38,6 +38,8 @@ setup(
             'HostConfiguration.main',
             'vbt-web-service=virtual_box_tools.web_service:'
             'WebService.main',
+            'vbt-extract=virtual_box_tools.extract:'
+            'Extract.main',
         ],
     },
 )

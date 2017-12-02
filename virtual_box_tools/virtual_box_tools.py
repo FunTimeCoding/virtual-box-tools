@@ -410,8 +410,17 @@ class Commands:
                 sudo_user=self.sudo_user
             )
 
-        open_archive = tarfile.open(archive, 'r:gz')
-        open_archive.extractall(trivial_directory)
+        # Use own extract program since tar would not be available on Windows.
+        if self.sudo_user == '':
+            open_archive = tarfile.open(archive, 'r:gz')
+            open_archive.extractall(trivial_directory)
+        else:
+            extract_path = shutil.which('vbt-extract')
+            CommandProcess(
+                arguments=[extract_path, archive, trivial_directory],
+                sudo_user=self.sudo_user
+            )
+
         CommandProcess(
             arguments=[
                 'vboxmanage', 'modifyvm', name,
