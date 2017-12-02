@@ -279,6 +279,12 @@ class Commands:
             domain=domain
         )
         user_home = expanduser('~')
+        temporary_directory = user_home + '/tmp'
+        web_directory = temporary_directory + '/web'
+
+        if not exists(web_directory):
+            makedirs(web_directory)
+
         # TODO: Decide whether to create the preseed file in this project.
         CommandProcess(
             arguments=[
@@ -289,7 +295,7 @@ class Commands:
                 '--user-name', user,
                 '--user-password', user_password,
                 '--user-real-name', pwd.getpwnam(user)[4],
-                '--output-document', user_home + '/tmp/web/' + name + '.cfg'
+                '--output-document', web_directory + '/' + name + '.cfg'
             ],
             sudo_user=self.sudo_user
         )
@@ -361,8 +367,6 @@ class Commands:
             ],
             sudo_user=self.sudo_user
         )
-
-        temporary_directory = user_home + '/tmp'
 
         if not exists(temporary_directory):
             makedirs(temporary_directory)
@@ -474,11 +478,6 @@ class Commands:
             raise Exception('Not implemented yet')
         else:
             raise Exception('Unexpected platform: ' + platform)
-
-        web_directory = temporary_directory + '/web'
-
-        if not exists(web_directory):
-            raise Exception('Web directory does not exist: ' + web_directory)
 
         chdir(web_directory)
         server = ThreadedTCPServer(
