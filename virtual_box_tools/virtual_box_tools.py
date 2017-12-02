@@ -523,6 +523,7 @@ class Commands:
             if 'running' == state:
                 print('.', end='')
             else:
+                print('')
                 break
 
         server.shutdown()
