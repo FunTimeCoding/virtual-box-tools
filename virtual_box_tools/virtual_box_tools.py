@@ -129,7 +129,7 @@ class VirtualBoxTools:
             '--disk-size',
             default=VirtualBoxTools.DEFAULT_DISK_SIZE
         )
-        create_parent.add_argument('--bridge-interface')
+        create_parent.add_argument('--bridge-interface', default='')
         create_parser = host_subparsers.add_parser(
             'create',
             parents=[create_parent],
