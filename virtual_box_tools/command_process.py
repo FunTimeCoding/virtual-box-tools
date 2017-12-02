@@ -1,5 +1,5 @@
 from subprocess import Popen, PIPE
-from os import name as os_name
+from os import name as os_name, environ
 
 
 class CommandFailed(BaseException):
@@ -15,7 +15,8 @@ class CommandFailed(BaseException):
         self.standard_output = standard_output
         self.standard_error = standard_error
         self.message = 'CommandFailed:' \
-                       + '\nReturn code: ' + str(self.return_code)
+                       + '\nReturn code: ' + str(self.return_code) \
+                       + '\nPath: ' + environ['PATH']
 
         if self.standard_output != '':
             self.message += '\nStandard output: \n' + self.standard_output
