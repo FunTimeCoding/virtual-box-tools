@@ -524,6 +524,7 @@ class Commands:
                 print('.', end='')
             else:
                 print('')
+
                 break
 
         server.shutdown()
