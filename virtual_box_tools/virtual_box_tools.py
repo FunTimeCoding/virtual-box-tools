@@ -286,6 +286,7 @@ class Commands:
             makedirs(web_directory)
 
         # TODO: Decide whether to create the preseed file in this project.
+        # Do not use sudo for dt, because it would not be available in PATH.
         CommandProcess(
             arguments=[
                 'dt',
@@ -296,8 +297,7 @@ class Commands:
                 '--user-password', user_password,
                 '--user-real-name', pwd.getpwnam(user)[4],
                 '--output-document', web_directory + '/' + name + '.cfg'
-            ],
-            sudo_user=self.sudo_user
+            ]
         )
         CommandProcess(
             arguments=[
