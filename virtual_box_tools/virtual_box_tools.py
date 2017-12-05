@@ -198,6 +198,11 @@ class Commands:
 
     def get_password_sqlite(self, user: str, name: str, domain: str) -> str:
         old_mask = umask(0o077)
+
+        # TODO: Move this to ~/.virtual-box-tools
+        if not exists('tmp'):
+            makedirs('tmp')
+
         connection = sqlite3.connect('tmp/user.sqlite')
         umask(old_mask)
         cursor = connection.cursor()
