@@ -451,6 +451,7 @@ class Commands:
             sudo_user=self.sudo_user
         )
         sleep(20)
+        print('Start installer.')
         CommandProcess(
             arguments=[
                 'vboxmanage', 'controlvm', name,
@@ -528,6 +529,7 @@ class Commands:
             ],
             sudo_user=self.sudo_user
         )
+        print('Wait for host to install.')
 
         while True:
             sleep(60)
