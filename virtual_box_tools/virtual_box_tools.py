@@ -59,7 +59,8 @@ class VirtualBoxTools:
                         cores=self.parsed_arguments.cores,
                         memory=self.parsed_arguments.memory,
                         disk_size=self.parsed_arguments.disk_size,
-                        bridge_interface=self.parsed_arguments.bridge_interface
+                        bridge_interface=self.parsed_arguments.bridge_interface,
+                        skip_preseed=self.parsed_arguments.skip_preseed
                     )
                 except CommandFailed as exception:
                     print(exception)
@@ -128,6 +129,10 @@ class VirtualBoxTools:
         create_parent.add_argument(
             '--disk-size',
             default=VirtualBoxTools.DEFAULT_DISK_SIZE
+        )
+        create_parent.add_argument(
+            '--skip-preseed',
+            action='store_true'
         )
         create_parent.add_argument('--bridge-interface', default='')
         create_parser = host_subparsers.add_parser(
@@ -269,7 +274,8 @@ class Commands:
             cores: int = VirtualBoxTools.DEFAULT_CORES,
             memory: int = VirtualBoxTools.DEFAULT_MEMORY,
             disk_size: int = VirtualBoxTools.DEFAULT_DISK_SIZE,
-            bridge_interface: str = ''
+            bridge_interface: str = '',
+            skip_preseed: bool = False
     ):
         domain = getfqdn()
         root_password = self.get_password_sqlite(
@@ -292,18 +298,20 @@ class Commands:
 
         # TODO: Decide whether to create the preseed file in this project.
         # Do not use sudo for dt, because it would not be available in PATH.
-        CommandProcess(
-            arguments=[
-                'dt',
-                '--hostname', name,
-                '--domain', domain,
-                '--root-password', root_password,
-                '--user-name', user,
-                '--user-password', user_password,
-                '--user-real-name', pwd.getpwnam(user)[4],
-                '--output-document', web_directory + '/' + name + '.cfg'
-            ]
-        )
+        if skip_preseed is not False:
+            CommandProcess(
+                arguments=[
+                    'dt',
+                    '--hostname', name,
+                    '--domain', domain,
+                    '--root-password', root_password,
+                    '--user-name', user,
+                    '--user-password', user_password,
+                    '--user-real-name', pwd.getpwnam(user)[4],
+                    '--output-document', web_directory + '/' + name + '.cfg'
+                ]
+            )
+
         CommandProcess(
             arguments=[
                 'vboxmanage', 'createvm',
