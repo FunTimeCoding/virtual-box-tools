@@ -451,7 +451,7 @@ class Commands:
             sudo_user=self.sudo_user
         )
         sleep(20)
-        print('Start installer.')
+        # print('Start installer.')
         CommandProcess(
             arguments=[
                 'vboxmanage', 'controlvm', name,
@@ -529,14 +529,15 @@ class Commands:
             ],
             sudo_user=self.sudo_user
         )
-        print('Wait for host to install.')
+        # print('Wait for host to install.')
 
         while True:
             sleep(60)
             state = self.get_host_state(name)
 
             if 'running' == state:
-                print('.', end='')
+                # Flush because the dots would not show up in some cases.
+                print('.', end='', flush=True)
             else:
                 print('')
 
