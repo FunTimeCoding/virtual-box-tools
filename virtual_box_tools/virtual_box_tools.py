@@ -298,7 +298,7 @@ class Commands:
 
         # TODO: Decide whether to create the preseed file in this project.
         # Do not use sudo for dt, because it would not be available in PATH.
-        if skip_preseed is not False:
+        if skip_preseed is False:
             CommandProcess(
                 arguments=[
                     'dt',
