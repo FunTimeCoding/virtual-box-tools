@@ -74,7 +74,8 @@ class VirtualBoxTools:
                 try:
                     commands.stop_host(
                         name=self.parsed_arguments.name,
-                        force=self.parsed_arguments.force
+                        force=self.parsed_arguments.force,
+                        wait=self.parsed_arguments.wait
                     )
                 except CommandFailed as exception:
                     print(exception)
@@ -171,6 +172,7 @@ class VirtualBoxTools:
         stop_parent = CustomArgumentParser(add_help=False)
         stop_parent.add_argument('--name', required=True)
         stop_parent.add_argument('--force', action='store_true')
+        stop_parent.add_argument('--wait', action='store_true')
         stop_parser = host_subparsers.add_parser(
             'stop',
             parents=[stop_parent],
@@ -278,6 +280,19 @@ class Commands:
                 system_exit(1)
 
         return password
+
+    def wait_until_host_stops(self, name: str):
+        while True:
+            sleep(60)
+            state = self.get_host_state(name)
+
+            if 'running' == state:
+                # Flush because the dots would not show up in some cases.
+                print('.', end='', flush=True)
+            else:
+                print('')
+
+                break
 
     def create_host(
             self, name: str,
@@ -543,18 +558,7 @@ class Commands:
             sudo_user=self.sudo_user
         )
 
-        while True:
-            sleep(60)
-            state = self.get_host_state(name)
-
-            if 'running' == state:
-                # Flush because the dots would not show up in some cases.
-                print('.', end='', flush=True)
-            else:
-                print('')
-
-                break
-
+        self.wait_until_host_stops(name)
         server.shutdown()
         server.server_close()
 
@@ -577,7 +581,7 @@ class Commands:
                 sudo_user=self.sudo_user
             )
 
-    def stop_host(self, name: str, force: bool = False):
+    def stop_host(self, name: str, force: bool = False, wait: bool = False):
         if force:
             arguments = ['poweroff']
         else:
@@ -587,6 +591,9 @@ class Commands:
             arguments=['vboxmanage', 'controlvm', name] + arguments,
             sudo_user=self.sudo_user
         )
+
+        if wait and not force:
+            self.wait_until_host_stops(name)
 
     def destroy_host(self, name: str):
         state = self.get_host_state(name)
