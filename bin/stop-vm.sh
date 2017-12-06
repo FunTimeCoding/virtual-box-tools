@@ -38,27 +38,11 @@ if [ "${MACHINE_NAME}" = "" ]; then
 fi
 
 if [ "${FORCE}" = true ]; then
-    echo "Force shutdown."
-    ${VBOXMANAGE} controlvm "${MACHINE_NAME}" poweroff
+    vbt host stop --name "${MACHINE_NAME}" --force
 else
-    echo "Stop running virtual machine '${MACHINE_NAME}'."
-    ${VBOXMANAGE} controlvm "${MACHINE_NAME}" acpipowerbutton
-fi
-
-if [ "${WAIT}" = true ]; then
-    for SECOND in $(seq 1 30); do
-        echo "${SECOND}"
-        sleep 1
-        STATE=$("${SCRIPT_DIRECTORY}"/get-vm-state.sh "${MACHINE_NAME}")
-
-        if [ "${STATE}" = poweroff ]; then
-            DOWN=true
-
-            break
-        fi
-    done
-
-    if [ "${DOWN}" = false ]; then
-        echo "Error: Virtual machine could not be stopped."
+    if [ "${WAIT}" = true ]; then
+        vbt host stop --name "${MACHINE_NAME}" --wait
+    else
+        vbt host stop --name "${MACHINE_NAME}"
     fi
 fi
