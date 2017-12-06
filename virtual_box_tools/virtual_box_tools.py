@@ -331,8 +331,8 @@ class Commands:
             domain=domain
         )
         user_home = expanduser('~')
-        temporary_directory = user_home + '/tmp'
-        web_directory = temporary_directory + '/web'
+        temporary_directory = join(user_home, 'tmp')
+        web_directory = join(temporary_directory, 'web')
 
         if not exists(web_directory):
             makedirs(web_directory)
@@ -349,7 +349,7 @@ class Commands:
                     '--user-name', user,
                     '--user-password', user_password,
                     '--user-real-name', pwd.getpwnam(user)[4],
-                    '--output-document', web_directory + '/' + name + '.cfg'
+                    '--output-document', join(web_directory, name + '.cfg')
                 ]
             )
 
@@ -375,10 +375,14 @@ class Commands:
         if self.sudo_user == '':
             home_directory = user_home
         else:
-            home_directory = '/home/' + self.sudo_user
+            home_directory = join('/home', self.sudo_user)
 
-        disk_path = home_directory + '/VirtualBox VMs' \
-                                     '/' + name + '/' + name + '.vdi'
+        disk_path = join(
+            home_directory,
+            'VirtualBox VMs',
+            name,
+            name + '.vdi'
+        )
         CommandProcess(
             arguments=[
                 'vboxmanage', 'createmedium', 'disk',
@@ -418,7 +422,7 @@ class Commands:
         if not exists(temporary_directory):
             makedirs(temporary_directory)
 
-        archive = temporary_directory + '/netboot.tar.gz'
+        archive = join(temporary_directory, 'netboot.tar.gz')
 
         if not exists(archive):
             with urllib.request.urlopen(
@@ -428,11 +432,19 @@ class Commands:
                 shutil.copyfileobj(response, out_file)
 
         if platform == 'darwin':
-            configuration_directory = home_directory + '/Library/VirtualBox'
+            configuration_directory = join(
+                home_directory,
+                'Library',
+                'VirtualBox'
+            )
         else:
-            configuration_directory = home_directory + '/.config/VirtualBox'
+            configuration_directory = join(
+                home_directory,
+                '.config',
+                'VirtualBox'
+            )
 
-        trivial_directory = configuration_directory + '/TFTP'
+        trivial_directory = join(configuration_directory, 'TFTP')
 
         if exists(trivial_directory):
             # Cover the Windows case because rm is not the same there.
@@ -577,21 +589,22 @@ class Commands:
                 controller_name=controller_name,
                 medium='additions'
             )
+            script = 'install-additions.sh'
             shutil.copyfile(
                 src=join(
                     dirname(
                         abspath(virtual_box_tools.__file__)
                     ),
                     'script',
-                    'install-additions.sh'
+                    script
                 ),
-                dst=web_directory + '/install-additions.sh'
+                dst=join(web_directory, script)
             )
             self.keyboard_input(
                 name=name,
                 command='root\n' + root_password + '\n'
                         + 'wget --output-document - ' + locator
-                        + '/install-additions.sh | sh -e\n'
+                        + '/' + script + ' | sh -e\n'
             )
             sleep(120)
             self.attach_disc(
