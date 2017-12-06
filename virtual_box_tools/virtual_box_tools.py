@@ -70,6 +70,15 @@ class VirtualBoxTools:
                     commands.destroy_host(name=self.parsed_arguments.name)
                 except CommandFailed as exception:
                     print(exception)
+            elif 'start' in self.parsed_arguments:
+                try:
+                    commands.start_host(
+                        name=self.parsed_arguments.name,
+                        graphical=self.parsed_arguments.graphical,
+                        wait=self.parsed_arguments.wait
+                    )
+                except CommandFailed as exception:
+                    print(exception)
             elif 'stop' in self.parsed_arguments:
                 try:
                     commands.stop_host(
@@ -169,6 +178,17 @@ class VirtualBoxTools:
         )
         show_parser.add_argument('show', action='store_true')
 
+        start_parent = CustomArgumentParser(add_help=False)
+        start_parent.add_argument('--name', required=True)
+        start_parent.add_argument('--graphical', action='store_true')
+        start_parent.add_argument('--wait', action='store_true')
+        start_parser = host_subparsers.add_parser(
+            'start',
+            parents=[start_parent],
+            help='start a host'
+        )
+        start_parser.add_argument('start', action='store_true')
+
         stop_parent = CustomArgumentParser(add_help=False)
         stop_parent.add_argument('--name', required=True)
         stop_parent.add_argument('--force', action='store_true')
@@ -200,15 +220,12 @@ class Commands:
         return hosts
 
     def get_host_information(self, name: str) -> []:
-        # TODO: Filter virtual and hardware addresses out.
-        # return CommandProcess(
-        #     arguments=['vboxmanage', 'guestproperty', 'enumerate', name],
-        #     sudo_user=self.sudo_user
-        # ).get_standard_output()
-        return self.get_host_state(name)
+        return 'virtual address: ' + self.get_virtual_host_address(name) \
+               + '\nphysical address: ' + self.get_physical_host_address(name) \
+               + '\nstate:' + self.get_host_state(name)
 
     @staticmethod
-    def generate_password():
+    def generate_password() -> str:
         chars = string.ascii_uppercase + string.ascii_lowercase + string.digits
 
         return ''.join(random.choice(chars) for x in range(14))
@@ -281,7 +298,7 @@ class Commands:
 
         return password
 
-    def wait_until_host_stops(self, name: str):
+    def wait_until_host_stops(self, name: str) -> None:
         while True:
             sleep(60)
             state = self.get_host_state(name)
@@ -302,7 +319,7 @@ class Commands:
             bridge_interface: str = '',
             skip_preseed: bool = False,
             graphical: bool = False
-    ):
+    ) -> None:
         domain = getfqdn()
         root_password = self.get_password_sqlite(
             user='root',
@@ -581,7 +598,40 @@ class Commands:
                 sudo_user=self.sudo_user
             )
 
-    def stop_host(self, name: str, force: bool = False, wait: bool = False):
+    def start_host(
+            self, name: str,
+            graphical: bool = False,
+            wait: bool = False
+    ) -> None:
+        arguments = ['vboxmanage', 'startvm', name]
+
+        if not graphical:
+            arguments += ['--type', 'headless']
+
+        CommandProcess(
+            arguments=arguments,
+            sudo_user=self.sudo_user
+        )
+
+        if wait:
+            while True:
+                sleep(60)
+                address = self.get_virtual_host_address(name)
+
+                if '' == address:
+                    # Flush because the dots would not show up in some cases.
+                    print('.', end='', flush=True)
+                else:
+                    print('')
+
+                    break
+
+    def stop_host(
+            self,
+            name: str,
+            force: bool = False,
+            wait: bool = False
+    ) -> None:
         if force:
             arguments = ['poweroff']
         else:
@@ -595,7 +645,7 @@ class Commands:
         if wait and not force:
             self.wait_until_host_stops(name)
 
-    def destroy_host(self, name: str):
+    def destroy_host(self, name: str) -> None:
         state = self.get_host_state(name)
 
         if state != 'poweroff':
@@ -606,7 +656,7 @@ class Commands:
             sudo_user=self.sudo_user
         )
 
-    def get_host_state(self, name: str):
+    def get_host_state(self, name: str) -> str:
         output = CommandProcess(
             arguments=['vboxmanage', 'showvminfo', '--machinereadable', name],
             sudo_user=self.sudo_user
@@ -619,3 +669,31 @@ class Commands:
                 return elements[1].replace('"', '')
 
         return 'unknown'
+
+    def enumerate(self, name: str) -> str:
+        return CommandProcess(
+            arguments=['vboxmanage', 'guestproperty', 'enumerate', name],
+            sudo_user=self.sudo_user
+        ).get_standard_output()
+
+    def get_virtual_host_address(self, name: str) -> str:
+        output = self.enumerate(name)
+
+        for line in output.splitlines():
+            elements = line.split('=')
+
+            if 'IP' == elements[0]:
+                return elements[1].replace('"', '')
+
+        return ''
+
+    def get_physical_host_address(self, name: str) -> str:
+        output = self.enumerate(name)
+
+        for line in output.splitlines():
+            elements = line.split('=')
+
+            if 'MAC' == elements[0]:
+                return elements[1].replace('"', '')
+
+        return ''
