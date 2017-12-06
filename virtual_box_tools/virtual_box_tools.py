@@ -72,7 +72,10 @@ class VirtualBoxTools:
                     print(exception)
             elif 'stop' in self.parsed_arguments:
                 try:
-                    commands.stop_host(name=self.parsed_arguments.name)
+                    commands.stop_host(
+                        name=self.parsed_arguments.name,
+                        force=self.parsed_arguments.force
+                    )
                 except CommandFailed as exception:
                     print(exception)
             elif 'show' in self.parsed_arguments:
@@ -167,6 +170,7 @@ class VirtualBoxTools:
 
         stop_parent = CustomArgumentParser(add_help=False)
         stop_parent.add_argument('--name', required=True)
+        stop_parent.add_argument('--force', action='store_true')
         stop_parser = host_subparsers.add_parser(
             'stop',
             parents=[stop_parent],
@@ -201,7 +205,8 @@ class Commands:
         # ).get_standard_output()
         return self.get_host_state(name)
 
-    def generate_password(self):
+    @staticmethod
+    def generate_password():
         chars = string.ascii_uppercase + string.ascii_lowercase + string.digits
 
         return ''.join(random.choice(chars) for x in range(14))
@@ -460,7 +465,6 @@ class Commands:
             sudo_user=self.sudo_user
         )
         sleep(20)
-        # print('Start installer.')
         CommandProcess(
             arguments=[
                 'vboxmanage', 'controlvm', name,
@@ -538,7 +542,6 @@ class Commands:
             ],
             sudo_user=self.sudo_user
         )
-        # print('Wait for host to install.')
 
         while True:
             sleep(60)
@@ -574,14 +577,23 @@ class Commands:
                 sudo_user=self.sudo_user
             )
 
-    # TODO: implement poweroff
-    def stop_host(self, name: str):
+    def stop_host(self, name: str, force: bool = False):
+        if force:
+            arguments = ['poweroff']
+        else:
+            arguments = ['acpipowerbutton']
+
         CommandProcess(
-            arguments=['vboxmanage', 'controlvm', name, 'acpipowerbutton'],
+            arguments=['vboxmanage', 'controlvm', name] + arguments,
             sudo_user=self.sudo_user
         )
 
     def destroy_host(self, name: str):
+        state = self.get_host_state(name)
+
+        if state != 'poweroff':
+            self.stop_host(name=name, force=True)
+
         CommandProcess(
             arguments=['vboxmanage', 'unregistervm', name, '--delete'],
             sudo_user=self.sudo_user
