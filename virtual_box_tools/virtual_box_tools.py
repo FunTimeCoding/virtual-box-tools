@@ -222,7 +222,7 @@ class Commands:
     def get_host_information(self, name: str) -> []:
         return 'virtual address: ' + self.get_virtual_host_address(name) \
                + '\nphysical address: ' + self.get_physical_host_address(name) \
-               + '\nstate:' + self.get_host_state(name)
+               + '\nstate: ' + self.get_host_state(name)
 
     @staticmethod
     def generate_password() -> str:
