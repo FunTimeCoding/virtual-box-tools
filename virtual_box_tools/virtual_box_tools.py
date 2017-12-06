@@ -60,7 +60,8 @@ class VirtualBoxTools:
                         memory=self.parsed_arguments.memory,
                         disk_size=self.parsed_arguments.disk_size,
                         bridge_interface=self.parsed_arguments.bridge_interface,
-                        skip_preseed=self.parsed_arguments.skip_preseed
+                        skip_preseed=self.parsed_arguments.skip_preseed,
+                        graphical=self.parsed_arguments.graphical
                     )
                 except CommandFailed as exception:
                     print(exception)
@@ -132,6 +133,10 @@ class VirtualBoxTools:
         )
         create_parent.add_argument(
             '--skip-preseed',
+            action='store_true'
+        )
+        create_parent.add_argument(
+            '--graphical',
             action='store_true'
         )
         create_parent.add_argument('--bridge-interface', default='')
@@ -275,7 +280,8 @@ class Commands:
             memory: int = VirtualBoxTools.DEFAULT_MEMORY,
             disk_size: int = VirtualBoxTools.DEFAULT_DISK_SIZE,
             bridge_interface: str = '',
-            skip_preseed: bool = False
+            skip_preseed: bool = False,
+            graphical: bool = False
     ):
         domain = getfqdn()
         root_password = self.get_password_sqlite(
@@ -443,11 +449,14 @@ class Commands:
             ],
             sudo_user=self.sudo_user
         )
+
+        start_arguments = ['vboxmanage', 'startvm', name]
+
+        if graphical is False:
+            start_arguments += ['--type', 'headless']
+
         CommandProcess(
-            arguments=[
-                'vboxmanage', 'startvm', name,
-                '--type', 'headless'
-            ],
+            arguments=start_arguments,
             sudo_user=self.sudo_user
         )
         sleep(20)
