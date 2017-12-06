@@ -28,6 +28,7 @@ setup(
     ],
     keywords='virtualbox abstraction command line web service',
     packages=['virtual_box_tools'],
+    package_data={'virtual_box_tools': ['script/*.sh']},
     install_requires=['pyyaml', 'flask'],
     python_requires='>=3.2',
     entry_points={

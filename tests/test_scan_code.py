@@ -9,6 +9,18 @@ def test_two_letters() -> None:
     assert ScanCode.scan('ab') == '1e 9e 30 b0'
 
 
+def test_newline() -> None:
+    assert ScanCode.scan('\n') == '1c 9c'
+
+
+def test_escape() -> None:
+    assert ScanCode.scan('\027') == '01 81'
+
+
+def test_two_letters_with_newline() -> None:
+    assert ScanCode.scan('a\nb') == '1e 9e 1c 9c 30 b0'
+
+
 def test_installer_command() -> None:
     assert ScanCode.scan(
         'auto url=http://127.0.0.1:8000/example.cfg'

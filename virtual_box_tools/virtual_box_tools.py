@@ -2,7 +2,7 @@ from getpass import getuser
 from socket import getfqdn
 from argparse import ArgumentDefaultsHelpFormatter
 from os import name as operating_system_name, umask, makedirs, chdir
-from os.path import expanduser, exists
+from os.path import expanduser, exists, join, abspath, dirname
 from sys import exit as system_exit, argv, platform, stderr
 from time import sleep
 import tarfile
@@ -15,6 +15,7 @@ import http.server
 import socketserver
 import threading
 
+import virtual_box_tools
 from virtual_box_tools.scan_code import ScanCode
 from virtual_box_tools.command_process import CommandProcess, \
     CommandFailed
@@ -61,7 +62,8 @@ class VirtualBoxTools:
                         disk_size=self.parsed_arguments.disk_size,
                         bridge_interface=self.parsed_arguments.bridge_interface,
                         skip_preseed=self.parsed_arguments.skip_preseed,
-                        graphical=self.parsed_arguments.graphical
+                        graphical=self.parsed_arguments.graphical,
+                        additions=self.parsed_arguments.additions
                     )
                 except CommandFailed as exception:
                     print(exception)
@@ -144,14 +146,9 @@ class VirtualBoxTools:
             '--disk-size',
             default=VirtualBoxTools.DEFAULT_DISK_SIZE
         )
-        create_parent.add_argument(
-            '--skip-preseed',
-            action='store_true'
-        )
-        create_parent.add_argument(
-            '--graphical',
-            action='store_true'
-        )
+        create_parent.add_argument('--skip-preseed', action='store_true')
+        create_parent.add_argument('--graphical', action='store_true')
+        create_parent.add_argument('--additions', action='store_true')
         create_parent.add_argument('--bridge-interface', default='')
         create_parser = host_subparsers.add_parser(
             'create',
@@ -318,7 +315,8 @@ class Commands:
             disk_size: int = VirtualBoxTools.DEFAULT_DISK_SIZE,
             bridge_interface: str = '',
             skip_preseed: bool = False,
-            graphical: bool = False
+            graphical: bool = False,
+            additions: bool = False
     ) -> None:
         domain = getfqdn()
         root_password = self.get_password_sqlite(
@@ -401,17 +399,10 @@ class Commands:
             ],
             sudo_user=self.sudo_user
         )
-        CommandProcess(
-            arguments=[
-                'vboxmanage', 'storageattach', name,
-                '--storagectl',
-                controller_name,
-                '--port', '1',
-                '--device', '0',
-                '--type', 'dvddrive',
-                '--medium', 'emptydrive'
-            ],
-            sudo_user=self.sudo_user
+        self.attach_disc(
+            name=name,
+            controller_name=controller_name,
+            medium='emptydrive'
         )
         CommandProcess(
             arguments=[
@@ -497,12 +488,10 @@ class Commands:
             sudo_user=self.sudo_user
         )
         sleep(20)
-        CommandProcess(
-            arguments=[
-                'vboxmanage', 'controlvm', name,
-                'keyboardputscancode', '01', '81'
-            ],
-            sudo_user=self.sudo_user
+        # Escape to enter menu.
+        self.keyboard_input(
+            name=name,
+            command='\027'
         )
         sleep(1)
 
@@ -512,14 +501,13 @@ class Commands:
             for line in CommandProcess(
                     arguments=['networksetup', '-listallhardwareports']
             ).get_standard_output().splitlines():
-                pass
                 elements = line.split(':')
 
                 if 'Device' == elements[0]:
                     interfaces += [elements[1].strip()]
 
             if len(interfaces) == 0:
-                raise Exception('Could not determine first network interface.')
+                raise Exception('Could not determine network interface.')
 
             address = CommandProcess(
                 arguments=['ipconfig', 'getifaddr', interfaces[0]]
@@ -537,7 +525,7 @@ class Commands:
                     interfaces += [interface]
 
             if len(interfaces) == 0:
-                raise Exception('Could not determine first network interface.')
+                raise Exception('Could not determine network interface.')
 
             address = CommandProcess(
                 arguments=['ifdata', '-pa', interfaces[0]]
@@ -555,29 +543,12 @@ class Commands:
         server_thread = threading.Thread(target=server.serve_forever)
         server_thread.daemon = True
         server_thread.start()
-        command = 'auto url=http://' + address + ':8000/' + name + '.cfg'
-
-        for line in ScanCode.scan(command).splitlines():
-            CommandProcess(
-                arguments=[
-                              'vboxmanage', 'controlvm', name,
-                              'keyboardputscancode',
-                          ] + line.split(' '),
-                sudo_user=self.sudo_user
-            )
-
-        sleep(1)
-        CommandProcess(
-            arguments=[
-                'vboxmanage', 'controlvm', name,
-                'keyboardputscancode', '1c', '9c'
-            ],
-            sudo_user=self.sudo_user
+        locator = 'http://' + address + ':8000'
+        self.keyboard_input(
+            name=name,
+            command='auto url=' + locator + '/' + name + '.cfg\n'
         )
-
         self.wait_until_host_stops(name)
-        server.shutdown()
-        server.server_close()
 
         if bridge_interface == '':
             CommandProcess(
@@ -597,6 +568,70 @@ class Commands:
                 ],
                 sudo_user=self.sudo_user
             )
+
+        if additions:
+            self.start_host(name)
+            sleep(60)
+            self.attach_disc(
+                name=name,
+                controller_name=controller_name,
+                medium='additions'
+            )
+            shutil.copyfile(
+                src=join(
+                    dirname(
+                        abspath(virtual_box_tools.__file__)
+                    ),
+                    'script',
+                    'install-additions.sh'
+                ),
+                dst=web_directory + '/install-additions.sh'
+            )
+            self.keyboard_input(
+                name=name,
+                command='root\n' + root_password + '\n'
+                        + 'wget --output-document - ' + locator
+                        + '/install-additions.sh | sh -e\n'
+            )
+            sleep(120)
+            self.attach_disc(
+                name=name,
+                controller_name=controller_name,
+                medium='emptydrive'
+            )
+            self.stop_host(name)
+            self.wait_until_host_stops(name)
+
+        server.shutdown()
+        server.server_close()
+
+    def keyboard_input(self, name: str, command: str):
+        for line in ScanCode.scan(command).splitlines():
+            CommandProcess(
+                arguments=[
+                              'vboxmanage', 'controlvm', name,
+                              'keyboardputscancode',
+                          ] + line.split(' '),
+                sudo_user=self.sudo_user
+            )
+
+    def attach_disc(
+            self,
+            name: str,
+            controller_name: str,
+            medium: str = 'emptydrive'
+    ) -> None:
+        CommandProcess(
+            arguments=[
+                'vboxmanage', 'storageattach', name,
+                '--storagectl', controller_name,
+                '--port', '1',
+                '--device', '0',
+                '--type', 'dvddrive',
+                '--medium', medium
+            ],
+            sudo_user=self.sudo_user
+        )
 
     def start_host(
             self, name: str,
