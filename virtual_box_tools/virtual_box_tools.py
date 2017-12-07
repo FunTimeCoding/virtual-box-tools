@@ -569,6 +569,14 @@ class Commands:
         )
         self.wait_for_host_to_stop(name)
 
+        CommandProcess(
+            arguments=[
+                'vboxmanage', 'modifyvm', name,
+                '--boot1', 'disk',
+            ],
+            sudo_user=self.sudo_user
+        )
+
         if additions:
             self.start_host(name)
             sleep(60)
