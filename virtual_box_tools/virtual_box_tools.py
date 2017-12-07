@@ -562,6 +562,7 @@ class Commands:
         )
         self.wait_until_host_stops(name)
 
+        # TODO: Install additions before changing interfaces.
         if bridge_interface == '':
             CommandProcess(
                 arguments=[
