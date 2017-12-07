@@ -3,7 +3,7 @@ from socket import getfqdn
 from argparse import ArgumentDefaultsHelpFormatter
 from os import name as operating_system_name, umask, makedirs, chdir
 from os.path import expanduser, exists, join, abspath, dirname
-from sys import exit as system_exit, argv, platform, stderr
+from sys import exit as system_exit, argv, platform
 from time import sleep
 import tarfile
 import sqlite3
@@ -36,6 +36,12 @@ class VirtualBoxTools:
     DEFAULT_CORES = 1
     DEFAULT_MEMORY = 4096
     DEFAULT_DISK_SIZE = 64
+    HOST_COMMAND = 'host'
+    START_COMMAND = 'start'
+    STOP_COMMAND = 'stop'
+    SHOW_COMMAND = 'show'
+    CREATE_COMMAND = 'create'
+    LIST_COMMAND = 'list'
 
     def __init__(self, arguments: list):
         self.parser = self.create_parser()
@@ -48,12 +54,12 @@ class VirtualBoxTools:
         return VirtualBoxTools(argv[1:]).run()
 
     def run(self) -> int:
-        if 'host' in self.parsed_arguments:
+        if self.HOST_COMMAND in self.parsed_arguments:
             commands = Commands(self.sudo_user)
 
-            if 'list' in self.parsed_arguments:
+            if self.LIST_COMMAND in self.parsed_arguments:
                 print(commands.list_hosts())
-            elif 'create' in self.parsed_arguments:
+            elif self.CREATE_COMMAND in self.parsed_arguments:
                 try:
                     commands.create_host(
                         name=self.parsed_arguments.name,
@@ -72,7 +78,7 @@ class VirtualBoxTools:
                     commands.destroy_host(name=self.parsed_arguments.name)
                 except CommandFailed as exception:
                     print(exception)
-            elif 'start' in self.parsed_arguments:
+            elif self.START_COMMAND in self.parsed_arguments:
                 try:
                     commands.start_host(
                         name=self.parsed_arguments.name,
@@ -81,7 +87,7 @@ class VirtualBoxTools:
                     )
                 except CommandFailed as exception:
                     print(exception)
-            elif 'stop' in self.parsed_arguments:
+            elif self.STOP_COMMAND in self.parsed_arguments:
                 try:
                     commands.stop_host(
                         name=self.parsed_arguments.name,
@@ -90,7 +96,7 @@ class VirtualBoxTools:
                     )
                 except CommandFailed as exception:
                     print(exception)
-            elif 'show' in self.parsed_arguments:
+            elif self.SHOW_COMMAND in self.parsed_arguments:
                 try:
                     print(
                         commands.get_host_information(
@@ -110,26 +116,24 @@ class VirtualBoxTools:
 
         return 0
 
-    @staticmethod
-    def create_parser() -> CustomArgumentParser:
+    def create_parser(self) -> CustomArgumentParser:
         parser = CustomArgumentParser(
-            description='Wrapper around VirtualBox to simplify operations',
+            description='Wrapper for VirtualBox to simplify operations',
             formatter_class=ArgumentDefaultsHelpFormatter
         )
         subparsers = parser.add_subparsers()
-        VirtualBoxTools.add_host_parser(subparsers)
+        self.add_host_parser(subparsers)
 
         return parser
 
-    @staticmethod
-    def add_host_parser(subparsers) -> None:
+    def add_host_parser(self, subparsers) -> None:
         host_parent = CustomArgumentParser(add_help=False)
         host_parser = subparsers.add_parser(
-            'host',
+            self.HOST_COMMAND,
             parents=[host_parent],
             help='manage hosts'
         )
-        host_parser.add_argument('host', action='store_true')
+        host_parser.add_argument(self.HOST_COMMAND, action='store_true')
         host_subparsers = host_parser.add_subparsers()
 
         create_parent = CustomArgumentParser(add_help=False)
@@ -151,11 +155,11 @@ class VirtualBoxTools:
         create_parent.add_argument('--additions', action='store_true')
         create_parent.add_argument('--bridge-interface', default='')
         create_parser = host_subparsers.add_parser(
-            'create',
+            self.CREATE_COMMAND,
             parents=[create_parent],
             help='create a host'
         )
-        create_parser.add_argument('create', action='store_true')
+        create_parser.add_argument(self.CREATE_COMMAND, action='store_true')
 
         destroy_parent = CustomArgumentParser(add_help=False)
         destroy_parent.add_argument('--name', required=True)
@@ -169,36 +173,39 @@ class VirtualBoxTools:
         show_parent = CustomArgumentParser(add_help=False)
         show_parent.add_argument('--name', required=True)
         show_parser = host_subparsers.add_parser(
-            'show',
+            self.SHOW_COMMAND,
             parents=[show_parent],
             help='show a host'
         )
-        show_parser.add_argument('show', action='store_true')
+        show_parser.add_argument(self.SHOW_COMMAND, action='store_true')
 
         start_parent = CustomArgumentParser(add_help=False)
         start_parent.add_argument('--name', required=True)
         start_parent.add_argument('--graphical', action='store_true')
         start_parent.add_argument('--wait', action='store_true')
         start_parser = host_subparsers.add_parser(
-            'start',
+            self.START_COMMAND,
             parents=[start_parent],
             help='start a host'
         )
-        start_parser.add_argument('start', action='store_true')
+        start_parser.add_argument(self.START_COMMAND, action='store_true')
 
         stop_parent = CustomArgumentParser(add_help=False)
         stop_parent.add_argument('--name', required=True)
         stop_parent.add_argument('--force', action='store_true')
         stop_parent.add_argument('--wait', action='store_true')
         stop_parser = host_subparsers.add_parser(
-            'stop',
+            self.STOP_COMMAND,
             parents=[stop_parent],
             help='stop a host'
         )
-        stop_parser.add_argument('stop', action='store_true')
+        stop_parser.add_argument(self.STOP_COMMAND, action='store_true')
 
-        list_parser = host_subparsers.add_parser('list', help='list hosts')
-        list_parser.add_argument('list', action='store_true')
+        list_parser = host_subparsers.add_parser(
+            self.LIST_COMMAND,
+            help='list hosts'
+        )
+        list_parser.add_argument(self.LIST_COMMAND, action='store_true')
 
 
 class Commands:
@@ -295,7 +302,7 @@ class Commands:
 
         return password
 
-    def wait_until_host_stops(self, name: str) -> None:
+    def wait_for_host_to_stop(self, name: str) -> None:
         while True:
             sleep(60)
             state = self.get_host_state(name)
@@ -500,7 +507,7 @@ class Commands:
             sudo_user=self.sudo_user
         )
         sleep(20)
-        # Escape to enter menu.
+        # Send escape key to open installer command input.
         self.keyboard_input(
             name=name,
             command='\027'
@@ -560,27 +567,7 @@ class Commands:
             name=name,
             command='auto url=' + locator + '/' + name + '.cfg\n'
         )
-        self.wait_until_host_stops(name)
-
-        # TODO: Install additions before changing interfaces.
-        if bridge_interface == '':
-            CommandProcess(
-                arguments=[
-                    'vboxmanage', 'modifyvm', name,
-                    '--nic1', 'hostonly',
-                    '--hostonlyadapter1', 'vboxnet0'
-                ],
-                sudo_user=self.sudo_user
-            )
-        else:
-            CommandProcess(
-                arguments=[
-                    'vboxmanage', 'modifyvm', name,
-                    '--nic1', 'bridged',
-                    '--bridgeadapter1', bridge_interface
-                ],
-                sudo_user=self.sudo_user
-            )
+        self.wait_for_host_to_stop(name)
 
         if additions:
             self.start_host(name)
@@ -593,9 +580,7 @@ class Commands:
             script = 'install-additions.sh'
             shutil.copyfile(
                 src=join(
-                    dirname(
-                        abspath(virtual_box_tools.__file__)
-                    ),
+                    dirname(abspath(virtual_box_tools.__file__)),
                     'script',
                     script
                 ),
@@ -614,10 +599,29 @@ class Commands:
                 medium='emptydrive'
             )
             self.stop_host(name)
-            self.wait_until_host_stops(name)
+            self.wait_for_host_to_stop(name)
 
         server.shutdown()
         server.server_close()
+
+        if bridge_interface == '':
+            CommandProcess(
+                arguments=[
+                    'vboxmanage', 'modifyvm', name,
+                    '--nic1', 'hostonly',
+                    '--hostonlyadapter1', 'vboxnet0'
+                ],
+                sudo_user=self.sudo_user
+            )
+        else:
+            CommandProcess(
+                arguments=[
+                    'vboxmanage', 'modifyvm', name,
+                    '--nic1', 'bridged',
+                    '--bridgeadapter1', bridge_interface
+                ],
+                sudo_user=self.sudo_user
+            )
 
     def keyboard_input(self, name: str, command: str):
         for line in ScanCode.scan(command).splitlines():
@@ -692,7 +696,7 @@ class Commands:
         )
 
         if wait and not force:
-            self.wait_until_host_stops(name)
+            self.wait_for_host_to_stop(name)
 
     def destroy_host(self, name: str) -> None:
         state = self.get_host_state(name)
