@@ -304,7 +304,7 @@ class Commands:
 
     def wait_for_host_to_stop(self, name: str) -> None:
         while True:
-            sleep(60)
+            sleep(10)
             state = self.get_host_state(name)
 
             if 'running' == state:
@@ -682,7 +682,7 @@ class Commands:
 
         if wait:
             while True:
-                sleep(60)
+                sleep(10)
                 address = self.get_virtual_host_address(name)
 
                 if '' == address:
