@@ -594,10 +594,16 @@ class Commands:
                 ),
                 dst=join(web_directory, script)
             )
+            self.keyboard_input(name=name, command='root\n')
+            sleep(5)
             self.keyboard_input(
                 name=name,
-                command='root\n' + root_password + '\n'
-                        + 'wget --output-document - ' + locator
+                command=root_password + '\n'
+            )
+            sleep(5)
+            self.keyboard_input(
+                name=name,
+                command='wget --output-document - ' + locator
                         + '/' + script + ' | sh -e\n'
             )
             sleep(120)
