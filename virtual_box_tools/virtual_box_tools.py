@@ -601,13 +601,13 @@ class Commands:
                         + '/' + script + ' | sh -e\n'
             )
             sleep(120)
+            self.stop_host(name)
+            self.wait_for_host_to_stop(name)
             self.attach_disc(
                 name=name,
                 controller_name=controller_name,
                 medium='emptydrive'
             )
-            self.stop_host(name)
-            self.wait_for_host_to_stop(name)
 
         server.shutdown()
         server.server_close()
