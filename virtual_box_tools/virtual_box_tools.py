@@ -79,7 +79,7 @@ class VirtualBoxTools:
                         bridge_interface=self.parsed_arguments.bridge_interface,
                         skip_preseed=self.parsed_arguments.skip_preseed,
                         graphical=self.parsed_arguments.graphical,
-                        additions=self.parsed_arguments.additions
+                        no_additions=self.parsed_arguments.no_additions
                     )
                 except CommandFailed as exception:
                     print(exception)
@@ -162,7 +162,7 @@ class VirtualBoxTools:
         )
         create_parent.add_argument('--skip-preseed', action='store_true')
         create_parent.add_argument('--graphical', action='store_true')
-        create_parent.add_argument('--additions', action='store_true')
+        create_parent.add_argument('--no-additions', action='store_true')
         create_parent.add_argument('--bridge-interface', default='')
         create_parser = host_subparsers.add_parser(
             self.CREATE_COMMAND,
@@ -333,7 +333,7 @@ class Commands:
             bridge_interface: str = '',
             skip_preseed: bool = False,
             graphical: bool = False,
-            additions: bool = False
+            no_additions: bool = False
     ) -> None:
         domain = getfqdn()
         root_password = self.get_password_sqlite(
@@ -583,7 +583,7 @@ class Commands:
             sudo_user=self.sudo_user
         )
 
-        if additions:
+        if not no_additions:
             self.start_host(name)
             sleep(60)
             self.attach_disc(
