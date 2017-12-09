@@ -5,16 +5,15 @@ from os import name as operating_system_name, umask, makedirs, chdir
 from os.path import expanduser, exists, join, abspath, dirname
 from sys import exit as system_exit, argv, platform
 from time import sleep
-import tarfile
-import sqlite3
-import string
-import random
-import urllib.request
-import shutil
-import http.server
-import socketserver
-import threading
-import logging
+from http.server import SimpleHTTPRequestHandler
+from socketserver import ThreadingMixIn, TCPServer
+from shutil import copyfile, copyfileobj, rmtree, which
+from threading import Thread
+from urllib.request import urlopen
+from tarfile import open as open_tar_file
+from sqlite3 import connect as sequel_lite_connect
+from string import ascii_uppercase, ascii_lowercase, digits
+from random import choice
 
 import virtual_box_tools
 from virtual_box_tools.scan_code import ScanCode
@@ -29,8 +28,17 @@ else:
     import pwd
 
 
-class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
-    pass
+class ThreadedTCPServer(ThreadingMixIn, TCPServer):
+    logging = False
+
+
+class CustomLoggingHandler(SimpleHTTPRequestHandler):
+    def log_message(self, log_format, *args):
+        if self.server.logging:
+            SimpleHTTPRequestHandler.log_message(
+                self, log_format,
+                *args
+            )
 
 
 class VirtualBoxTools:
@@ -50,7 +58,6 @@ class VirtualBoxTools:
         self.parsed_arguments = self.parser.parse_args(arguments)
         config = YamlConfig('~/.virtual-box-tools.yaml')
         self.sudo_user = config.get('sudo_user')
-        logging.basicConfig(level=logging.WARNING)
 
     @staticmethod
     def main() -> int:
@@ -239,9 +246,9 @@ class Commands:
 
     @staticmethod
     def generate_password() -> str:
-        chars = string.ascii_uppercase + string.ascii_lowercase + string.digits
+        chars = ascii_uppercase + ascii_lowercase + digits
 
-        return ''.join(random.choice(chars) for _ in range(14))
+        return ''.join(choice(chars) for _ in range(14))
 
     def get_password_sqlite(self, user: str, name: str, domain: str) -> str:
         tools_directory = expanduser('~/.virtual-box-tools')
@@ -250,7 +257,7 @@ class Commands:
 
         # Make file permissions 600.
         old_mask = umask(0o077)
-        connection = sqlite3.connect(join(tools_directory, 'user.sqlite'))
+        connection = sequel_lite_connect(join(tools_directory, 'user.sqlite'))
         umask(old_mask)
         cursor = connection.cursor()
         cursor.execute("""
@@ -434,11 +441,11 @@ class Commands:
         archive = join(temporary_directory, 'netboot.tar.gz')
 
         if not exists(archive):
-            with urllib.request.urlopen(
+            with urlopen(
                     'http://ftp.debian.org/debian/dists/stretch/main'
                     '/installer-amd64/current/images/netboot/netboot.tar.gz'
             ) as response, open(archive, 'wb') as out_file:
-                shutil.copyfileobj(response, out_file)
+                copyfileobj(response, out_file)
 
         if platform == 'darwin':
             configuration_directory = join(
@@ -458,7 +465,7 @@ class Commands:
         if exists(trivial_directory):
             # Cover the Windows case because rm is not the same there.
             if self.sudo_user == '':
-                shutil.rmtree(trivial_directory)
+                rmtree(trivial_directory)
             else:
                 CommandProcess(
                     arguments=[
@@ -480,10 +487,10 @@ class Commands:
 
         # Use own extract program since tar would not be available on Windows.
         if self.sudo_user == '':
-            open_archive = tarfile.open(archive, 'r:gz')
+            open_archive = open_tar_file(archive, 'r:gz')
             open_archive.extractall(trivial_directory)
         else:
-            extract_path = shutil.which('vbt-extract')
+            extract_path = which('vbt-extract')
             CommandProcess(
                 arguments=[extract_path, archive, trivial_directory],
                 sudo_user=self.sudo_user
@@ -557,11 +564,8 @@ class Commands:
             raise Exception('Unexpected platform: ' + platform)
 
         chdir(web_directory)
-        server = ThreadedTCPServer(
-            (address, 8000),
-            http.server.SimpleHTTPRequestHandler
-        )
-        server_thread = threading.Thread(target=server.serve_forever)
+        server = ThreadedTCPServer((address, 8000), CustomLoggingHandler)
+        server_thread = Thread(target=server.serve_forever)
         server_thread.daemon = True
         server_thread.start()
         locator = 'http://' + address + ':8000'
@@ -588,7 +592,7 @@ class Commands:
                 medium='additions'
             )
             script = 'install-additions.sh'
-            shutil.copyfile(
+            copyfile(
                 src=join(
                     dirname(abspath(virtual_box_tools.__file__)),
                     'script',
