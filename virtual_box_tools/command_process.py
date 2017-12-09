@@ -14,7 +14,7 @@ class CommandFailed(BaseException):
         self.return_code = return_code
         self.standard_output = standard_output
         self.standard_error = standard_error
-        self.message = 'CommandFailed:' + ' '.join(command) \
+        self.message = 'CommandFailed: ' + ' '.join(command) \
                        + '\nReturn code: ' + str(self.return_code) \
                        + '\nPath: ' + environ['PATH']
 
