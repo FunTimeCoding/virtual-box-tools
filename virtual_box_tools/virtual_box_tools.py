@@ -315,7 +315,7 @@ class Commands:
         while True:
             sleep(10)
 
-            if 'running' == self.get_host_state(name):
+            if 'running' != self.get_host_state(name):
                 break
 
     def create_host(
