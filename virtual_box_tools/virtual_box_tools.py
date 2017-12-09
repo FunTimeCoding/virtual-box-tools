@@ -14,6 +14,7 @@ import shutil
 import http.server
 import socketserver
 import threading
+import logging
 
 import virtual_box_tools
 from virtual_box_tools.scan_code import ScanCode
@@ -49,6 +50,7 @@ class VirtualBoxTools:
         self.parsed_arguments = self.parser.parse_args(arguments)
         config = YamlConfig('~/.virtual-box-tools.yaml')
         self.sudo_user = config.get('sudo_user')
+        logging.basicConfig(level=logging.WARNING)
 
     @staticmethod
     def main() -> int:
@@ -312,14 +314,8 @@ class Commands:
     def wait_for_host_to_stop(self, name: str) -> None:
         while True:
             sleep(10)
-            state = self.get_host_state(name)
 
-            if 'running' == state:
-                # Flush because the dots would not show up in some cases.
-                print('.', end='', flush=True)
-            else:
-                print('')
-
+            if 'running' == self.get_host_state(name):
                 break
 
     def create_host(
@@ -689,14 +685,8 @@ class Commands:
         if wait:
             while True:
                 sleep(10)
-                address = self.get_virtual_host_address(name)
 
-                if '' == address:
-                    # Flush because the dots would not show up in some cases.
-                    print('.', end='', flush=True)
-                else:
-                    print('')
-
+                if '' != self.get_virtual_host_address(name):
                     break
 
     def stop_host(
@@ -761,10 +751,10 @@ class Commands:
         return address
 
     def get_physical_host_address(self, name: str) -> str:
-        physical_address = iter(self.get_guest_property(
+        temporary = iter(self.get_guest_property(
             name=name, key='/VirtualBox/GuestInfo/Net/0/MAC'
         ).split(' ')[1])
 
         return ':'.join(
-            a + b for a, b in zip(physical_address, physical_address)
+            a + b for a, b in zip(temporary, temporary)
         )
