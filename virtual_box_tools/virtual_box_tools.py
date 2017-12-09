@@ -42,6 +42,7 @@ class VirtualBoxTools:
     SHOW_COMMAND = 'show'
     CREATE_COMMAND = 'create'
     LIST_COMMAND = 'list'
+    POWER_OFF_STATE = 'poweroff'
 
     def __init__(self, arguments: list):
         self.parser = self.create_parser()
@@ -99,7 +100,7 @@ class VirtualBoxTools:
             elif self.SHOW_COMMAND in self.parsed_arguments:
                 try:
                     print(
-                        commands.get_host_information(
+                        commands.show_host(
                             self.parsed_arguments.name
                         )
                     )
@@ -223,25 +224,31 @@ class Commands:
 
         return hosts
 
-    def get_host_information(self, name: str) -> []:
-        return 'virtual address: ' + self.get_virtual_host_address(name) \
-               + '\nphysical address: ' + self.get_physical_host_address(name) \
-               + '\nstate: ' + self.get_host_state(name)
+    def show_host(self, name: str) -> []:
+        state = self.get_host_state(name)
+        result = 'physical address: ' + self.get_physical_host_address(name) \
+                 + '\nstate: ' + self.get_host_state(name)
+
+        if state != VirtualBoxTools.POWER_OFF_STATE:
+            result = 'virtual address: ' + self.get_virtual_host_address(name) \
+                     + result
+
+        return result
 
     @staticmethod
     def generate_password() -> str:
         chars = string.ascii_uppercase + string.ascii_lowercase + string.digits
 
-        return ''.join(random.choice(chars) for x in range(14))
+        return ''.join(random.choice(chars) for _ in range(14))
 
     def get_password_sqlite(self, user: str, name: str, domain: str) -> str:
+        tools_directory = expanduser('~/.virtual-box-tools')
+        if not exists(tools_directory):
+            makedirs(tools_directory)
+
+        # Make file permissions 600.
         old_mask = umask(0o077)
-
-        # TODO: Move this to ~/.virtual-box-tools
-        if not exists('tmp'):
-            makedirs('tmp')
-
-        connection = sqlite3.connect('tmp/user.sqlite')
+        connection = sqlite3.connect(join(tools_directory, 'user.sqlite'))
         umask(old_mask)
         cursor = connection.cursor()
         cursor.execute("""
@@ -344,7 +351,6 @@ class Commands:
         if not exists(web_directory):
             makedirs(web_directory)
 
-        # TODO: Decide whether to create the preseed file in this project.
         # Do not use sudo for dt, because it would not be available in PATH.
         if skip_preseed is False:
             CommandProcess(
@@ -715,7 +721,7 @@ class Commands:
     def destroy_host(self, name: str) -> None:
         state = self.get_host_state(name)
 
-        if state != 'poweroff':
+        if state != VirtualBoxTools.POWER_OFF_STATE:
             self.stop_host(name=name, force=True)
 
         CommandProcess(
@@ -737,30 +743,28 @@ class Commands:
 
         return 'unknown'
 
-    def enumerate(self, name: str) -> str:
+    def get_guest_property(self, name: str, key: str) -> str:
         return CommandProcess(
-            arguments=['vboxmanage', 'guestproperty', 'enumerate', name],
+            arguments=['vboxmanage', 'guestproperty', 'get', name, key],
             sudo_user=self.sudo_user
         ).get_standard_output()
 
     def get_virtual_host_address(self, name: str) -> str:
-        output = self.enumerate(name)
+        address = self.get_guest_property(
+            name=name, key='/VirtualBox/GuestInfo/Net/0/V4/IP'
+        ).split(' ')[1]
 
-        for line in output.splitlines():
-            elements = line.split('=')
+        # It returns this address when the virtual machine is off.
+        if address == '10.0.2.15':
+            address = ''
 
-            if 'IP' == elements[0]:
-                return elements[1].replace('"', '')
-
-        return ''
+        return address
 
     def get_physical_host_address(self, name: str) -> str:
-        output = self.enumerate(name)
+        physical_address = iter(self.get_guest_property(
+            name=name, key='/VirtualBox/GuestInfo/Net/0/MAC'
+        ).split(' ')[1])
 
-        for line in output.splitlines():
-            elements = line.split('=')
-
-            if 'MAC' == elements[0]:
-                return elements[1].replace('"', '')
-
-        return ''
+        return ':'.join(
+            a + b for a, b in zip(physical_address, physical_address)
+        )

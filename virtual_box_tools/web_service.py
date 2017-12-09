@@ -89,7 +89,7 @@ class WebService:
             else:
                 try:
                     return json.dumps(
-                        commands.get_host_information(name=name)
+                        commands.show_host(name=name)
                     )
                 except CommandFailed as exception:
                     if 'Could not find a registered machine named' \
