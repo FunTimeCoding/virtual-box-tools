@@ -614,8 +614,6 @@ class Commands:
                 command='wget --output-document - ' + locator
                         + '/' + script + ' | sh -e\n'
             )
-            sleep(120)
-            self.stop_host(name)
             self.wait_for_host_to_stop(name)
             self.attach_disc(
                 name=name,

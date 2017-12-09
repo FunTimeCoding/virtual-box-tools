@@ -9,4 +9,4 @@ umount /mnt
 eject /dev/sr0
 systemctl daemon-reload
 systemctl enable vboxadd
-systemctl start vboxadd
+init 0
