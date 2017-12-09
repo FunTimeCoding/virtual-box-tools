@@ -755,10 +755,17 @@ class Commands:
         return address
 
     def get_physical_host_address(self, name: str) -> str:
-        temporary = iter(self.get_guest_property(
+        guest_property = self.get_guest_property(
             name=name, key='/VirtualBox/GuestInfo/Net/0/MAC'
-        ).split(' ')[1])
-
-        return ':'.join(
-            a + b for a, b in zip(temporary, temporary)
         )
+
+        if guest_property == 'No value set!':
+            result = ''
+        else:
+            temporary = iter(guest_property.split(' ')[1])
+
+            result = ':'.join(
+                a + b for a, b in zip(temporary, temporary)
+            )
+
+        return result
