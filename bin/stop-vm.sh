@@ -1,15 +1,5 @@
 #!/bin/sh -e
 
-DIRECTORY=$(dirname "${0}")
-SCRIPT_DIRECTORY=$(cd "${DIRECTORY}" || exit 1; pwd)
-
-usage()
-{
-    echo "Usage: ${0} [--force][--wait] MACHINE_NAME"
-}
-
-# shellcheck source=/dev/null
-. "${SCRIPT_DIRECTORY}"/../lib/virtual_box_tools.sh
 FORCE=false
 WAIT=false
 
@@ -29,20 +19,12 @@ while true; do
     esac
 done
 
-MACHINE_NAME="${1}"
-
-if [ "${MACHINE_NAME}" = "" ]; then
-    usage
-
-    exit 1
-fi
-
 if [ "${FORCE}" = true ]; then
-    vbt host stop --name "${MACHINE_NAME}" --force
+    vbt host stop --name "${1}" --force
 else
     if [ "${WAIT}" = true ]; then
-        vbt host stop --name "${MACHINE_NAME}" --wait
+        vbt host stop --name "${1}" --wait
     else
-        vbt host stop --name "${MACHINE_NAME}"
+        vbt host stop --name "${1}"
     fi
 fi
