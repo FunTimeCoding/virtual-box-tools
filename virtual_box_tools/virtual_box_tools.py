@@ -749,7 +749,8 @@ class Commands:
         )
 
         # It returns this address when the virtual machine is off.
-        if guest_property == 'No value set!' or guest_property == '10.0.2.15':
+        if guest_property == 'No value set!' \
+                or guest_property.split(' ')[1] == '10.0.2.15':
             result = ''
         else:
             result = guest_property.split(' ')[1]
