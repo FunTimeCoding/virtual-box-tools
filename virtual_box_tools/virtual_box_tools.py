@@ -234,13 +234,15 @@ class Commands:
         return hosts
 
     def show_host(self, name: str) -> []:
-        state = self.get_host_state(name)
-        result = 'physical address: ' + self.get_physical_host_address(name) \
-                 + '\nstate: ' + self.get_host_state(name)
+        virtual_address = self.get_virtual_host_address(name)
+        physical_address = self.get_physical_host_address(name)
+        result = 'state: ' + self.get_host_state(name)
 
-        if state != VirtualBoxTools.POWER_OFF_STATE:
-            result = 'virtual address: ' + self.get_virtual_host_address(name) \
-                     + result
+        if virtual_address != '':
+            result += '\nvirtual address: ' + virtual_address
+
+        if physical_address != '':
+            result += '\nphysical address: ' + physical_address
 
         return result
 
