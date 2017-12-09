@@ -746,15 +746,17 @@ class Commands:
         ).get_standard_output()
 
     def get_virtual_host_address(self, name: str) -> str:
-        address = self.get_guest_property(
+        guest_property = self.get_guest_property(
             name=name, key='/VirtualBox/GuestInfo/Net/0/V4/IP'
-        ).split(' ')[1]
+        )
 
         # It returns this address when the virtual machine is off.
-        if address == '10.0.2.15':
-            address = ''
+        if guest_property == 'No value set!' or guest_property == '10.0.2.15':
+            result = ''
+        else:
+            result = guest_property.split(' ')[1]
 
-        return address
+        return result
 
     def get_physical_host_address(self, name: str) -> str:
         guest_property = self.get_guest_property(
