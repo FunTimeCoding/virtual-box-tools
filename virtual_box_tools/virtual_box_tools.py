@@ -573,7 +573,9 @@ class Commands:
         locator = 'http://' + address + ':8000'
         self.keyboard_input(
             name=name,
-            command='auto url=' + locator + '/' + name + '.cfg\n'
+            command='auto url=' + locator + '/' + name + '.cfg'
+                    + ' netcfg/get_hostname=' + name
+                    + ' netcfg/get_domain=' + domain + '\n'
         )
         self.wait_for_host_to_stop(name)
 

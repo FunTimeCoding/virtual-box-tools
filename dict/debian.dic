@@ -7,3 +7,4 @@ buildsystem
 libyaml
 libxslt
 pxelinux
+netcfg
