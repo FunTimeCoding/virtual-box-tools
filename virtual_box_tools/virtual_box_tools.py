@@ -598,7 +598,8 @@ class Commands:
                 arguments=[
                     'vboxmanage', 'modifyvm', name,
                     '--nic1', 'hostonly',
-                    '--hostonlyadapter1', 'vboxnet0'
+                    '--hostonlyadapter1', 'vboxnet0',
+                    '--cableconnected1', 'on'
                 ],
                 sudo_user=self.sudo_user
             )
