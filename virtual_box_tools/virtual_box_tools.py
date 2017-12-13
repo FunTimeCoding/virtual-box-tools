@@ -587,6 +587,25 @@ class Commands:
             sudo_user=self.sudo_user
         )
 
+        if bridge_interface == '':
+            CommandProcess(
+                arguments=[
+                    'vboxmanage', 'modifyvm', name,
+                    '--nic1', 'hostonly',
+                    '--hostonlyadapter1', 'vboxnet0'
+                ],
+                sudo_user=self.sudo_user
+            )
+        else:
+            CommandProcess(
+                arguments=[
+                    'vboxmanage', 'modifyvm', name,
+                    '--nic1', 'bridged',
+                    '--bridgeadapter1', bridge_interface
+                ],
+                sudo_user=self.sudo_user
+            )
+
         if not no_additions:
             self.start_host(name)
             sleep(60)
@@ -625,25 +644,6 @@ class Commands:
 
         server.shutdown()
         server.server_close()
-
-        if bridge_interface == '':
-            CommandProcess(
-                arguments=[
-                    'vboxmanage', 'modifyvm', name,
-                    '--nic1', 'hostonly',
-                    '--hostonlyadapter1', 'vboxnet0'
-                ],
-                sudo_user=self.sudo_user
-            )
-        else:
-            CommandProcess(
-                arguments=[
-                    'vboxmanage', 'modifyvm', name,
-                    '--nic1', 'bridged',
-                    '--bridgeadapter1', bridge_interface
-                ],
-                sudo_user=self.sudo_user
-            )
 
     def keyboard_input(self, name: str, command: str):
         for line in ScanCode.scan(command).splitlines():
