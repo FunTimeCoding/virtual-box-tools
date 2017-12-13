@@ -50,13 +50,18 @@ Show help.
 ```sh
 vbt --help
 vbt host --help
-vbt service --help
 ```
 
 Create a host.
 
 ```sh
 vbt host create --name example
+```
+
+Create a host and connect it to a bridge interface. For local network scenarios.
+
+```sh
+vbt host create --name example --bridge-interface en0
 ```
 
 Destroy a host.
@@ -69,6 +74,12 @@ Run the web service.
 
 ```sh
 vbt-web-service
+```
+
+Show users.
+
+```sh
+bin/show-users.sh
 ```
 
 
@@ -126,10 +137,4 @@ Send a request to the web service.
 curl --silent --header 'Authorization: Token example' localhost:5000/host
 curl --silent --header 'Authorization: Token example' --header 'Content-Type: application/json' --request POST --data '{"name": "example"}' localhost:5000/host
 curl --silent --header 'Authorization: Token example' --request DELETE localhost:5000/host/example
-```
-
-Show user entries.
-
-```sh
-sqlite3 user.sqlite "SELECT * FROM user"
 ```

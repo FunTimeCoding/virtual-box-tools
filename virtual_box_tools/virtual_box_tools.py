@@ -79,7 +79,7 @@ class VirtualBoxTools:
                         bridge_interface=self.parsed_arguments.bridge_interface,
                         skip_preseed=self.parsed_arguments.skip_preseed,
                         graphical=self.parsed_arguments.graphical,
-                        no_additions=self.parsed_arguments.no_additions
+                        no_additions=self.parsed_arguments.no_additions,
                     )
                 except CommandFailed as exception:
                     print(exception)
@@ -93,7 +93,7 @@ class VirtualBoxTools:
                     commands.start_host(
                         name=self.parsed_arguments.name,
                         graphical=self.parsed_arguments.graphical,
-                        wait=self.parsed_arguments.wait
+                        wait=self.parsed_arguments.wait,
                     )
                 except CommandFailed as exception:
                     print(exception)
@@ -102,17 +102,13 @@ class VirtualBoxTools:
                     commands.stop_host(
                         name=self.parsed_arguments.name,
                         force=self.parsed_arguments.force,
-                        wait=self.parsed_arguments.wait
+                        wait=self.parsed_arguments.wait,
                     )
                 except CommandFailed as exception:
                     print(exception)
             elif self.SHOW_COMMAND in self.parsed_arguments:
                 try:
-                    print(
-                        commands.show_host(
-                            self.parsed_arguments.name
-                        )
-                    )
+                    print(commands.show_host(self.parsed_arguments.name))
                 except CommandFailed as exception:
                     if 'Could not find a registered machine named' \
                             in exception.get_standard_error():
@@ -141,7 +137,7 @@ class VirtualBoxTools:
         host_parser = subparsers.add_parser(
             self.HOST_COMMAND,
             parents=[host_parent],
-            help='manage hosts'
+            help='manage hosts',
         )
         host_parser.add_argument(self.HOST_COMMAND, action='store_true')
         host_subparsers = host_parser.add_subparsers()
@@ -150,15 +146,15 @@ class VirtualBoxTools:
         create_parent.add_argument('--name', required=True)
         create_parent.add_argument(
             '--cores',
-            default=VirtualBoxTools.DEFAULT_CORES
+            default=VirtualBoxTools.DEFAULT_CORES,
         )
         create_parent.add_argument(
             '--memory',
-            default=VirtualBoxTools.DEFAULT_MEMORY
+            default=VirtualBoxTools.DEFAULT_MEMORY,
         )
         create_parent.add_argument(
             '--disk-size',
-            default=VirtualBoxTools.DEFAULT_DISK_SIZE
+            default=VirtualBoxTools.DEFAULT_DISK_SIZE,
         )
         create_parent.add_argument('--skip-preseed', action='store_true')
         create_parent.add_argument('--graphical', action='store_true')
@@ -167,7 +163,7 @@ class VirtualBoxTools:
         create_parser = host_subparsers.add_parser(
             self.CREATE_COMMAND,
             parents=[create_parent],
-            help='create a host'
+            help='create a host',
         )
         create_parser.add_argument(self.CREATE_COMMAND, action='store_true')
 
@@ -176,7 +172,7 @@ class VirtualBoxTools:
         destroy_parser = host_subparsers.add_parser(
             'destroy',
             parents=[destroy_parent],
-            help='destroy a host'
+            help='destroy a host',
         )
         destroy_parser.add_argument('destroy', action='store_true')
 
@@ -185,7 +181,7 @@ class VirtualBoxTools:
         show_parser = host_subparsers.add_parser(
             self.SHOW_COMMAND,
             parents=[show_parent],
-            help='show a host'
+            help='show a host',
         )
         show_parser.add_argument(self.SHOW_COMMAND, action='store_true')
 
@@ -196,7 +192,7 @@ class VirtualBoxTools:
         start_parser = host_subparsers.add_parser(
             self.START_COMMAND,
             parents=[start_parent],
-            help='start a host'
+            help='start a host',
         )
         start_parser.add_argument(self.START_COMMAND, action='store_true')
 
@@ -207,13 +203,13 @@ class VirtualBoxTools:
         stop_parser = host_subparsers.add_parser(
             self.STOP_COMMAND,
             parents=[stop_parent],
-            help='stop a host'
+            help='stop a host',
         )
         stop_parser.add_argument(self.STOP_COMMAND, action='store_true')
 
         list_parser = host_subparsers.add_parser(
             self.LIST_COMMAND,
-            help='list hosts'
+            help='list hosts',
         )
         list_parser.add_argument(self.LIST_COMMAND, action='store_true')
 
@@ -227,7 +223,7 @@ class Commands:
 
         for line in CommandProcess(
                 arguments=['vboxmanage', 'list', 'vms'],
-                sudo_user=self.sudo_user
+                sudo_user=self.sudo_user,
         ).get_standard_output().splitlines():
             hosts += [{'name': line.split(' ')[0][1:-1]}]
 
@@ -276,7 +272,7 @@ class Commands:
             ' WHERE user_name = ?'
             ' AND host_name = ?'
             ' AND domain_name = ?',
-            [user, name, domain]
+            [user, name, domain],
         )
         result = cursor.fetchone()
 
@@ -284,7 +280,7 @@ class Commands:
             password = self.generate_password()
             cursor.execute(
                 'INSERT INTO user VALUES (?, ?, ?, ?)',
-                [user, name, domain, password]
+                [user, name, domain, password],
             )
             connection.commit()
         else:
@@ -300,7 +296,7 @@ class Commands:
         try:
             get_password_process = CommandProcess(
                 arguments=['pass', 'host/' + name + '.' + domain + '/' + user],
-                sudo_user=self.sudo_user
+                sudo_user=self.sudo_user,
             )
             password = get_password_process.get_standard_output()
         except CommandFailed as exception:
@@ -311,7 +307,7 @@ class Commands:
                         'host/' + name + '.' + domain + '/' + user,
                         '--no-symbols', '14'
                     ],
-                    sudo_user=self.sudo_user
+                    sudo_user=self.sudo_user,
                 )
                 password = generate_password_process.get_standard_output()
             else:
@@ -341,13 +337,13 @@ class Commands:
         root_password = self.get_password_sqlite(
             user='root',
             name=name,
-            domain=domain
+            domain=domain,
         )
         user = getuser()
         user_password = self.get_password_sqlite(
             user=user,
             name=name,
-            domain=domain
+            domain=domain,
         )
         user_home = expanduser('~')
         temporary_directory = join(user_home, 'tmp')
@@ -367,7 +363,7 @@ class Commands:
                     '--user-name', user,
                     '--user-password', user_password,
                     '--user-real-name', pwd.getpwnam(user)[4],
-                    '--output-document', join(web_directory, name + '.cfg')
+                    '--output-document', join(web_directory, name + '.cfg'),
                 ]
             )
 
@@ -376,18 +372,18 @@ class Commands:
                 'vboxmanage', 'createvm',
                 '--name', name,
                 '--register',
-                '--ostype', 'Debian_64'
+                '--ostype', 'Debian_64',
             ],
-            sudo_user=self.sudo_user
+            sudo_user=self.sudo_user,
         )
         controller_name = 'SATA controller'
         CommandProcess(
             arguments=[
                 'vboxmanage', 'storagectl', name,
                 '--name', controller_name,
-                '--add', 'sata'
+                '--add', 'sata',
             ],
-            sudo_user=self.sudo_user
+            sudo_user=self.sudo_user,
         )
 
         if self.sudo_user == '':
@@ -399,13 +395,13 @@ class Commands:
             home_directory,
             'VirtualBox VMs',
             name,
-            name + '.vdi'
+            name + '.vdi',
         )
         CommandProcess(
             arguments=[
                 'vboxmanage', 'createmedium', 'disk',
                 '--filename', disk_path,
-                '--size', str(disk_size * 1024)
+                '--size', str(disk_size * 1024),
             ],
             sudo_user=self.sudo_user
         )
@@ -417,14 +413,14 @@ class Commands:
                 '--port', '0',
                 '--device', '0',
                 '--type', 'hdd',
-                '--medium', disk_path
+                '--medium', disk_path,
             ],
             sudo_user=self.sudo_user
         )
         self.attach_disc(
             name=name,
             controller_name=controller_name,
-            medium='emptydrive'
+            medium='emptydrive',
         )
         CommandProcess(
             arguments=[
@@ -432,7 +428,7 @@ class Commands:
                 '--acpi', 'on',
                 '--cpus', str(cores),
                 '--memory', str(memory),
-                '--vram', '16'
+                '--vram', '16',
             ],
             sudo_user=self.sudo_user
         )
@@ -453,13 +449,13 @@ class Commands:
             configuration_directory = join(
                 home_directory,
                 'Library',
-                'VirtualBox'
+                'VirtualBox',
             )
         else:
             configuration_directory = join(
                 home_directory,
                 '.config',
-                'VirtualBox'
+                'VirtualBox',
             )
 
         trivial_directory = join(configuration_directory, 'TFTP')
@@ -495,7 +491,7 @@ class Commands:
             extract_path = which('vbt-extract')
             CommandProcess(
                 arguments=[extract_path, archive, trivial_directory],
-                sudo_user=self.sudo_user
+                sudo_user=self.sudo_user,
             )
 
         CommandProcess(
@@ -503,9 +499,9 @@ class Commands:
                 'vboxmanage', 'modifyvm', name,
                 '--nic1', 'nat',
                 '--boot1', 'net',
-                '--nattftpfile1', '/pxelinux.0'
+                '--nattftpfile1', '/pxelinux.0',
             ],
-            sudo_user=self.sudo_user
+            sudo_user=self.sudo_user,
         )
 
         start_arguments = ['vboxmanage', 'startvm', name]
@@ -515,13 +511,13 @@ class Commands:
 
         CommandProcess(
             arguments=start_arguments,
-            sudo_user=self.sudo_user
+            sudo_user=self.sudo_user,
         )
         sleep(20)
         # Send escape key to open installer command input.
         self.keyboard_input(
             name=name,
-            command='\027'
+            command='\027',
         )
         sleep(1)
 
@@ -575,7 +571,7 @@ class Commands:
             name=name,
             command='auto url=' + locator + '/' + name + '.cfg'
                     + ' netcfg/get_hostname=' + name
-                    + ' netcfg/get_domain=' + domain + '\n'
+                    + ' netcfg/get_domain=' + domain + '\n',
         )
         self.wait_for_host_to_stop(name)
 
@@ -599,18 +595,17 @@ class Commands:
                     'vboxmanage', 'modifyvm', name,
                     '--nic1', 'hostonly',
                     '--hostonlyadapter1', 'vboxnet0',
-                    '--cableconnected1', 'on'
                 ],
-                sudo_user=self.sudo_user
+                sudo_user=self.sudo_user,
             )
         else:
             CommandProcess(
                 arguments=[
                     'vboxmanage', 'modifyvm', name,
                     '--nic1', 'bridged',
-                    '--bridgeadapter1', bridge_interface
+                    '--bridgeadapter1', bridge_interface,
                 ],
-                sudo_user=self.sudo_user
+                sudo_user=self.sudo_user,
             )
 
         if not no_additions:
@@ -619,14 +614,14 @@ class Commands:
             self.attach_disc(
                 name=name,
                 controller_name=controller_name,
-                medium='additions'
+                medium='additions',
             )
             script = 'install-additions.sh'
             copyfile(
                 src=join(
                     dirname(abspath(virtual_box_tools.__file__)),
                     'script',
-                    script
+                    script,
                 ),
                 dst=join(web_directory, script)
             )
@@ -634,39 +629,39 @@ class Commands:
             sleep(5)
             self.keyboard_input(
                 name=name,
-                command=root_password + '\n'
+                command=root_password + '\n',
             )
             sleep(5)
             self.keyboard_input(
                 name=name,
                 command='wget --output-document - ' + locator
-                        + '/' + script + ' | sh -e\n'
+                        + '/' + script + ' | sh -e\n',
             )
             self.wait_for_host_to_stop(name)
             self.attach_disc(
                 name=name,
                 controller_name=controller_name,
-                medium='emptydrive'
+                medium='emptydrive',
             )
 
         server.shutdown()
         server.server_close()
 
-    def keyboard_input(self, name: str, command: str):
+    def keyboard_input(self, name: str, command: str) -> None:
         for line in ScanCode.scan(command).splitlines():
             CommandProcess(
                 arguments=[
                               'vboxmanage', 'controlvm', name,
                               'keyboardputscancode',
                           ] + line.split(' '),
-                sudo_user=self.sudo_user
+                sudo_user=self.sudo_user,
             )
 
     def attach_disc(
             self,
             name: str,
             controller_name: str,
-            medium: str = 'emptydrive'
+            medium: str = 'emptydrive',
     ) -> None:
         CommandProcess(
             arguments=[
@@ -675,9 +670,9 @@ class Commands:
                 '--port', '1',
                 '--device', '0',
                 '--type', 'dvddrive',
-                '--medium', medium
+                '--medium', medium,
             ],
-            sudo_user=self.sudo_user
+            sudo_user=self.sudo_user,
         )
 
     def start_host(
@@ -692,7 +687,7 @@ class Commands:
 
         CommandProcess(
             arguments=arguments,
-            sudo_user=self.sudo_user
+            sudo_user=self.sudo_user,
         )
 
         if wait:
@@ -706,7 +701,7 @@ class Commands:
             self,
             name: str,
             force: bool = False,
-            wait: bool = False
+            wait: bool = False,
     ) -> None:
         if force:
             arguments = ['poweroff']
@@ -729,13 +724,13 @@ class Commands:
 
         CommandProcess(
             arguments=['vboxmanage', 'unregistervm', name, '--delete'],
-            sudo_user=self.sudo_user
+            sudo_user=self.sudo_user,
         )
 
     def get_host_state(self, name: str) -> str:
         output = CommandProcess(
             arguments=['vboxmanage', 'showvminfo', '--machinereadable', name],
-            sudo_user=self.sudo_user
+            sudo_user=self.sudo_user,
         ).get_standard_output()
 
         for line in output.splitlines():
@@ -749,20 +744,20 @@ class Commands:
     def get_guest_property(self, name: str, key: str) -> str:
         return CommandProcess(
             arguments=['vboxmanage', 'guestproperty', 'get', name, key],
-            sudo_user=self.sudo_user
+            sudo_user=self.sudo_user,
         ).get_standard_output()
 
     def get_virtual_host_address(self, name: str) -> str:
         guest_property = self.get_guest_property(
             name=name, key='/VirtualBox/GuestInfo/Net/0/V4/IP'
         )
+        second_element = guest_property.split(' ')[1]
 
         # It returns this address when the virtual machine is off.
-        if guest_property == 'No value set!' \
-                or guest_property.split(' ')[1] == '10.0.2.15':
+        if guest_property == 'No value set!' or second_element == '10.0.2.15':
             result = ''
         else:
-            result = guest_property.split(' ')[1]
+            result = second_element
 
         return result
 
@@ -777,7 +772,7 @@ class Commands:
             temporary = iter(guest_property.split(' ')[1])
 
             result = ':'.join(
-                a + b for a, b in zip(temporary, temporary)
+                keys + values for keys, values in zip(temporary, temporary)
             )
 
         return result
