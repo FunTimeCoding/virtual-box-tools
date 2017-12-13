@@ -587,6 +587,12 @@ class Commands:
             sudo_user=self.sudo_user
         )
 
+        # If the interface is changed after installing additions, the DHCP
+        #  client on the virtual machine will not forget the 10.0.2.15 address
+        #  for hours, leading to the new machine not being available after
+        #  creation. This will likely cause problems when the virtual machine
+        #  is supposed to get a static address. Perhaps it can be solved by
+        #  including the network configuration into the create process.
         if bridge_interface == '':
             CommandProcess(
                 arguments=[
