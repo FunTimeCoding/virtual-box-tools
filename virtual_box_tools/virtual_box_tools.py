@@ -583,31 +583,6 @@ class Commands:
             sudo_user=self.sudo_user
         )
 
-        # If the interface is changed after installing additions, the DHCP
-        #  client on the virtual machine will not forget the 10.0.2.15 address
-        #  for hours, leading to the new machine not being available after
-        #  creation. This will likely cause problems when the virtual machine
-        #  is supposed to get a static address. Perhaps it can be solved by
-        #  including the network configuration into the create process.
-        if bridge_interface == '':
-            CommandProcess(
-                arguments=[
-                    'vboxmanage', 'modifyvm', name,
-                    '--nic1', 'hostonly',
-                    '--hostonlyadapter1', 'vboxnet0',
-                ],
-                sudo_user=self.sudo_user,
-            )
-        else:
-            CommandProcess(
-                arguments=[
-                    'vboxmanage', 'modifyvm', name,
-                    '--nic1', 'bridged',
-                    '--bridgeadapter1', bridge_interface,
-                ],
-                sudo_user=self.sudo_user,
-            )
-
         if not no_additions:
             self.start_host(name)
             sleep(60)
@@ -646,6 +621,25 @@ class Commands:
 
         server.shutdown()
         server.server_close()
+
+        if bridge_interface == '':
+            CommandProcess(
+                arguments=[
+                    'vboxmanage', 'modifyvm', name,
+                    '--nic1', 'hostonly',
+                    '--hostonlyadapter1', 'vboxnet0',
+                ],
+                sudo_user=self.sudo_user,
+            )
+        else:
+            CommandProcess(
+                arguments=[
+                    'vboxmanage', 'modifyvm', name,
+                    '--nic1', 'bridged',
+                    '--bridgeadapter1', bridge_interface,
+                ],
+                sudo_user=self.sudo_user,
+            )
 
     def keyboard_input(self, name: str, command: str) -> None:
         for line in ScanCode.scan(command).splitlines():
