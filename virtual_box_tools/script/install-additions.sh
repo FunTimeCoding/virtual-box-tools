@@ -7,4 +7,5 @@ mount --options loop /dev/sr0 /mnt
 yes | sh /mnt/VBoxLinuxAdditions.run
 umount /mnt
 eject /dev/sr0
+rm /var/lib/dhcp/*
 init 0
