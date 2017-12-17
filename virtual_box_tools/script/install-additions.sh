@@ -11,5 +11,5 @@ eject /dev/sr0
 #  it receives during installation.
 rm /var/lib/dhcp/*
 # This might help avoid problems with dclient.
-echo "pre-up sleep 2" >> /etc/network/interfaces
+echo 'pre-up sleep 2' >> /etc/network/interface
 init 0
