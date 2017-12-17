@@ -603,6 +603,7 @@ class Commands:
             )
 
         if not no_additions:
+            # Sleep to avoid VBOX_E_INVALID_OBJECT_STATE.
             sleep(5)
             self.start_host(name=name, graphical=graphical)
             sleep(60)
@@ -707,6 +708,9 @@ class Commands:
             arguments=['vboxmanage', 'controlvm', name] + arguments,
             sudo_user=self.sudo_user
         )
+
+        # Sleep to avoid VBOX_E_INVALID_OBJECT_STATE.
+        sleep(5)
 
         if wait and not force:
             self.wait_for_host_to_stop(name)
