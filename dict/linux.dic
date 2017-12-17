@@ -1,3 +1,4 @@
 initrd
 syslinux
 ifdata
+dhclient

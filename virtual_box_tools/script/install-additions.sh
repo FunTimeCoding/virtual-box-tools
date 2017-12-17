@@ -10,10 +10,6 @@ eject /dev/sr0
 # Clear leases. Otherwise the client will not let go of the temporary address
 #  it receives during installation.
 rm /var/lib/dhcp/*
-<<<<<<< HEAD
-# This might help avoid problems with dclient.
-echo 'pre-up sleep 2' >> /etc/network/interface
-=======
+# This might help avoid problems with dhclient.
 echo 'pre-up sleep 2' >> /etc/network/interfaces
->>>>>>> add missing s
 init 0
