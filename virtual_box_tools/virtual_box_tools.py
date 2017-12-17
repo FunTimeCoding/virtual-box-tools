@@ -603,7 +603,7 @@ class Commands:
             )
 
         if not no_additions:
-            self.start_host(name)
+            self.start_host(name=name, graphical=graphical)
             sleep(60)
             self.attach_disc(
                 name=name,
