@@ -339,7 +339,7 @@ class Commands:
             graphical: bool = False,
             no_additions: bool = False
     ) -> None:
-        domain = getfqdn()
+        domain = '.'.join(getfqdn().split('.')[1:])
         root_password = self.get_password_sqlite(
             user='root',
             name=name,
