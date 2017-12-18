@@ -68,7 +68,7 @@ class VirtualBoxTools:
             commands = Commands(self.sudo_user)
 
             if self.LIST_COMMAND in self.parsed_arguments:
-                print(commands.list_hosts())
+                print(commands.list_hosts(list_all=self.parsed_arguments.all))
             elif self.CREATE_COMMAND in self.parsed_arguments:
                 try:
                     commands.create_host(
@@ -211,6 +211,7 @@ class VirtualBoxTools:
             self.LIST_COMMAND,
             help='list hosts',
         )
+        list_parser.add_argument('--all', action='store_true')
         list_parser.add_argument(self.LIST_COMMAND, action='store_true')
 
 
@@ -218,11 +219,16 @@ class Commands:
     def __init__(self, sudo_user: str):
         self.sudo_user = sudo_user
 
-    def list_hosts(self) -> []:
+    def list_hosts(self, list_all: bool = False) -> []:
         hosts = []
 
+        if list_all:
+            group = 'vms'
+        else:
+            group = 'runningvms'
+
         for line in CommandProcess(
-                arguments=['vboxmanage', 'list', 'vms'],
+                arguments=['vboxmanage', 'list', group],
                 sudo_user=self.sudo_user,
         ).get_standard_output().splitlines():
             hosts += [{'name': line.split(' ')[0][1:-1]}]
