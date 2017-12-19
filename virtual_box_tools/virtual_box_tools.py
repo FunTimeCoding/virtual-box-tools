@@ -17,8 +17,7 @@ from random import choice
 
 import virtual_box_tools
 from virtual_box_tools.scan_code import ScanCode
-from virtual_box_tools.command_process import CommandProcess, \
-    CommandFailed
+from virtual_box_tools.command_process import CommandProcess, CommandFailed
 from virtual_box_tools.custom_argument_parser import CustomArgumentParser
 from virtual_box_tools.yaml_config import YamlConfig
 
@@ -33,7 +32,7 @@ class ThreadedTCPServer(ThreadingMixIn, TCPServer):
 
 
 class CustomLoggingHandler(SimpleHTTPRequestHandler):
-    def log_message(self, log_format, *args):
+    def log_message(self, log_format, *args) -> None:
         if self.server.logging:
             SimpleHTTPRequestHandler.log_message(
                 self, log_format,
@@ -53,7 +52,7 @@ class VirtualBoxTools:
     LIST_COMMAND = 'list'
     POWER_OFF_STATE = 'poweroff'
 
-    def __init__(self, arguments: list):
+    def __init__(self, arguments: list) -> None:
         self.parser = self.create_parser()
         self.parsed_arguments = self.parser.parse_args(arguments)
         config = YamlConfig('~/.virtual-box-tools.yaml')
@@ -216,7 +215,7 @@ class VirtualBoxTools:
 
 
 class Commands:
-    def __init__(self, sudo_user: str):
+    def __init__(self, sudo_user: str) -> None:
         self.sudo_user = sudo_user
 
     def list_hosts(self, list_all: bool = False) -> []:
@@ -714,15 +713,14 @@ class Commands:
             wait: bool = False,
     ) -> None:
         if force:
-            arguments = ['poweroff']
+            state = 'poweroff'
         else:
-            arguments = ['acpipowerbutton']
+            state = 'acpipowerbutton'
 
         CommandProcess(
-            arguments=['vboxmanage', 'controlvm', name] + arguments,
+            arguments=['vboxmanage', 'controlvm', name, state],
             sudo_user=self.sudo_user
         )
-
         # Sleep to avoid VBOX_E_INVALID_OBJECT_STATE.
         sleep(5)
 
