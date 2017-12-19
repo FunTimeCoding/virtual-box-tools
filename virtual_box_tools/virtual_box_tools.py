@@ -1,5 +1,5 @@
 from getpass import getuser
-from socket import getfqdn
+from socket import getfqdn, socket, AF_INET, SOCK_STREAM
 from argparse import ArgumentDefaultsHelpFormatter
 from os import name as operating_system_name, umask, makedirs, chdir
 from os.path import expanduser, exists, join, abspath, dirname
@@ -329,6 +329,10 @@ class Commands:
             if 'running' != self.get_host_state(name):
                 break
 
+    @staticmethod
+    def get_domain() -> str:
+        return '.'.join(getfqdn().split('.')[1:])
+
     def create_host(
             self, name: str,
             cores: int = VirtualBoxTools.DEFAULT_CORES,
@@ -339,7 +343,7 @@ class Commands:
             graphical: bool = False,
             no_additions: bool = False
     ) -> None:
-        domain = '.'.join(getfqdn().split('.')[1:])
+        domain = self.get_domain()
         root_password = self.get_password_sqlite(
             user='root',
             name=name,
@@ -694,9 +698,13 @@ class Commands:
 
         if wait:
             while True:
-                sleep(10)
+                sleep(2)
+                check_socket = socket(AF_INET, SOCK_STREAM)
+                check_socket.settimeout(1)
 
-                if '' != self.get_virtual_host_address(name):
+                if check_socket.connect_ex(
+                        (name + '.' + Commands.get_domain(), 22)
+                ) is 0:
                     break
 
     def stop_host(
