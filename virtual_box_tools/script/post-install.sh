@@ -2,7 +2,7 @@
 
 export DEBIAN_FRONTEND=noninteractive
 apt-get --quiet 2 update
-# dkms for additions, python-apt for Ansible
+# dkms for additions, python-apt for Ansible to use check mode
 apt-get --quiet 2 install dkms python-apt
 mount --options loop /dev/sr0 /mnt
 yes | sh /mnt/VBoxLinuxAdditions.run
