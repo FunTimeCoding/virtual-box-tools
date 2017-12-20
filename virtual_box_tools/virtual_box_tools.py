@@ -78,7 +78,7 @@ class VirtualBoxTools:
                         bridge_interface=self.parsed_arguments.bridge_interface,
                         skip_preseed=self.parsed_arguments.skip_preseed,
                         graphical=self.parsed_arguments.graphical,
-                        no_additions=self.parsed_arguments.no_additions,
+                        no_post_install=self.parsed_arguments.no_post_install,
                     )
                 except CommandFailed as exception:
                     print(exception)
@@ -157,7 +157,7 @@ class VirtualBoxTools:
         )
         create_parent.add_argument('--skip-preseed', action='store_true')
         create_parent.add_argument('--graphical', action='store_true')
-        create_parent.add_argument('--no-additions', action='store_true')
+        create_parent.add_argument('--no-post-install', action='store_true')
         create_parent.add_argument('--bridge-interface', default='')
         create_parser = host_subparsers.add_parser(
             self.CREATE_COMMAND,
@@ -340,7 +340,7 @@ class Commands:
             bridge_interface: str = '',
             skip_preseed: bool = False,
             graphical: bool = False,
-            no_additions: bool = False
+            no_post_install: bool = False
     ) -> None:
         domain = self.get_domain()
         root_password = self.get_password_sqlite(
@@ -611,7 +611,7 @@ class Commands:
                 sudo_user=self.sudo_user,
             )
 
-        if not no_additions:
+        if not no_post_install:
             # Sleep to avoid VBOX_E_INVALID_OBJECT_STATE.
             sleep(5)
             self.start_host(name=name, graphical=graphical)
@@ -621,7 +621,7 @@ class Commands:
                 controller_name=controller_name,
                 medium='additions',
             )
-            script = 'install-additions.sh'
+            script = 'post-install.sh'
             copyfile(
                 src=join(
                     dirname(abspath(virtual_box_tools.__file__)),
