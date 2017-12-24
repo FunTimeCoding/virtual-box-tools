@@ -385,7 +385,7 @@ class Commands:
             ],
             sudo_user=self.sudo_user,
         )
-        controller_name = 'SATA controller'
+        controller_name = 'SATA'
         CommandProcess(
             arguments=[
                 'vboxmanage', 'storagectl', name,
