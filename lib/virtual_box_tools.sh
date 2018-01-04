@@ -1,20 +1,13 @@
 #!/bin/sh -e
 
-function_exists()
-{
-    declare -f -F "${1}" > /dev/null
-
-    return $?
-}
-
-CONFIG="${HOME}/.virtual-box-tools.yaml"
+CONFIG=""
 
 while true; do
     case ${1} in
         --help)
             echo "Global usage: ${0} [--help][--config CONFIG]"
 
-            if function_exists usage; then
+            if command -v usage > /dev/null; then
                 usage
             fi
 
@@ -31,6 +24,11 @@ while true; do
 done
 
 OPTIND=1
+
+if [ "${CONFIG}" = "" ]; then
+    CONFIG="${HOME}/.virtual-box-tools.yaml"
+fi
+
 CONFIG=$(realpath "${CONFIG}")
 
 if [ -f "${CONFIG}" ]; then
