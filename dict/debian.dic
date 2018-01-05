@@ -1,3 +1,11 @@
 Debian
 preseed
 netboot
+debhelper
+pybuild
+buildsystem
+libyaml
+libxslt
+pxelinux
+netcfg
+dkms

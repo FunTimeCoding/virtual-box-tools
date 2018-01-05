@@ -8,3 +8,5 @@ pyenchant
 pygtk
 optparse
 contextlib
+asctime
+levelname
