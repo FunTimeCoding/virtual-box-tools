@@ -155,6 +155,8 @@ class VirtualBoxTools:
             '--disk-size',
             default=VirtualBoxTools.DEFAULT_DISK_SIZE,
         )
+        # TODO: Consider using --preseed-file instead to pass the path to a
+        # config and copy it, or if not defined, create one using dt.
         create_parent.add_argument('--skip-preseed', action='store_true')
         create_parent.add_argument('--graphical', action='store_true')
         create_parent.add_argument('--no-post-install', action='store_true')
@@ -348,6 +350,11 @@ class Commands:
             name=name,
             domain=domain,
         )
+        # TODO: Allow specifying username in case of running dt as virtualbox
+        # user.
+        # If username in preseed is different, what then?
+        # User names and passwords are maintained by vbt, so vbt should run dt?
+        # Or merge dt into vbt?
         user = getuser()
         user_password = self.get_password_sqlite(
             user=user,
