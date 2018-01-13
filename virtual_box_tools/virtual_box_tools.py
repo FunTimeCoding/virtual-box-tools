@@ -143,6 +143,7 @@ class VirtualBoxTools:
 
         create_parent = CustomArgumentParser(add_help=False)
         create_parent.add_argument('--name', required=True)
+        create_parent.add_argument('--bridge-interface', required=True)
         create_parent.add_argument(
             '--cores',
             default=VirtualBoxTools.DEFAULT_CORES,
@@ -160,7 +161,6 @@ class VirtualBoxTools:
         create_parent.add_argument('--skip-preseed', action='store_true')
         create_parent.add_argument('--graphical', action='store_true')
         create_parent.add_argument('--no-post-install', action='store_true')
-        create_parent.add_argument('--bridge-interface', default='')
         create_parser = host_subparsers.add_parser(
             self.CREATE_COMMAND,
             parents=[create_parent],
@@ -335,14 +335,15 @@ class Commands:
         return '.'.join(getfqdn().split('.')[1:])
 
     def create_host(
-            self, name: str,
+            self,
+            name: str,
+            bridge_interface: str,
             cores: int = VirtualBoxTools.DEFAULT_CORES,
             memory: int = VirtualBoxTools.DEFAULT_MEMORY,
             disk_size: int = VirtualBoxTools.DEFAULT_DISK_SIZE,
-            bridge_interface: str = '',
             skip_preseed: bool = False,
             graphical: bool = False,
-            no_post_install: bool = False
+            no_post_install: bool = False,
     ) -> None:
         domain = self.get_domain()
         root_password = self.get_password_sqlite(
@@ -599,24 +600,14 @@ class Commands:
             sudo_user=self.sudo_user
         )
 
-        if bridge_interface == '':
-            CommandProcess(
-                arguments=[
-                    'vboxmanage', 'modifyvm', name,
-                    '--nic1', 'hostonly',
-                    '--hostonlyadapter1', 'vboxnet0',
-                ],
-                sudo_user=self.sudo_user,
-            )
-        else:
-            CommandProcess(
-                arguments=[
-                    'vboxmanage', 'modifyvm', name,
-                    '--nic1', 'bridged',
-                    '--bridgeadapter1', bridge_interface,
-                ],
-                sudo_user=self.sudo_user,
-            )
+        CommandProcess(
+            arguments=[
+                'vboxmanage', 'modifyvm', name,
+                '--nic1', 'bridged',
+                '--bridgeadapter1', bridge_interface,
+            ],
+            sudo_user=self.sudo_user,
+        )
 
         if not no_post_install:
             # Sleep to avoid VBOX_E_INVALID_OBJECT_STATE.
