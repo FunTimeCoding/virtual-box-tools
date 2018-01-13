@@ -334,6 +334,10 @@ class Commands:
     def get_domain() -> str:
         return '.'.join(getfqdn().split('.')[1:])
 
+    # TODO: Create host first, then grab physical address to configure hostname
+    # and domain name through DHCP. Not helpful in non-DHCP environments. It
+    # would be more clean to configure the new host using DHCP provided
+    # hostname and domain.
     def create_host(
             self,
             name: str,
