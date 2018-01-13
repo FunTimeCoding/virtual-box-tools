@@ -58,7 +58,7 @@ Create a host.
 vbt host create --name example
 ```
 
-Create a host and connect it to a bridge interface. For local network scenarios.
+Create a host and connect it to a bridge interface.
 
 ```sh
 vbt host create --name example --bridge-interface en0
