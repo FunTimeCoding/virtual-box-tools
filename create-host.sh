@@ -16,7 +16,7 @@ sleep 60
 vbt host show --name "${NAME}"
 sleep 5
 vbt host stop --name "${NAME}"
-echo -ne '\007'
+echo "\007"
 
 while true; do
     echo "Network configured? y/N"
@@ -30,4 +30,4 @@ done
 vbt host start --name "${NAME}"
 sleep 60
 bin/bootstrap-wrapper.sh "${NAME}"
-echo -ne '\007'
+echo "\007"
