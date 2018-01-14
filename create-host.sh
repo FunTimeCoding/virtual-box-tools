@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 NAME="${1}"
-INTERFACE="${1}"
+INTERFACE="${2}"
 
 if [ "${NAME}" = "" ] || [ "${INTERFACE}" = "" ]; then
     echo "Usage: ${0} NAME INTERFACE"
