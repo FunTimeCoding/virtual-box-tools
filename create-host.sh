@@ -10,9 +10,11 @@ if [ "${NAME}" = "" ] || [ "${INTERFACE}" = "" ]; then
 fi
 
 vbt host create --name "${NAME}" --bridge-interface "${INTERFACE}"
+sleep 5
 vbt host start --name "${NAME}"
 sleep 60
 vbt host show --name "${NAME}"
+sleep 5
 vbt host stop --name "${NAME}"
 echo -ne '\007'
 
