@@ -23,12 +23,12 @@ TEMPORARY_DIRECTORY="${HOME}/tmp/virtualbox"
 mkdir -p "${TEMPORARY_DIRECTORY}"
 
 if [ ! -d "${TEMPORARY_DIRECTORY}/${MACHINE_NAME}" ]; then
-    STATE=$("${SCRIPT_DIRECTORY}"/get-vm-state.sh)
+    # TODO: Extract running string properly.
+    #STATE=$(vbt host show --name "${MACHINE_NAME}" | grep state)
 
-    if [ "${STATE}" = running ]; then
-        echo "Stop running machine"
-        "${SCRIPT_DIRECTORY}"/bin/stop-vm.sh --wait "${MACHINE_NAME}"
-    fi
+    #if [ "${STATE}" = running ]; then
+    #    vbt host stop --name "${MACHINE_NAME}" --wait
+    #fi
 
     if [ "${SUDO_USER}" = "" ]; then
         HOME_DIRECTORY="${HOME}"
@@ -36,19 +36,20 @@ if [ ! -d "${TEMPORARY_DIRECTORY}/${MACHINE_NAME}" ]; then
         HOME_DIRECTORY="/home/${SUDO_USER}"
     fi
 
-    echo "Make local copy of machine"
     sudo cp -R "${HOME_DIRECTORY}/VirtualBox VMs/${MACHINE_NAME}" "${TEMPORARY_DIRECTORY}/${MACHINE_NAME}"
 
-    if [ "${STATE}" = running ]; then
-        echo "Start machine again"
-        "${SCRIPT_DIRECTORY}"/bin/start-vm.sh --wait "${MACHINE_NAME}"
-    fi
+    #if [ "${STATE}" = running ]; then
+    #    vbt host start --name "${MACHINE_NAME}" --wait
+    #fi
 
-    sudo chown -R shiin:shiin "${TEMPORARY_DIRECTORY}/${MACHINE_NAME}"
+    if [ "${SUDO_USER}" = "" ]; then
+        sudo chown -R "${SUDO_USER}:${SUDO_USER}" "${TEMPORARY_DIRECTORY}/${MACHINE_NAME}"
+    else
+        sudo chown -R "${USER}:${USER}" "${TEMPORARY_DIRECTORY}/${MACHINE_NAME}"
+    fi
 fi
 
 rm -f "${TEMPORARY_DIRECTORY}/${MACHINE_NAME}/${MACHINE_NAME}.vbox-prev"
 rm -rf "${TEMPORARY_DIRECTORY}/${MACHINE_NAME}/Logs"
-echo "Transfer machine to destination server"
 ssh "${DESTINATION_HOST}" mkdir -p tmp/virtualbox
 rsync --archive --verbose --update --delete --progress "${TEMPORARY_DIRECTORY}/${MACHINE_NAME}" "${DESTINATION_HOST}:${HOME}/tmp/virtualbox"

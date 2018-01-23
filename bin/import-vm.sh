@@ -25,9 +25,14 @@ if [ ! -d "${PATH_TO_MACHINE}" ]; then
     exit 1
 fi
 
-sudo chown -R virtualbox:virtualbox "${PATH_TO_MACHINE}"
 MACHINE_NAME=$(basename "${PATH_TO_MACHINE}")
-BOX_DIRECTORY="/home/virtualbox/VirtualBox VMs"
+
+if [ "${SUDO_USER}" = "" ]; then
+    BOX_DIRECTORY="${HOME}/VirtualBox VMs"
+else
+    sudo chown -R "${SUDO_USER}:${SUDO_USER}" "${PATH_TO_MACHINE}"
+    BOX_DIRECTORY="/home/${SUDO_USER}/VirtualBox VMs"
+fi
 
 if [ -f "${BOX_DIRECTORY}/${MACHINE_NAME}" ]; then
     echo "Virtual machine already exists: ${BOX_DIRECTORY}/${MACHINE_NAME}"
@@ -37,4 +42,5 @@ fi
 
 sudo mv "${PATH_TO_MACHINE}" "${BOX_DIRECTORY}/${MACHINE_NAME}"
 ${VBOXMANAGE} registervm "${BOX_DIRECTORY}/${MACHINE_NAME}/${MACHINE_NAME}.vbox"
-"${DIRECTORY}"/start-vm.sh --wait "${MACHINE_NAME}"
+# TODO: Confirm this works some other time.
+#vbt host start --name "${MACHINE_NAME}" --wait
