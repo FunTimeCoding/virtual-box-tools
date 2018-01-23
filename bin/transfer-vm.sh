@@ -38,6 +38,7 @@ if [ ! -d "${TEMPORARY_DIRECTORY}/${MACHINE_NAME}" ]; then
 
     sudo cp -R "${HOME_DIRECTORY}/VirtualBox VMs/${MACHINE_NAME}" "${TEMPORARY_DIRECTORY}/${MACHINE_NAME}"
 
+    # TODO: Add option to not start it anymore if it uses a static address.
     #if [ "${STATE}" = running ]; then
     #    vbt host start --name "${MACHINE_NAME}" --wait
     #fi
