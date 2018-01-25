@@ -566,22 +566,8 @@ class Commands:
                 arguments=['ipconfig', 'getifaddr', interfaces[0]]
             ).get_standard_output()
         elif platform == 'linux':
-            interfaces = []
-
-            for line in CommandProcess(
-                    arguments=['ip', '-o', 'link', 'show']
-            ).get_standard_output().splitlines():
-                elements = line.split(':')
-                interface = elements[1].strip()
-
-                if interface != 'lo':
-                    interfaces += [interface]
-
-            if len(interfaces) == 0:
-                raise Exception('Could not determine network interface.')
-
             address = CommandProcess(
-                arguments=['ifdata', '-pa', interfaces[0]]
+                arguments=['ifdata', '-pa', bridge_interface]
             ).get_standard_output()
         elif platform == 'windows':
             raise Exception('Not implemented yet')
