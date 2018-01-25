@@ -79,6 +79,7 @@ class VirtualBoxTools:
                         skip_preseed=self.parsed_arguments.skip_preseed,
                         graphical=self.parsed_arguments.graphical,
                         no_post_install=self.parsed_arguments.no_post_install,
+                        proxy=self.parsed_arguments.proxy
                     )
                 except CommandFailed as exception:
                     print(exception)
@@ -161,6 +162,7 @@ class VirtualBoxTools:
         create_parent.add_argument('--skip-preseed', action='store_true')
         create_parent.add_argument('--graphical', action='store_true')
         create_parent.add_argument('--no-post-install', action='store_true')
+        create_parent.add_argument('--proxy', default='')
         create_parser = host_subparsers.add_parser(
             self.CREATE_COMMAND,
             parents=[create_parent],
@@ -348,6 +350,7 @@ class Commands:
             skip_preseed: bool = False,
             graphical: bool = False,
             no_post_install: bool = False,
+            proxy: str = '',
     ) -> None:
         domain = self.get_domain()
         root_password = self.get_password_sqlite(
@@ -375,18 +378,21 @@ class Commands:
 
         # Do not use sudo for dt, because it would not be available in PATH.
         if skip_preseed is False:
-            CommandProcess(
-                arguments=[
-                    'dt',
-                    '--hostname', name,
-                    '--domain', domain,
-                    '--root-password', root_password,
-                    '--user-name', user,
-                    '--user-password', user_password,
-                    '--user-real-name', pwd.getpwnam(user)[4],
-                    '--output-document', join(web_directory, name + '.cfg'),
-                ]
-            )
+            arguments = [
+                'dt',
+                '--hostname', name,
+                '--domain', domain,
+                '--root-password', root_password,
+                '--user-name', user,
+                '--user-password', user_password,
+                '--user-real-name', pwd.getpwnam(user)[4],
+                '--output-document', join(web_directory, name + '.cfg'),
+            ]
+
+            if proxy != '':
+                arguments += ['--proxy', proxy]
+
+            CommandProcess(arguments=arguments)
 
         CommandProcess(
             arguments=[
