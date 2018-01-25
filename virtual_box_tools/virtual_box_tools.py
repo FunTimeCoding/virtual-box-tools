@@ -596,15 +596,6 @@ class Commands:
             sudo_user=self.sudo_user
         )
 
-        CommandProcess(
-            arguments=[
-                'vboxmanage', 'modifyvm', name,
-                '--nic1', 'bridged',
-                '--bridgeadapter1', bridge_interface,
-            ],
-            sudo_user=self.sudo_user,
-        )
-
         if not no_post_install:
             # Sleep to avoid VBOX_E_INVALID_OBJECT_STATE.
             sleep(5)
@@ -645,6 +636,14 @@ class Commands:
 
         server.shutdown()
         server.server_close()
+        CommandProcess(
+            arguments=[
+                'vboxmanage', 'modifyvm', name,
+                '--nic1', 'bridged',
+                '--bridgeadapter1', bridge_interface,
+            ],
+            sudo_user=self.sudo_user,
+        )
 
     def keyboard_input(self, name: str, command: str) -> None:
         for line in ScanCode.scan(command).splitlines():
