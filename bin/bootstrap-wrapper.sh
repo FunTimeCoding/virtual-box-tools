@@ -29,4 +29,4 @@ DOMAIN=$(sqlite3 "${HOME}/.virtual-box-tools/user.sqlite" "SELECT domain_name FR
 USER_PASSWORD=$(sqlite3 "${HOME}/.virtual-box-tools/user.sqlite" "SELECT password FROM user WHERE host_name = '${HOST_NAME}' AND user_name = '${USER_NAME}'")
 ROOT_PASSWORD=$(sqlite3 "${HOME}/.virtual-box-tools/user.sqlite" "SELECT password FROM user WHERE host_name = '${HOST_NAME}' AND user_name = 'root'")
 PUBLIC_KEY=$(cat "${PUBLIC_KEY_PATH}")
-"${SCRIPT_DIRECTORY}"/bootstrap.tcl "${HOST_NAME}" "${USER_PASSWORD}" "${ROOT_PASSWORD}" "${PUBLIC_KEY}"
+"${SCRIPT_DIRECTORY}"/bootstrap.tcl "${USER_NAME}@${HOST_NAME}.${DOMAIN}" "${USER_PASSWORD}" "${ROOT_PASSWORD}" "${PUBLIC_KEY}"

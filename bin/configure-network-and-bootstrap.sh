@@ -28,7 +28,7 @@ ADDRESS=$(dig +noall +answer "${HOST_NAME}.${DOMAIN}" | grep "${HOST_NAME}.${DOM
 #sleep 30
 #vbt host start --name "${HOST_NAME}"
 #sleep 120
-sh -ex bin/bootstrap-wrapper.sh "${USER_NAME}@${HOST_NAME}.${DOMAIN}" "${PUBLIC_KEY_PATH}"
+bin/bootstrap-wrapper.sh "${HOST_NAME}" "${PUBLIC_KEY_PATH}"
 #PROXY=""
 #SALT_MASTER=""
 #MINION_IDENTIFIER=""
