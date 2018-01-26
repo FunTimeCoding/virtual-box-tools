@@ -29,7 +29,9 @@ ROOT_PASSWORD=$(sqlite3 "${HOME}/.virtual-box-tools/user.sqlite" "SELECT passwor
 ADDRESS=$(dig +noall +answer "${HOST_NAME}.${DOMAIN}" | grep "${HOST_NAME}.${DOMAIN}" | awk '{ print $5 }')
 bin/configure-network.sh "${HOST_NAME}" "${ROOT_PASSWORD}" "${ADDRESS}" "${NETMASK}" "${NETWORK}" "${BROADCAST}" "${GATEWAY}" "${NAMESERVER}" "${DOMAIN}"
 vbt host stop --name "${HOST_NAME}" --wait
+# TODO: Something prevents the network from shutting down orderly, taking 90 seconds extra. Disable DHCP if possible.
 vbt host start --name "${HOST_NAME}" --wait
+# TODO: If host existed before, this will likely fail because of the known_hosts entry being different.
 bin/bootstrap-wrapper.sh "${HOST_NAME}" "${PUBLIC_KEY_PATH}"
 #PROXY=""
 #SALT_MASTER=""
