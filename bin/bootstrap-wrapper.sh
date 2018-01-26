@@ -1,15 +1,21 @@
 #!/bin/sh -e
 
-HOST="${1}"
+HOST_NAME="${1}"
+PUBLIC_KEY_PATH="${2}"
 
-if [ "${HOST}" = "" ]; then
-    echo "Usage: ${0} HOST"
+if [ "${HOST_NAME}" = "" ]; then
+    echo "Usage: ${0} HOST [PUBLIC_KEY_PATH]"
 
     exit 1
 fi
 
+if [ "${PUBLIC_KEY_PATH}" = "" ]; then
+    PUBLIC_KEY_PATH="${HOME}/.ssh/id_rsa.pub"
+fi
+
 DOMAIN=$(hostname -d)
-USER_PASSWORD=$(sqlite3 "${HOME}/.virtual-box-tools/user.sqlite" "SELECT password FROM user WHERE host_name = '${HOST}' AND user_name = '${USER}' AND domain_name = '${DOMAIN}'")
-ROOT_PASSWORD=$(sqlite3 "${HOME}/.virtual-box-tools/user.sqlite" "SELECT password FROM user WHERE host_name = '${HOST}' AND user_name = 'root' AND domain_name = '${DOMAIN}'")
-PUBLIC_KEY=$(cat "${HOME}/.ssh/id_rsa.pub")
-bin/bootstrap.tcl "${HOST}" "${USER_PASSWORD}" "${ROOT_PASSWORD}" "${PUBLIC_KEY}"
+USER_NAME=$(sqlite3 "${HOME}/.virtual-box-tools/user.sqlite" "SELECT user_name FROM user WHERE host_name = '${HOST_NAME}' AND user_name != 'root'")
+USER_PASSWORD=$(sqlite3 "${HOME}/.virtual-box-tools/user.sqlite" "SELECT password FROM user WHERE host_name = '${HOST_NAME}' AND user_name = '${USER_NAME}'")
+ROOT_PASSWORD=$(sqlite3 "${HOME}/.virtual-box-tools/user.sqlite" "SELECT password FROM user WHERE host_name = '${HOST_NAME}' AND user_name = 'root'")
+PUBLIC_KEY=$(cat "${PUBLIC_KEY_PATH}")
+bin/bootstrap.tcl "${HOST_NAME}" "${USER_PASSWORD}" "${ROOT_PASSWORD}" "${PUBLIC_KEY}"
