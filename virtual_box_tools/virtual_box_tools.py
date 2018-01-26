@@ -71,7 +71,7 @@ class VirtualBoxTools:
             elif self.CREATE_COMMAND in self.parsed_arguments:
                 try:
                     commands.create_host(
-                        name=self.parsed_arguments.name,
+                        host_name=self.parsed_arguments.name,
                         cores=self.parsed_arguments.cores,
                         memory=self.parsed_arguments.memory,
                         disk_size=self.parsed_arguments.disk_size,
@@ -79,7 +79,9 @@ class VirtualBoxTools:
                         skip_preseed=self.parsed_arguments.skip_preseed,
                         graphical=self.parsed_arguments.graphical,
                         no_post_install=self.parsed_arguments.no_post_install,
-                        proxy=self.parsed_arguments.proxy
+                        proxy=self.parsed_arguments.proxy,
+                        user_name=self.parsed_arguments.user_name,
+                        real_name=self.parsed_arguments.real_name,
                     )
                 except CommandFailed as exception:
                     print(exception)
@@ -157,12 +159,11 @@ class VirtualBoxTools:
             '--disk-size',
             default=VirtualBoxTools.DEFAULT_DISK_SIZE,
         )
-        # TODO: Consider using --preseed-file instead to pass the path to a
-        # config and copy it, or if not defined, create one using dt.
-        create_parent.add_argument('--skip-preseed', action='store_true')
         create_parent.add_argument('--graphical', action='store_true')
         create_parent.add_argument('--no-post-install', action='store_true')
         create_parent.add_argument('--proxy', default='')
+        create_parent.add_argument('--user-name', default='')
+        create_parent.add_argument('--real-name', default='')
         create_parser = host_subparsers.add_parser(
             self.CREATE_COMMAND,
             parents=[create_parent],
@@ -257,7 +258,12 @@ class Commands:
 
         return ''.join(choice(chars) for _ in range(14))
 
-    def get_password_sqlite(self, user: str, name: str, domain: str) -> str:
+    def get_password_sqlite(
+            self,
+            user_name: str,
+            host_name: str,
+            domain_name: str
+    ) -> str:
         tools_directory = expanduser('~/.virtual-box-tools')
         if not exists(tools_directory):
             makedirs(tools_directory)
@@ -281,7 +287,7 @@ class Commands:
             ' WHERE user_name = ?'
             ' AND host_name = ?'
             ' AND domain_name = ?',
-            [user, name, domain],
+            [user_name, host_name, domain_name],
         )
         result = cursor.fetchone()
 
@@ -289,7 +295,7 @@ class Commands:
             password = self.generate_password()
             cursor.execute(
                 'INSERT INTO user VALUES (?, ?, ?, ?)',
-                [user, name, domain, password],
+                [user_name, host_name, domain_name, password],
             )
             connection.commit()
         else:
@@ -299,12 +305,20 @@ class Commands:
 
         return password
 
-    def get_password_pass(self, user: str, name: str, domain: str) -> str:
+    def get_password_pass(
+            self,
+            user_name: str,
+            host_name: str,
+            domain_name: str
+    ) -> str:
         password = ''
 
         try:
             get_password_process = CommandProcess(
-                arguments=['pass', 'host/' + name + '.' + domain + '/' + user],
+                arguments=[
+                    'pass',
+                    'host/' + host_name + '.' + domain_name + '/' + user_name
+                ],
                 sudo_user=self.sudo_user,
             )
             password = get_password_process.get_standard_output()
@@ -313,7 +327,8 @@ class Commands:
                 generate_password_process = CommandProcess(
                     arguments=[
                         'pass', 'generate',
-                        'host/' + name + '.' + domain + '/' + user,
+                        'host/' + host_name + '.' + domain_name
+                        + '/' + user_name,
                         '--no-symbols', '14'
                     ],
                     sudo_user=self.sudo_user,
@@ -342,32 +357,34 @@ class Commands:
     # hostname and domain.
     def create_host(
             self,
-            name: str,
+            host_name: str,
             bridge_interface: str,
             cores: int = VirtualBoxTools.DEFAULT_CORES,
             memory: int = VirtualBoxTools.DEFAULT_MEMORY,
             disk_size: int = VirtualBoxTools.DEFAULT_DISK_SIZE,
-            skip_preseed: bool = False,
             graphical: bool = False,
             no_post_install: bool = False,
             proxy: str = '',
+            user_name: str = '',
+            real_name: str = '',
     ) -> None:
-        domain = self.get_domain()
+        domain_name = self.get_domain()
         root_password = self.get_password_sqlite(
-            user='root',
-            name=name,
-            domain=domain,
+            user_name='root',
+            host_name=host_name,
+            domain_name=domain_name,
         )
-        # TODO: Allow specifying username in case of running dt as virtualbox
-        # user.
-        # If username in preseed is different, what then?
-        # User names and passwords are maintained by vbt, so vbt should run dt?
-        # Or merge dt into vbt?
-        user = getuser()
+
+        if user_name == '':
+            user_name = getuser()
+
+        if real_name == '':
+            real_name = pwd.getpwnam(user_name)[4]
+
         user_password = self.get_password_sqlite(
-            user=user,
-            name=name,
-            domain=domain,
+            user_name=user_name,
+            host_name=host_name,
+            domain_name=domain_name,
         )
         user_home = expanduser('~')
         temporary_directory = join(user_home, 'tmp')
@@ -376,28 +393,27 @@ class Commands:
         if not exists(web_directory):
             makedirs(web_directory)
 
+        debian_tools_arguments = [
+            'dt',
+            '--hostname', host_name,
+            '--domain', domain_name,
+            '--root-password', root_password,
+            '--user-name', user_name,
+            '--user-password', user_password,
+            '--user-real-name', real_name,
+            '--output-document', join(web_directory, host_name + '.cfg'),
+        ]
+
+        if proxy != '':
+            debian_tools_arguments += ['--proxy', proxy]
+
         # Do not use sudo for dt, because it would not be available in PATH.
-        if skip_preseed is False:
-            arguments = [
-                'dt',
-                '--hostname', name,
-                '--domain', domain,
-                '--root-password', root_password,
-                '--user-name', user,
-                '--user-password', user_password,
-                '--user-real-name', pwd.getpwnam(user)[4],
-                '--output-document', join(web_directory, name + '.cfg'),
-            ]
-
-            if proxy != '':
-                arguments += ['--proxy', proxy]
-
-            CommandProcess(arguments=arguments)
+        CommandProcess(arguments=debian_tools_arguments)
 
         CommandProcess(
             arguments=[
                 'vboxmanage', 'createvm',
-                '--name', name,
+                '--name', host_name,
                 '--register',
                 '--ostype', 'Debian_64',
             ],
@@ -406,7 +422,7 @@ class Commands:
         controller_name = 'SATA'
         CommandProcess(
             arguments=[
-                'vboxmanage', 'storagectl', name,
+                'vboxmanage', 'storagectl', host_name,
                 '--name', controller_name,
                 '--add', 'sata',
             ],
@@ -421,8 +437,8 @@ class Commands:
         disk_path = join(
             home_directory,
             'VirtualBox VMs',
-            name,
-            name + '.vdi',
+            host_name,
+            host_name + '.vdi',
         )
         CommandProcess(
             arguments=[
@@ -434,7 +450,7 @@ class Commands:
         )
         CommandProcess(
             arguments=[
-                'vboxmanage', 'storageattach', name,
+                'vboxmanage', 'storageattach', host_name,
                 '--storagectl',
                 controller_name,
                 '--port', '0',
@@ -445,13 +461,13 @@ class Commands:
             sudo_user=self.sudo_user
         )
         self.attach_disc(
-            name=name,
+            name=host_name,
             controller_name=controller_name,
             medium='emptydrive',
         )
         CommandProcess(
             arguments=[
-                'vboxmanage', 'modifyvm', name,
+                'vboxmanage', 'modifyvm', host_name,
                 '--acpi', 'on',
                 '--cpus', str(cores),
                 '--memory', str(memory),
@@ -523,7 +539,7 @@ class Commands:
 
         CommandProcess(
             arguments=[
-                'vboxmanage', 'modifyvm', name,
+                'vboxmanage', 'modifyvm', host_name,
                 '--nic1', 'nat',
                 '--boot1', 'net',
                 '--nattftpfile1', '/pxelinux.0',
@@ -531,7 +547,7 @@ class Commands:
             sudo_user=self.sudo_user,
         )
 
-        start_arguments = ['vboxmanage', 'startvm', name]
+        start_arguments = ['vboxmanage', 'startvm', host_name]
 
         if graphical is False:
             start_arguments += ['--type', 'headless']
@@ -543,7 +559,7 @@ class Commands:
         sleep(20)
         # Send escape key to open installer command input.
         self.keyboard_input(
-            name=name,
+            name=host_name,
             command='\027',
         )
         sleep(1)
@@ -581,16 +597,16 @@ class Commands:
         server_thread.start()
         locator = 'http://' + address + ':8000'
         self.keyboard_input(
-            name=name,
-            command='auto url=' + locator + '/' + name + '.cfg'
-                    + ' netcfg/get_hostname=' + name
-                    + ' netcfg/get_domain=' + domain + '\n',
+            name=host_name,
+            command='auto url=' + locator + '/' + host_name + '.cfg'
+                    + ' netcfg/get_hostname=' + host_name
+                    + ' netcfg/get_domain=' + domain_name + '\n',
         )
-        self.wait_for_host_to_stop(name)
+        self.wait_for_host_to_stop(host_name)
 
         CommandProcess(
             arguments=[
-                'vboxmanage', 'modifyvm', name,
+                'vboxmanage', 'modifyvm', host_name,
                 '--boot1', 'disk',
             ],
             sudo_user=self.sudo_user
@@ -599,10 +615,10 @@ class Commands:
         if not no_post_install:
             # Sleep to avoid VBOX_E_INVALID_OBJECT_STATE.
             sleep(5)
-            self.start_host(name=name, graphical=graphical)
+            self.start_host(name=host_name, graphical=graphical)
             sleep(60)
             self.attach_disc(
-                name=name,
+                name=host_name,
                 controller_name=controller_name,
                 medium='additions',
             )
@@ -615,21 +631,21 @@ class Commands:
                 ),
                 dst=join(web_directory, script)
             )
-            self.keyboard_input(name=name, command='root\n')
+            self.keyboard_input(name=host_name, command='root\n')
             sleep(5)
             self.keyboard_input(
-                name=name,
+                name=host_name,
                 command=root_password + '\n',
             )
             sleep(5)
             self.keyboard_input(
-                name=name,
+                name=host_name,
                 command='wget --output-document - ' + locator
                         + '/' + script + ' | sh -e\n',
             )
-            self.wait_for_host_to_stop(name)
+            self.wait_for_host_to_stop(host_name)
             self.attach_disc(
-                name=name,
+                name=host_name,
                 controller_name=controller_name,
                 medium='emptydrive',
             )
@@ -638,7 +654,7 @@ class Commands:
         server.server_close()
         CommandProcess(
             arguments=[
-                'vboxmanage', 'modifyvm', name,
+                'vboxmanage', 'modifyvm', host_name,
                 '--nic1', 'bridged',
                 '--bridgeadapter1', bridge_interface,
             ],
