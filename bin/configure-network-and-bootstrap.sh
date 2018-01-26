@@ -16,7 +16,7 @@ fi
 
 STATE=$(vbt host show --name cm1 | grep --perl-regexp --only-matching "(?<=state: )[a-z]+")
 
-if [ "${STATE}" = stopped ]; then
+if [ "${STATE}" = poweroff ]; then
     vbt host start --name "${HOST_NAME}"
     sleep 60
     # TODO: Find a way to check if machine has finished booting with guest additions?
