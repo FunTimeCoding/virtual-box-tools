@@ -1,10 +1,21 @@
 #!/bin/sh -e
 
+DIRECTORY=$(dirname "${0}")
+SCRIPT_DIRECTORY=$(cd "${DIRECTORY}" || exit 1; pwd)
+
+usage()
+{
+    echo "Usage: ${0} HOST [PUBLIC_KEY_PATH]"
+}
+
+# shellcheck source=/dev/null
+. "${SCRIPT_DIRECTORY}"/../lib/virtual_box_tools.sh
+
 HOST_NAME="${1}"
 PUBLIC_KEY_PATH="${2}"
 
 if [ "${HOST_NAME}" = "" ]; then
-    echo "Usage: ${0} HOST [PUBLIC_KEY_PATH]"
+    usage
 
     exit 1
 fi
@@ -18,4 +29,4 @@ USER_NAME=$(sqlite3 "${HOME}/.virtual-box-tools/user.sqlite" "SELECT user_name F
 USER_PASSWORD=$(sqlite3 "${HOME}/.virtual-box-tools/user.sqlite" "SELECT password FROM user WHERE host_name = '${HOST_NAME}' AND user_name = '${USER_NAME}'")
 ROOT_PASSWORD=$(sqlite3 "${HOME}/.virtual-box-tools/user.sqlite" "SELECT password FROM user WHERE host_name = '${HOST_NAME}' AND user_name = 'root'")
 PUBLIC_KEY=$(cat "${PUBLIC_KEY_PATH}")
-bin/bootstrap.tcl "${HOST_NAME}" "${USER_PASSWORD}" "${ROOT_PASSWORD}" "${PUBLIC_KEY}"
+"${SCRIPT_DIRECTORY}"/bootstrap.tcl "${HOST_NAME}" "${USER_PASSWORD}" "${ROOT_PASSWORD}" "${PUBLIC_KEY}"
