@@ -76,7 +76,6 @@ class VirtualBoxTools:
                         memory=self.parsed_arguments.memory,
                         disk_size=self.parsed_arguments.disk_size,
                         bridge_interface=self.parsed_arguments.bridge_interface,
-                        skip_preseed=self.parsed_arguments.skip_preseed,
                         graphical=self.parsed_arguments.graphical,
                         no_post_install=self.parsed_arguments.no_post_install,
                         proxy=self.parsed_arguments.proxy,
