@@ -23,9 +23,12 @@ DOMAIN=$(sqlite3 "${HOME}/.virtual-box-tools/user.sqlite" "SELECT domain_name FR
 USER_PASSWORD=$(sqlite3 "${HOME}/.virtual-box-tools/user.sqlite" "SELECT password FROM user WHERE host_name = '${HOST_NAME}' AND user_name = '${USER_NAME}'")
 ROOT_PASSWORD=$(sqlite3 "${HOME}/.virtual-box-tools/user.sqlite" "SELECT password FROM user WHERE host_name = '${HOST_NAME}' AND user_name = 'root'")
 ADDRESS=$(dig +noall +answer "${HOST_NAME}.${DOMAIN}" | grep "${HOST_NAME}.${DOMAIN}" | awk '{ print $5 }')
-bin/configure-network.sh "${HOST_NAME}" "${ROOT_PASSWORD}" "${ADDRESS}" "${NETMASK}" "${NETWORK}" "${BROADCAST}" "${GATEWAY}" "${NAMESERVER}" "${DOMAIN}"
+#bin/configure-network.sh "${HOST_NAME}" "${ROOT_PASSWORD}" "${ADDRESS}" "${NETMASK}" "${NETWORK}" "${BROADCAST}" "${GATEWAY}" "${NAMESERVER}" "${DOMAIN}"
+#vbt host stop --name "${HOST_NAME}"
+#sleep 30
+#vbt host start --name "${HOST_NAME}"
 #sleep 120
-#bin/bootstrap-wrapper.sh "${USER_NAME}@${HOST_NAME}.${DOMAIN}" "${PUBLIC_KEY_PATH}"
+bin/bootstrap-wrapper.sh "${USER_NAME}@${HOST_NAME}.${DOMAIN}" "${PUBLIC_KEY_PATH}"
 #PROXY=""
 #SALT_MASTER=""
 #MINION_IDENTIFIER=""

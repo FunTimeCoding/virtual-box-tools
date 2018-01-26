@@ -43,5 +43,4 @@ echo 'broadcast ${BROADCAST}' >> /etc/network/interfaces
 echo 'gateway ${GATEWAY}' >> /etc/network/interfaces
 echo 'dns-nameservers ${NAMESERVER}' >> /etc/network/interfaces
 echo 'dns-search ${SEARCH}' >> /etc/network/interfaces
-reboot
 "
