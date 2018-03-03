@@ -4,7 +4,7 @@
   <description/>
   <keepDependencies>false</keepDependencies>
   <properties/>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@3.3.0">
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@3.7.0">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
@@ -36,27 +36,27 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>./build.sh</command>
+      <command>script/build.sh</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
-    <hudson.tasks.junit.JUnitResultArchiver plugin="junit@1.20">
+    <hudson.tasks.junit.JUnitResultArchiver plugin="junit@1.24">
       <testResults>build/junit.xml</testResults>
       <keepLongStdio>false</keepLongStdio>
       <healthScaleFactor>1.0</healthScaleFactor>
       <allowEmptyResults>false</allowEmptyResults>
     </hudson.tasks.junit.JUnitResultArchiver>
-    <hudson.plugins.checkstyle.CheckStylePublisher plugin="checkstyle@3.48">
+    <hudson.plugins.checkstyle.CheckStylePublisher plugin="checkstyle@3.50">
       <healthy/>
       <unHealthy/>
       <thresholdLimit>low</thresholdLimit>
       <pluginName>[CHECKSTYLE] </pluginName>
       <defaultEncoding/>
-      <canRunOnFailed>false</canRunOnFailed>
+      <canRunOnFailed>true</canRunOnFailed>
       <usePreviousBuildAsReference>false</usePreviousBuildAsReference>
       <useStableBuildAsReference>false</useStableBuildAsReference>
       <useDeltaValues>false</useDeltaValues>
-      <thresholds plugin="analysis-core@1.87">
+      <thresholds plugin="analysis-core@1.94">
         <unstableTotalAll/>
         <unstableTotalHigh/>
         <unstableTotalNormal/>
@@ -77,7 +77,7 @@
       <shouldDetectModules>false</shouldDetectModules>
       <dontComputeNew>true</dontComputeNew>
       <doNotResolveRelativePaths>false</doNotResolveRelativePaths>
-      <pattern>build/log/checkstyle-*</pattern>
+      <pattern>build/log/checkstyle-*.xml</pattern>
     </hudson.plugins.checkstyle.CheckStylePublisher>
     <hudson.tasks.Mailer plugin="mailer@1.20">
       <recipients>funtimecoding@gmail.com</recipients>
