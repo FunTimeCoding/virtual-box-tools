@@ -15,22 +15,84 @@ if [ "${1}" = --ci-mode ]; then
     CONTINUOUS_INTEGRATION_MODE=true
 fi
 
+MARKDOWN_FILES=$(find . -name '*.md')
+BLACKLIST=""
+DICTIONARY=en_US
+
+for FILE in ${MARKDOWN_FILES}; do
+    WORDS=$(hunspell -d "${DICTIONARY}" -p documentation/dictionary/virtual-box-tools.dic -l "${FILE}" | sort | uniq)
+
+    if [ ! "${WORDS}" = "" ]; then
+        echo "${FILE}"
+
+        for WORD in ${WORDS}; do
+            BLACKLISTED=$(echo "${BLACKLIST}" | grep "${WORD}") || BLACKLISTED=false
+
+            if [ "${BLACKLISTED}" = false ]; then
+                if [ "${CONTINUOUS_INTEGRATION_MODE}" = true ]; then
+                    grep --line-number "${WORD}" "${FILE}"
+                else
+                    # The equals character is required.
+                    grep --line-number --color=always "${WORD}" "${FILE}"
+                fi
+            else
+                echo "Blacklisted word: ${WORD}"
+            fi
+        done
+
+        echo
+    fi
+done
+
+TEX_FILES=$(find . -name '*.tex')
+
+for FILE in ${TEX_FILES}; do
+    WORDS=$(hunspell -d "${DICTIONARY}" -p documentation/dictionary/virtual-box-tools.dic -l -t "${FILE}")
+
+    if [ ! "${WORDS}" = "" ]; then
+        echo "${FILE}"
+
+        for WORD in ${WORDS}; do
+            STARTS_WITH_DASH=$(echo "${WORD}" | grep -q '^-') || STARTS_WITH_DASH=false
+
+            if [ "${STARTS_WITH_DASH}" = false ]; then
+                BLACKLISTED=$(echo "${BLACKLIST}" | grep "${WORD}") || BLACKLISTED=false
+
+                if [ "${BLACKLISTED}" = false ]; then
+                    if [ "${CONTINUOUS_INTEGRATION_MODE}" = true ]; then
+                        grep --line-number "${WORD}" "${FILE}"
+                    else
+                        # The equals character is required.
+                        grep --line-number --color=always "${WORD}" "${FILE}"
+                    fi
+                else
+                    echo "Skip blacklisted: ${WORD}"
+                fi
+            else
+                echo "Skip invalid: ${WORD}"
+            fi
+        done
+
+        echo
+    fi
+done
+
 SYSTEM=$(uname)
 
 if [ "${SYSTEM}" = Darwin ]; then
-    FIND=gfind
+    FIND='gfind'
 else
-    FIND=find
+    FIND='find'
 fi
 
-INCLUDE_FILTER="^.*(\/bin\/[a-z]*|\.py)$"
-EXCLUDE_FILTER="^.*\/(build|tmp|\.git|\.vagrant|\.idea|\.venv|\.tox)\/.*$"
+INCLUDE_FILTER='^.*(\/bin\/[a-z]*|\.py)$'
+EXCLUDE_FILTER='^.*\/(build|tmp|\.git|\.vagrant|\.idea|\.venv|\.tox)\/.*$'
 
 if [ "${CONTINUOUS_INTEGRATION_MODE}" = true ]; then
     FILES=$(${FIND} . -name '*.sh' -regextype posix-extended ! -regex "${EXCLUDE_FILTER}" -printf '%P\n')
 
     for FILE in ${FILES}; do
-        FILE_REPLACED=$(echo "${FILE}" | sed 's/\//-/')
+        FILE_REPLACED=$(echo "${FILE}" | sed 's/\//-/g')
         shellcheck --format checkstyle "${FILE}" > "build/log/checkstyle-${FILE_REPLACED}.xml" || true
     done
 else
@@ -44,7 +106,7 @@ else
     fi
 fi
 
-EXCLUDE_FILTER_WITH_INIT="^.*\/((build|tmp|\.git|\.vagrant|\.idea|\.venv|\.tox)\/.*|__init__\.py)$"
+EXCLUDE_FILTER_WITH_INIT='^.*\/((build|tmp|\.git|\.vagrant|\.idea|\.venv|\.tox)\/.*|__init__\.py)$'
 # shellcheck disable=SC2016
 EMPTY_FILES=$(${FIND} . -empty -regextype posix-extended ! -regex "${EXCLUDE_FILTER_WITH_INIT}")
 
@@ -89,17 +151,17 @@ if [ ! "${SHELLCHECK_IGNORES}" = "" ]; then
     fi
 fi
 
-PEP8_CONCERNS=$(pep8 --exclude=.git,.tox,.venv,__pycache__ --statistics .) || RETURN_CODE=$?
+PYCODESTYLE_CONCERNS=$(pycodestyle --exclude=.git,.tox,.venv,__pycache__ --statistics .) || RETURN_CODE=$?
 
 if [ "${CONTINUOUS_INTEGRATION_MODE}" = true ]; then
-    echo "${PEP8_CONCERNS}" > build/log/pep8.txt
+    echo "${PYCODESTYLE_CONCERNS}" > build/log/pycodestyle.txt
 else
-    if [ ! "${PEP8_CONCERNS}" = "" ]; then
+    if [ ! "${PYCODESTYLE_CONCERNS}" = "" ]; then
         CONCERN_FOUND=true
         echo
         echo "(WARNING) PEP8 concerns:"
         echo
-        echo "${PEP8_CONCERNS}"
+        echo "${PYCODESTYLE_CONCERNS}"
     fi
 fi
 
@@ -110,9 +172,9 @@ PYLINT_OUTPUT=$(pylint ${PYTHON_FILES}) || RETURN_CODE=$?
 SYSTEM=$(uname)
 
 if [ "${SYSTEM}" = Darwin ]; then
-    TEE=gtee
+    TEE='gtee'
 else
-    TEE=tee
+    TEE='tee'
 fi
 
 if [ "${CONTINUOUS_INTEGRATION_MODE}" = true ]; then
@@ -130,10 +192,8 @@ if [ ! "${RETURN_CODE}" = 0 ]; then
 fi
 
 if [ "${CONCERN_FOUND}" = true ]; then
-    if [ "${CONTINUOUS_INTEGRATION_MODE}" = false ]; then
-        echo
-        echo "Concern(s) of category WARNING found." >&2
-    fi
+    echo
+    echo "Concern(s) of category WARNING found." >&2
 
     exit 2
 fi

@@ -5,9 +5,9 @@ if [ "${1}" = --ci-mode ]; then
     SYSTEM=$(uname)
 
     if [ "${SYSTEM}" = Darwin ]; then
-        TEE=gtee
+        TEE='gtee'
     else
-        TEE=tee
+        TEE='tee'
     fi
 
     mkdir -p build/log

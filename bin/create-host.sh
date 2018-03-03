@@ -29,5 +29,5 @@ done
 
 vbt host start --name "${NAME}"
 sleep 60
-bin/bootstrap-wrapper.sh "${NAME}"
+bootstrap-wrapper.sh "${NAME}"
 echo "\007"

@@ -4,6 +4,7 @@ flake8 # style check
 pyenchant # pylint spell check plugin
 pytest # test framework
 pytest-cov # pytest coverage plugin
+mccabe # static analysis
 pyyaml # YAML parser
 Flask # web framework
 wheel # packaging tool

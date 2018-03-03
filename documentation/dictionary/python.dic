@@ -1,7 +1,6 @@
 pycache
 pyyaml
 shyaml
-pylint
 venv
 htmlcov
 pyenchant
@@ -10,3 +9,25 @@ optparse
 contextlib
 asctime
 levelname
+pycodestyle
+
+# pytest
+pytest
+exitfirst
+capsys
+
+# pylint
+pylint
+msvs
+rdiv
+asdict
+
+# pylint typos
+reenable
+parseable
+typecheck
+mypackage
+mymodule
+inlinevar
+regexes
+classmethod

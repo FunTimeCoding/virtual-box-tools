@@ -1,9 +1,9 @@
 #!/bin/sh -e
 
 rm -rf build
-id -u vagrant > /dev/null && IS_VAGRANT_ENVIRONMENT=true || IS_VAGRANT_ENVIRONMENT=false
+id -u vagrant > /dev/null && VAGRANT_ENVIRONMENT=true || VAGRANT_ENVIRONMENT=false
 
-if [ "${IS_VAGRANT_ENVIRONMENT}" = true ]; then
+if [ "${VAGRANT_ENVIRONMENT}" = true ]; then
     VIRTUAL_ENVIRONMENT_PATH=/home/vagrant/venv
 else
     VIRTUAL_ENVIRONMENT_PATH=.venv
@@ -18,13 +18,12 @@ fi
 pip3 install wheel
 pip3 install --requirement requirements.txt
 pip3 install --editable .
-./spell-check.sh --ci-mode
-./style-check.sh --ci-mode
-#./metrics.sh --ci-mode
-./tests.sh --ci-mode
+script/check.sh --ci-mode
+script/measure.sh --ci-mode
+script/test.sh --ci-mode
 ./setup.py bdist_wheel --dist-dir build
 SYSTEM=$(uname)
 
 if [ "${SYSTEM}" = Linux ]; then
-    ./package.sh
+    script/package.sh
 fi
