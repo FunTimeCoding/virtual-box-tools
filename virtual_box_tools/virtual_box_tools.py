@@ -1,4 +1,5 @@
 from getpass import getuser
+from json import dumps
 from socket import getfqdn, socket, AF_INET, SOCK_STREAM
 from argparse import ArgumentDefaultsHelpFormatter
 from os import name as operating_system_name, umask, makedirs, chdir
@@ -67,7 +68,11 @@ class VirtualBoxTools:
             commands = Commands(self.sudo_user)
 
             if self.LIST_COMMAND in self.parsed_arguments:
-                print(commands.list_hosts(list_all=self.parsed_arguments.all))
+                print(
+                    dumps(
+                        commands.list_hosts(list_all=self.parsed_arguments.all)
+                    )
+                )
             elif self.CREATE_COMMAND in self.parsed_arguments:
                 try:
                     commands.create_host(
