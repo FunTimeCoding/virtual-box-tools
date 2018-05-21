@@ -15,24 +15,24 @@ cat /vagrant/virtual-box-tools.yaml > /home/vagrant/.virtual-box-tools.yaml
 USER_NAME=$(cat /vagrant/tmp/user-name.txt | head -n 1 | sed --expression 's/[\r\n]//g')
 FULL_NAME=$(cat /vagrant/tmp/full-name.txt | head -n 1 | sed --expression 's/[\r\n]//g')
 DOMAIN=$(cat /vagrant/tmp/domain.txt | head -n 1 | sed --expression 's/[\r\n]//g')
-EMAIL="${USER_NAME}@${DOMAIN}"
-PASSWORD=$(pwgen 14 1)
-echo "${PASSWORD}" > /vagrant/tmp/password.txt
-echo "Key-Type: default
-Subkey-Type: default
-Name-Real: ${FULL_NAME}
-Name-Comment: Debian package signature key
-Name-Email: ${EMAIL}
-Expire-Date: 1y
-Passphrase: ${PASSWORD}" > /vagrant/tmp/settings.txt
+
+echo "REAL_NAME='${FULL_NAME}'
+EMAIL='${USER_NAME}@${DOMAIN}'
+KEY_SERVER='keyserver.ubuntu.com'" > "${HOME}/.gnu-privacy-guard-tools.sh"
+
 # GNUPGHOME needs specific permissions which do not work over network sharing.
 mkdir -p /home/vagrant/gnu-privacy-guard-home
 chmod 700 /home/vagrant/gnu-privacy-guard-home
 export GNUPGHOME=/home/vagrant/gnu-privacy-guard-home
-gpg2 --batch --gen-key /vagrant/tmp/settings.txt
-gpg2 --export --armor "${FULL_NAME}" > "/vagrant/tmp/${USER_NAME}.gpg-public-key.asc"
+
+/vagrant/gnu-privacy-guard-tools/bin/generate-key.sh --type signature --purpose 'Debian package' --virtual
+/vagrant/gnu-privacy-guard-tools/bin/export-public-key.sh --output-file "/vagrant/tmp/${USER_NAME}.gpg-public-key.asc" "${FULL_NAME}"
+
+# Required for non-interactive private key export.
 echo allow-loopback-pinentry > "${GNUPGHOME}/gpg-agent.conf"
-gpg-connect-agent reloadagent /bye
-gpg2 --batch --passphrase-fd 1 --passphrase-file /vagrant/tmp/password.txt --pinentry-mode loopback --export-secret-key --armor "${FULL_NAME}" > "/vagrant/tmp/${USER_NAME}.gpg-private-key.asc"
+/vagrant/gnu-privacy-guard-tools/bin/reload-agent.sh
+
+grep --only-matching --perl-regexp '(?<=Passphrase: ).*' tmp/settings.txt > /vagrant/tmp/password.txt
+/vagrant/gnu-privacy-guard-tools/bin/export-public-key.sh --passphrase-file /vagrant/tmp/password.txt --output-file "/vagrant/tmp/${USER_NAME}.gpg-private-key.asc" "${FULL_NAME}"
 #KEY_IDENTIFIER=$()
 #pass init "${KEY_IDENTIFIER}"
