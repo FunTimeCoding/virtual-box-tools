@@ -98,10 +98,16 @@ Configure Git on Windows before cloning. This avoids problems with Vagrant and V
 git config --global core.autocrlf input
 ```
 
-Build project. This installs dependencies.
+Create the development virtual machine on Linux and Darwin.
 
 ```sh
-script/build.sh
+script/vagrant/create.sh
+```
+
+Create the development virtual machine on Windows.
+
+```bat
+script\vagrant\create.bat
 ```
 
 Run tests, check style and measure metrics.
@@ -112,10 +118,10 @@ script/check.sh
 script/measure.sh
 ```
 
-Build package.
+Build project.
 
 ```sh
-script/package.sh
+script/build.sh
 ```
 
 Install Debian package.

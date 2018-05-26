@@ -18,9 +18,11 @@ fi
 MARKDOWN_FILES=$(find . -name '*.md')
 BLACKLIST=""
 DICTIONARY=en_US
+mkdir -p tmp
+cat documentation/dictionary/*.dic > tmp/combined.dic
 
 for FILE in ${MARKDOWN_FILES}; do
-    WORDS=$(hunspell -d "${DICTIONARY}" -p documentation/dictionary/virtual-box-tools.dic -l "${FILE}" | sort | uniq)
+    WORDS=$(hunspell -d "${DICTIONARY}" -p tmp/combined.dic -l "${FILE}" | sort | uniq)
 
     if [ ! "${WORDS}" = "" ]; then
         echo "${FILE}"
@@ -47,7 +49,7 @@ done
 TEX_FILES=$(find . -name '*.tex')
 
 for FILE in ${TEX_FILES}; do
-    WORDS=$(hunspell -d "${DICTIONARY}" -p documentation/dictionary/virtual-box-tools.dic -l -t "${FILE}")
+    WORDS=$(hunspell -d "${DICTIONARY}" -p tmp/combined.dic -l -t "${FILE}")
 
     if [ ! "${WORDS}" = "" ]; then
         echo "${FILE}"
@@ -151,7 +153,7 @@ if [ ! "${SHELLCHECK_IGNORES}" = "" ]; then
     fi
 fi
 
-PYCODESTYLE_CONCERNS=$(pycodestyle --exclude=.git,.tox,.venv,__pycache__ --statistics .) || RETURN_CODE=$?
+PYCODESTYLE_CONCERNS=$(pycodestyle --exclude=.git,.tox,.venv,__pycache__ --statistics .) || true
 
 if [ "${CONTINUOUS_INTEGRATION_MODE}" = true ]; then
     echo "${PYCODESTYLE_CONCERNS}" > build/log/pycodestyle.txt
