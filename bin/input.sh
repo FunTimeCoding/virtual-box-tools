@@ -22,5 +22,6 @@ fi
 LINES=$("${SCRIPT_DIRECTORY}"/scan-code.py "${TEXT}")
 
 for LINE in ${LINES}; do
+    # shellcheck disable=SC2086
     ${VBOXMANAGE} controlvm "${MACHINE_NAME}" keyboardputscancode ${LINE}
 done

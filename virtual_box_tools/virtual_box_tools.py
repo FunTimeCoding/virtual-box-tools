@@ -64,57 +64,59 @@ class VirtualBoxTools:
         return VirtualBoxTools(argv[1:]).run()
 
     def run(self) -> int:
-        if self.HOST_COMMAND in self.parsed_arguments:
+        arguments = self.parsed_arguments
+
+        if self.HOST_COMMAND in arguments:
             commands = Commands(self.sudo_user)
 
-            if self.LIST_COMMAND in self.parsed_arguments:
+            if self.LIST_COMMAND in arguments:
                 print(
                     dumps(
-                        commands.list_hosts(list_all=self.parsed_arguments.all)
+                        commands.list_hosts(list_all=arguments.all)
                     )
                 )
-            elif self.CREATE_COMMAND in self.parsed_arguments:
+            elif self.CREATE_COMMAND in arguments:
                 try:
                     commands.create_host(
-                        host_name=self.parsed_arguments.name,
-                        cores=self.parsed_arguments.cores,
-                        memory=self.parsed_arguments.memory,
-                        disk_size=self.parsed_arguments.disk_size,
-                        bridge_interface=self.parsed_arguments.bridge_interface,
-                        graphical=self.parsed_arguments.graphical,
-                        no_post_install=self.parsed_arguments.no_post_install,
-                        proxy=self.parsed_arguments.proxy,
-                        user_name=self.parsed_arguments.user_name,
-                        real_name=self.parsed_arguments.real_name,
+                        host_name=arguments.name,
+                        cores=arguments.cores,
+                        memory=arguments.memory,
+                        disk_size=arguments.disk_size,
+                        bridge_interface=arguments.bridge_interface,
+                        graphical=arguments.graphical,
+                        no_post_install=arguments.no_post_install,
+                        proxy=arguments.proxy,
+                        user_name=arguments.user_name,
+                        real_name=arguments.real_name,
                     )
                 except CommandFailed as exception:
                     print(exception)
-            elif 'destroy' in self.parsed_arguments:
+            elif 'destroy' in arguments:
                 try:
-                    commands.destroy_host(name=self.parsed_arguments.name)
+                    commands.destroy_host(name=arguments.name)
                 except CommandFailed as exception:
                     print(exception)
-            elif self.START_COMMAND in self.parsed_arguments:
+            elif self.START_COMMAND in arguments:
                 try:
                     commands.start_host(
-                        name=self.parsed_arguments.name,
-                        graphical=self.parsed_arguments.graphical,
-                        wait=self.parsed_arguments.wait,
+                        name=arguments.name,
+                        graphical=arguments.graphical,
+                        wait=arguments.wait,
                     )
                 except CommandFailed as exception:
                     print(exception)
-            elif self.STOP_COMMAND in self.parsed_arguments:
+            elif self.STOP_COMMAND in arguments:
                 try:
                     commands.stop_host(
-                        name=self.parsed_arguments.name,
-                        force=self.parsed_arguments.force,
-                        wait=self.parsed_arguments.wait,
+                        name=arguments.name,
+                        force=arguments.force,
+                        wait=arguments.wait,
                     )
                 except CommandFailed as exception:
                     print(exception)
-            elif self.SHOW_COMMAND in self.parsed_arguments:
+            elif self.SHOW_COMMAND in arguments:
                 try:
-                    print(commands.show_host(self.parsed_arguments.name))
+                    print(commands.show_host(arguments.name))
                 except CommandFailed as exception:
                     if 'Could not find a registered machine named' \
                             in exception.get_standard_error():
