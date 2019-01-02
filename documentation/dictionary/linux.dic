@@ -1,3 +1,8 @@
+addr
+inet
+sudo
+netstat
+sshd
 initrd
 syslinux
 ifdata

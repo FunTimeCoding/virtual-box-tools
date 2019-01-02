@@ -1,6 +1,12 @@
 @echo off
+if not exist .venv python -m venv .venv
 
 if not exist tmp mkdir tmp
+
+if not exist tmp/bootstrap-salt.sh powershell -Command "Invoke-WebRequest https://bootstrap.saltstack.com -OutFile tmp/bootstrap-salt.sh"
+
+if not exist tmp/salt mkdir tmp/salt
+xcopy /s configuration/minion.yaml tmp/salt/minion.conf
 
 echo eth0> tmp/ethernet-device.txt
 copy /y nul "tmp/pypirc.txt"

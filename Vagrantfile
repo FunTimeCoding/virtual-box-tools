@@ -1,5 +1,5 @@
-Vagrant.configure('2') do |config|
-  config.vm.box = 'debian/stretch64'
+Vagrant.configure('2') do |c|
+  c.vm.box = 'debian/stretch64'
   Dir.mkdir('tmp') unless File.exist?('tmp')
 
   if File.exist?('tmp/ethernet-device.txt')
@@ -14,23 +14,57 @@ Vagrant.configure('2') do |config|
     File.write('tmp/ethernet-device.txt', bridge + "\n")
   end
 
-  config.vm.network :public_network, bridge: bridge
-  config.vm.network :private_network, ip: '192.168.42.3'
-
-  if RbConfig::CONFIG['host_os'] =~ /mswin32|mingw32/
-    config.vm.synced_folder '.', '/vagrant', type: 'virtualbox'
+  if File.exist?('tmp/hostname.txt')
+    hostname = File.read('tmp/hostname.txt').chomp
   else
-    config.vm.synced_folder '.', '/vagrant', type: 'nfs'
+    hostname = 'vbt'
+    File.write('tmp/hostname.txt', hostname + "\n")
   end
 
-  config.vm.provider :virtualbox do |v|
+  if File.exist?('tmp/domain.txt')
+    domain = File.read('tmp/domain.txt').chomp
+  else
+    domain = 'example.org'
+    File.write('tmp/domain.txt', domain + "\n")
+  end
+
+  c.vm.network :public_network, bridge: bridge
+  c.vm.network :private_network, ip: '192.168.42.3'
+
+  if RbConfig::CONFIG['host_os'] =~ /mswin32|mingw32/
+    mount_type = 'virtualbox'
+  else
+    mount_type = 'nfs'
+  end
+
+  c.vm.synced_folder '.', '/vagrant', type: mount_type
+
+  c.vm.provider :virtualbox do |v|
     v.name = 'virtual-box-tools'
-    v.cpus = 1
+    v.cpus = 2
     v.memory = 1024
   end
 
-  config.vm.provision :shell, path: 'script/vagrant/update-system.sh'
-  config.vm.provision :shell, path: 'script/vagrant/provision.sh'
-end
+  c.vm.provision :shell, path: 'script/vagrant/update-system.sh'
+  c.vm.provision :shell, path: 'script/vagrant/provision.sh'
 
-# vim: ft=ruby
+  c.vm.provision :ansible do |a|
+    a.playbook = 'playbook.yml'
+    a.compatibility_mode = '2.0'
+  end
+
+  c.vm.synced_folder 'salt-provisioning', '/srv/salt', type: mount_type
+
+  c.vm.provision :shell do |s|
+    s.path = 'script/vagrant/salt.sh'
+    s.args = [hostname + '.' + domain, '/vagrant/tmp/salt/minion.conf']
+
+    # Install upstream Salt package.
+    #s.path = 'tmp/bootstrap-salt.sh'
+    # Jessie versions: https://repo.saltstack.com/apt/debian/8/amd64
+    # Stretch versions: https://repo.saltstack.com/apt/debian/9/amd64
+    #s.args = ['-U', '-i', hostname + '.' + domain, '-c', '/vagrant/tmp/salt', 'stable', '2018.3.3']
+  end
+
+  c.vm.provision :shell, inline: 'salt-call state.highstate'
+end

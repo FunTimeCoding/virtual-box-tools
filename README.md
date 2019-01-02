@@ -7,6 +7,12 @@ Tools for VirtualBox to simplify manual usage and automated integration.
 
 This section explains how to install and uninstall the project.
 
+Install project dependencies.
+
+```sh
+script/setup.sh
+```
+
 Install pip package from GitHub.
 
 ```sh
@@ -44,7 +50,7 @@ sudo_user: vbox
 
 This section explains how to use the project.
 
-Run program.
+Run the main program.
 
 ```sh
 vbt
@@ -110,12 +116,12 @@ Create the development virtual machine on Windows.
 script\vagrant\create.bat
 ```
 
-Run tests, check style and measure metrics.
+Run tests, style check and metrics.
 
 ```sh
-script/test.sh
-script/check.sh
-script/measure.sh
+script/test.sh [--ci-mode]
+script/check.sh [--ci-mode]
+script/measure.sh [--ci-mode]
 ```
 
 Build project.

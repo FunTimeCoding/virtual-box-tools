@@ -1,20 +1,21 @@
 # Conventions
 
-This document covers important conventions.
+This document covers conventions.
 
 
 ## Skeleton
 
 ### Directories
 
-Unified directories for all projects. Create them only if necessary.
+Directories for projects based on the skeleton for this language.
 
 * bin - Entry point scripts.
-* src,lib - Project code used by more than one entry point script.
-* test - Tests for project code and entry point scripts.
-* doc - Documentation files.
-* web - Web entry points and assets.
+* lib - Project code used by more than one entry point script.
+* documentation - Documentation files.
+* documentation/dictionary - Dictionary files.
+* script - Development scripts to build, check, manage job configuration and vagrant.
 * build - Files, executables and reports generated during build.
+* tmp - Temporary files.
 
 
 ### Files
@@ -27,23 +28,24 @@ Unified files and scripts for all projects. All mentioned scripts have the argum
 * CONVENTIONS.md - Explains the project structure and things that can be kept similar in other projects.
 * LICENSE.md - A license for the project so that code can be reused by others.
 * build.sh - Builds the project including metrics, checks and tests.
-* run-tests.sh - Run tests, provide access to individual test suites.
-* run-style-check.sh - Code style and lint checks.
-* run-metrics.sh - Collect metrics.
+* test.sh - Run tests, provide access to individual test suites.
+* check.sh - Code style and lint checks.
+* measure.sh - Collect metrics.
 
 
 ## Glossary
 
 ### Camel Case Convention
 
-Upper case every word, no separation of words.
-Keep abbreviations capitalized.
-Streamline names with irregular capital letters to have only one at the beginning.
+Upper case words.
+Use long forms of abbreviations and acronyms.
+Do not separate words.
 
 ```
-Camel Case Convention, camel case convention => CamelCaseConvention
-XML Library => XMLLibrary
-GitLab => Gitlab
+Upper Case Separated => UpperCaseSeparated
+lower case separated => LowerCaseSeparated
+Generic Lib => GenericLibrary
+XML Library => ExtensibleMarkupLanguageLibrary
 ```
 
 
@@ -52,25 +54,25 @@ GitLab => Gitlab
 Lower case everything, words separated by dashes.
 
 ```
-Dash Convention, dash convention => dash-convention
+Dash Convention => dash convention => dash-convention
 ```
 
 
 ### Initials Convention
 
-Lower case everything, take the first letter of each word and connect them.
+Lower case everything, take the first letter of each word.
 
 ```
-Initials Convention, initials convention => ic
+Initials Convention => initials convention => ic
 ```
 
 
 ### Underscore Convention
 
-Lowercase everything, separate words with an underscore.
+Lower case everything, separate words with an underscore.
 
 ```
-Initials Convention, initials convention => initials_convention
+Underscore Convention => underscore convention => underscore_convention
 ```
 
 
@@ -95,7 +97,7 @@ The project name should be in camel case convention.
 ```
 ExampleProject
 JenkinsJobManager
-GitlabTools
+GitLabTools
 JenkinsTools
 ```
 

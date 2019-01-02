@@ -1,13 +1,20 @@
 build
 tmp
 .vagrant
+debian/files
+debian/debhelper-build-stamp
+debian/virtual-box-tools
+debian/virtual-box-tools.substvars
+documentation/man/*.1
 
 # Python
+dist
 .coverage
 .cache
 .venv
 .tox
 *.egg-info
 *.pyc
+.pytest_cache
 
 running-vms.txt

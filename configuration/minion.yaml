@@ -1,0 +1,9 @@
+file_client: local
+# Reduce chance of timeout during high load.
+timeout: 30
+file_roots:
+  base:
+    - /srv/salt/state
+pillar_roots:
+  base:
+    - /srv/salt/pillar

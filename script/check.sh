@@ -1,5 +1,10 @@
 #!/bin/sh -e
 
+DIRECTORY=$(dirname "${0}")
+SCRIPT_DIRECTORY=$(cd "${DIRECTORY}" || exit 1; pwd)
+# shellcheck source=/dev/null
+. "${SCRIPT_DIRECTORY}/../lib/project.sh"
+
 if [ "${1}" = --help ]; then
     echo "Usage: ${0} [--ci-mode]"
 
@@ -15,16 +20,31 @@ if [ "${1}" = --ci-mode ]; then
     CONTINUOUS_INTEGRATION_MODE=true
 fi
 
-MARKDOWN_FILES=$(find . -name '*.md')
-BLACKLIST=""
+SYSTEM=$(uname)
+
+if [ "${SYSTEM}" = Darwin ]; then
+    FIND='gfind'
+    TEE='gtee'
+else
+    FIND='find'
+    TEE='tee'
+fi
+
+MARKDOWN_FILES=$(${FIND} . -regextype posix-extended -name '*.md' ! -regex "${EXCLUDE_FILTER}" -printf '%P\n')
+BLACKLIST=''
 DICTIONARY=en_US
 mkdir -p tmp
-cat documentation/dictionary/*.dic > tmp/combined.dic
+
+if [ -d documentation/dictionary ]; then
+    cat documentation/dictionary/*.dic > tmp/combined.dic
+else
+    touch tmp/combined.dic
+fi
 
 for FILE in ${MARKDOWN_FILES}; do
     WORDS=$(hunspell -d "${DICTIONARY}" -p tmp/combined.dic -l "${FILE}" | sort | uniq)
 
-    if [ ! "${WORDS}" = "" ]; then
+    if [ ! "${WORDS}" = '' ]; then
         echo "${FILE}"
 
         for WORD in ${WORDS}; do
@@ -46,12 +66,12 @@ for FILE in ${MARKDOWN_FILES}; do
     fi
 done
 
-TEX_FILES=$(find . -name '*.tex')
+TEX_FILES=$(${FIND} . -regextype posix-extended -name '*.tex' ! -regex "${EXCLUDE_FILTER}" -printf '%P\n')
 
 for FILE in ${TEX_FILES}; do
     WORDS=$(hunspell -d "${DICTIONARY}" -p tmp/combined.dic -l -t "${FILE}")
 
-    if [ ! "${WORDS}" = "" ]; then
+    if [ ! "${WORDS}" = '' ]; then
         echo "${FILE}"
 
         for WORD in ${WORDS}; do
@@ -79,19 +99,8 @@ for FILE in ${TEX_FILES}; do
     fi
 done
 
-SYSTEM=$(uname)
-
-if [ "${SYSTEM}" = Darwin ]; then
-    FIND='gfind'
-else
-    FIND='find'
-fi
-
-INCLUDE_FILTER='^.*(\/bin\/[a-z]*|\.py)$'
-EXCLUDE_FILTER='^.*\/(build|tmp|\.git|\.vagrant|\.idea|\.venv|\.tox)\/.*$'
-
 if [ "${CONTINUOUS_INTEGRATION_MODE}" = true ]; then
-    FILES=$(${FIND} . -name '*.sh' -regextype posix-extended ! -regex "${EXCLUDE_FILTER}" -printf '%P\n')
+    FILES=$(${FIND} . -regextype posix-extended -name '*.sh' ! -regex "${EXCLUDE_FILTER}" -printf '%P\n')
 
     for FILE in ${FILES}; do
         FILE_REPLACED=$(echo "${FILE}" | sed 's/\//-/g')
@@ -99,20 +108,19 @@ if [ "${CONTINUOUS_INTEGRATION_MODE}" = true ]; then
     done
 else
     # shellcheck disable=SC2016
-    SHELL_SCRIPT_CONCERNS=$(${FIND} . -name '*.sh' -regextype posix-extended ! -regex "${EXCLUDE_FILTER}" -exec sh -c 'shellcheck ${1} || true' '_' '{}' \;)
+    SHELL_SCRIPT_CONCERNS=$(${FIND} . -regextype posix-extended -name '*.sh' ! -regex "${EXCLUDE_FILTER}" -exec sh -c 'shellcheck ${1} || true' '_' '{}' \;)
 
-    if [ ! "${SHELL_SCRIPT_CONCERNS}" = "" ]; then
+    if [ ! "${SHELL_SCRIPT_CONCERNS}" = '' ]; then
         CONCERN_FOUND=true
         echo "(WARNING) Shell script concerns:"
         echo "${SHELL_SCRIPT_CONCERNS}"
     fi
 fi
 
-EXCLUDE_FILTER_WITH_INIT='^.*\/((build|tmp|\.git|\.vagrant|\.idea|\.venv|\.tox)\/.*|__init__\.py)$'
 # shellcheck disable=SC2016
-EMPTY_FILES=$(${FIND} . -type f -empty -regextype posix-extended ! -regex "${EXCLUDE_FILTER_WITH_INIT}")
+EMPTY_FILES=$(${FIND} . -regextype posix-extended -type f -empty ! -regex "${EXCLUDE_FILTER_WITH_INIT}")
 
-if [ ! "${EMPTY_FILES}" = "" ]; then
+if [ ! "${EMPTY_FILES}" = '' ]; then
     CONCERN_FOUND=true
 
     if [ "${CONTINUOUS_INTEGRATION_MODE}" = true ]; then
@@ -126,9 +134,9 @@ if [ ! "${EMPTY_FILES}" = "" ]; then
 fi
 
 # shellcheck disable=SC2016
-TO_DOS=$(${FIND} . -regextype posix-extended -type f -and ! -regex "${EXCLUDE_FILTER}" -exec sh -c 'grep -Hrn TODO "${1}" | grep -v "${2}"' '_' '{}' '${0}' \;)
+TO_DOS=$(${FIND} . -regextype posix-extended -type f ! -regex "${EXCLUDE_FILTER}" -exec sh -c 'grep -Hrn TODO "${1}" | grep -v "${2}"' '_' '{}' '${0}' \;)
 
-if [ ! "${TO_DOS}" = "" ]; then
+if [ ! "${TO_DOS}" = '' ]; then
     if [ "${CONTINUOUS_INTEGRATION_MODE}" = true ]; then
         echo "${TO_DOS}" > build/log/to-dos.txt
     else
@@ -140,9 +148,9 @@ if [ ! "${TO_DOS}" = "" ]; then
 fi
 
 # shellcheck disable=SC2016
-SHELLCHECK_IGNORES=$(${FIND} . -regextype posix-extended -type f -and ! -regex "${EXCLUDE_FILTER}" -exec sh -c 'grep -Hrn "# shellcheck" "${1}" | grep -v "${2}"' '_' '{}' '${0}' \;)
+SHELLCHECK_IGNORES=$(${FIND} . -regextype posix-extended -type f ! -regex "${EXCLUDE_FILTER}" -exec sh -c 'grep -Hrn "# shellcheck" "${1}" | grep -v "${2}"' '_' '{}' '${0}' \;)
 
-if [ ! "${SHELLCHECK_IGNORES}" = "" ]; then
+if [ ! "${SHELLCHECK_IGNORES}" = '' ]; then
     if [ "${CONTINUOUS_INTEGRATION_MODE}" = true ]; then
         echo "${SHELLCHECK_IGNORES}" > build/log/shellcheck-ignores.txt
     else
@@ -158,7 +166,7 @@ PYCODESTYLE_CONCERNS=$(pycodestyle --exclude=.git,.tox,.venv,__pycache__ --stati
 if [ "${CONTINUOUS_INTEGRATION_MODE}" = true ]; then
     echo "${PYCODESTYLE_CONCERNS}" > build/log/pycodestyle.txt
 else
-    if [ ! "${PYCODESTYLE_CONCERNS}" = "" ]; then
+    if [ ! "${PYCODESTYLE_CONCERNS}" = '' ]; then
         CONCERN_FOUND=true
         echo
         echo "(WARNING) PEP8 concerns:"
@@ -167,17 +175,10 @@ else
     fi
 fi
 
-PYTHON_FILES=$(${FIND} . -type f -regextype posix-extended -regex "${INCLUDE_FILTER}" -and ! -regex "${EXCLUDE_FILTER}")
+PYTHON_FILES=$(${FIND} . -regextype posix-extended -type f -name '*.py' ! -regex "${EXCLUDE_FILTER}")
 RETURN_CODE=0
 # shellcheck disable=SC2086
 PYLINT_OUTPUT=$(pylint ${PYTHON_FILES}) || RETURN_CODE=$?
-SYSTEM=$(uname)
-
-if [ "${SYSTEM}" = Darwin ]; then
-    TEE='gtee'
-else
-    TEE='tee'
-fi
 
 if [ "${CONTINUOUS_INTEGRATION_MODE}" = true ]; then
     echo | "${TEE}" build/log/pylint.txt
@@ -194,8 +195,10 @@ if [ ! "${RETURN_CODE}" = 0 ]; then
 fi
 
 if [ "${CONCERN_FOUND}" = true ]; then
-    echo
-    echo "Concern(s) of category WARNING found." >&2
+    if [ "${CONTINUOUS_INTEGRATION_MODE}" = false ]; then
+        echo
+        echo "Concern(s) of category WARNING found." >&2
+    fi
 
     exit 2
 fi

@@ -1,3 +1,8 @@
 #!/bin/sh -e
 
-~/src/jenkins-tools/bin/update-job.sh virtual-box-tools job.xml
+DIRECTORY=$(dirname "${0}")
+SCRIPT_DIRECTORY=$(cd "${DIRECTORY}" || exit 1; pwd)
+# shellcheck source=/dev/null
+. "${SCRIPT_DIRECTORY}/../../lib/project.sh"
+
+~/src/jenkins-tools/bin/update-job.sh "${PROJECT_NAME}" job.xml

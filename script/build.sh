@@ -1,12 +1,12 @@
 #!/bin/sh -e
 
 rm -rf build
-id -u vagrant > /dev/null && VAGRANT_ENVIRONMENT=true || VAGRANT_ENVIRONMENT=false
+id -u vagrant > /dev/null && VAGRANT_ENVIRONMENT='true' || VAGRANT_ENVIRONMENT='false'
 
 if [ "${VAGRANT_ENVIRONMENT}" = true ]; then
-    VIRTUAL_ENVIRONMENT_PATH=/home/vagrant/venv
+    VIRTUAL_ENVIRONMENT_PATH='/home/vagrant/venv'
 else
-    VIRTUAL_ENVIRONMENT_PATH=.venv
+    VIRTUAL_ENVIRONMENT_PATH='.venv'
 fi
 
 if [ ! -d "${VIRTUAL_ENVIRONMENT_PATH}" ]; then
@@ -25,5 +25,20 @@ script/test.sh --ci-mode
 SYSTEM=$(uname)
 
 if [ "${SYSTEM}" = Linux ]; then
-    script/package.sh
+    script/debian/package.sh
 fi
+
+if [ "${GIT_BRANCH}" = '' ]; then
+    GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+fi
+
+if [ "${GIT_BRANCH}" = master ]; then
+    script/python/publish.sh
+
+    if [ "${SYSTEM}" = Linux ]; then
+        script/debian/publish.sh
+    fi
+fi
+
+# TODO: Finish implementation.
+#script/docker/build.sh

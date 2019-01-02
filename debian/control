@@ -1,4 +1,5 @@
 Source: virtual-box-tools
+Section: misc
 Priority: optional
 Maintainer: Alexander Reitzel <funtimecoding@gmail.com>
 Build-Depends: debhelper (>= 9), dh-python, python3-all, python3-setuptools, python3-mccabe, python3-flask, python3-yaml
@@ -12,5 +13,5 @@ Package: python3-virtual-box-tools
 Section: python
 Architecture: amd64
 Depends: ${python3:Depends}, ${misc:Depends}, python3-mccabe, python3-flask, python3-yaml
-Description: stub short description
- Stub long description.
+Description: short stub description
+ Long stub description.
