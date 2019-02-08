@@ -6,5 +6,5 @@ LIST=$(cat "${SCRIPT_DIRECTORY}"/../running-vms.txt)
 
 for ELEMENT in ${LIST}; do
     vbt host start --name "${ELEMENT}"
-    sleep 30
+    sleep 60
 done
