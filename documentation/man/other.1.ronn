@@ -1,0 +1,43 @@
+other(1) -- example command for example purpose
+===============================================
+
+## SYNOPSIS
+
+`other` `-h`|`--help` <file><br>
+`other` `-e`|`--example` <file><br>
+
+## DESCRIPTION
+
+One or more description paragraphs of what the program does.
+
+## OPTIONS
+
+Short paragraph describing what the options can do.
+
+  * `-h`, `--help`:
+    Show help.
+
+## EXAMPLES
+
+One or more example cases showing use cases of the program:
+
+    $ other --example
+    Expected example output when passed the --example argument.
+    $ other --help
+
+## ENVIRONMENT
+
+  * `EXAMPLE`:
+    An environment variable that affects the program.
+
+## BUGS
+
+Known bugs should be mentioned here.
+
+## COPYRIGHT
+
+virtual-box-tools is Copyright (C) 2018 Alexander Reitzel <https://github.com/FunTimeCoding>
+
+## SEE ALSO
+
+sh(1)

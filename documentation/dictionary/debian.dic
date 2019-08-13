@@ -1,7 +1,9 @@
 Debian
+debhelper
+shlibs
+dpkg
 preseed
 netboot
-debhelper
 pybuild
 buildsystem
 libyaml

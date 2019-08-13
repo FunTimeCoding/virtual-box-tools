@@ -1,7 +1,7 @@
+venv
 pycache
 pyyaml
 shyaml
-venv
 htmlcov
 pyenchant
 pygtk

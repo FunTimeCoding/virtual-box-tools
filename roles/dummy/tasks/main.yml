@@ -1,0 +1,5 @@
+---
+- template:
+    src: ansible-example.md
+    dest: /root/ansible-example.md
+  become: true

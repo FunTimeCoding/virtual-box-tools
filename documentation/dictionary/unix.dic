@@ -1,5 +1,7 @@
-shellcheck
 OPTIND
+mkdir
+tmp
+uname
 sudo
 netmask
 nameservers
@@ -9,5 +11,4 @@ cpio
 libenchant
 hunspell
 wget
-mkdir
 myspell

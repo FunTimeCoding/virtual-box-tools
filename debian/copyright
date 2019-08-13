@@ -1,0 +1,9 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: virtual-box-tools
+Upstream-Contact: Alexander Reitzel <funtimecoding@gmail.com>
+Source: https://github.com/FunTimeCoding/virtual-box-tools
+
+Files: *
+Copyright: 2018 Alexander Reitzel <funtimecoding@gmail.com>
+License: MIT
+  [LICENSE TEXT]
