@@ -1,5 +1,6 @@
 #!/bin/sh -e
 
+# shellcheck source=/dev/null
 . "${HOME}/.aptly-tools.sh"
 
 FILE_PATH="${1}"

@@ -1,18 +1,18 @@
 #!/bin/sh -e
 
-NAME=virtual-box-tools
-PROJECT_VERSION=0.1.0
-ARCHIVE="${NAME}_${PROJECT_VERSION}.orig.tar.gz"
-PROJECT_ROOT="${NAME}-${PROJECT_VERSION}"
-PACKAGE_VERSION=1
-COMBINED_VERSION="${PROJECT_VERSION}-${PACKAGE_VERSION}"
+DIRECTORY=$(dirname "${0}")
+SCRIPT_DIRECTORY=$(cd "${DIRECTORY}" || exit 1; pwd)
+# shellcheck source=/dev/null
+. "${SCRIPT_DIRECTORY}/../lib/project.sh"
+ARCHIVE="${PROJECT_NAME}_${PROJECT_VERSION}.orig.tar.gz"
+PROJECT_ROOT="${PROJECT_NAME}-${PROJECT_VERSION}"
 
 if [ ! -f debian/changelog ]; then
-    dch --create -v "${COMBINED_VERSION}" --package "${NAME}"
+    dch --create -v "${COMBINED_VERSION}" --package "${PROJECT_NAME}"
 fi
 
 mkdir -p build
-tar --create --gzip --transform "s,^,${PROJECT_ROOT}/," --exclude='./build' --exclude './.venv' --exclude './.tmp' --exclude './.idea' --exclude './.git' --exclude './.vagrant' --exclude './virtual_box_tools.egg-info' --file "build/${ARCHIVE}" .
+tar --create --gzip --transform "s,^,${PROJECT_ROOT}/," --exclude='./build' --exclude './.venv' --exclude './.tmp' --exclude './.idea' --exclude './.git' --exclude './.vagrant' --exclude "./${PROJECT_NAME_UNDERSCORE}.egg-info" --file "build/${ARCHIVE}" .
 cd build
 tar --extract --file "${ARCHIVE}"
 cd "${PROJECT_ROOT}"

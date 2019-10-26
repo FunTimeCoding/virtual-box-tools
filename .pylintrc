@@ -26,7 +26,7 @@ jobs=1
 # complex, nested conditions.
 limit-inference-results=100
 
-# List of plugins (as comma separated values of python modules names) to load,
+# List of plugins (as comma separated values of python module names) to load,
 # usually to register additional checkers.
 load-plugins=
 
@@ -60,7 +60,9 @@ confidence=
 # --enable=similarities". If you want to run only the classes checker, but have
 # no Warning level messages displayed, use "--disable=all --enable=classes
 # --disable=W".
-disable=missing-docstring,
+disable=missing-module-docstring,
+        missing-class-docstring,
+        missing-function-docstring,
         print-statement,
         parameter-unpacking,
         unpacking-in-except,
@@ -150,11 +152,11 @@ enable=c-extension-no-member
 
 [REPORTS]
 
-# Python expression which should return a note less than 10 (10 is the highest
-# note). You have access to the variables errors warning, statement which
-# respectively contain the number of errors / warnings messages and the total
-# number of statements analyzed. This is used by the global evaluation report
-# (RP0004).
+# Python expression which should return a score less than or equal to 10. You
+# have access to the variables 'error', 'warning', 'refactor', and 'convention'
+# which contain the number of messages in each category, as well as 'statement'
+# which is the total number of statements analyzed. This score is used by the
+# global evaluation report (RP0004).
 evaluation=10.0 - ((float(5 * error + warning + refactor + convention) / statement) * 10)
 
 # Template used to display messages. This is a python new-style format string
@@ -188,7 +190,7 @@ never-returning-functions=sys.exit
 [LOGGING]
 
 # Format style used to check logging format string. `old` means using %
-# formatting, while `new` is for `{}` formatting.
+# formatting, `new` is for `{}` formatting,and `fstr` is for f-strings.
 logging-format-style=old
 
 # Logging modules to check that the string format arguments are in logging
@@ -202,17 +204,17 @@ logging-modules=logging
 max-spelling-suggestions=4
 
 # Spelling dictionary name. Available dictionaries: de_DE (myspell), fr_FR
-# (myspell), en_GB (myspell), en_AU (myspell), en_US (myspell)..
+# (myspell), en_GB (myspell), en_AU (myspell), en_US (myspell).
 spelling-dict=en_US
 
 # List of comma separated words that should not be checked.
 spelling-ignore-words=
 
-# A path to a file that contains private dictionary; one word per line.
+# A path to a file that contains the private dictionary; one word per line.
 spelling-private-dict-file=tmp/combined.dic
 
-# Tells whether to store unknown words to indicated private dictionary in
-# --spelling-private-dict-file option instead of raising a message.
+# Tells whether to store unknown words to the private dictionary (see the
+# --spelling-private-dict-file option) instead of raising a message.
 spelling-store-unknown-words=no
 
 
@@ -257,7 +259,7 @@ ignored-classes=optparse.Values,thread._local,_thread._local
 
 # List of module names for which member attributes should not be checked
 # (useful for modules/projects where namespaces are manipulated during runtime
-# and thus existing member attributes cannot be deduced by static analysis. It
+# and thus existing member attributes cannot be deduced by static analysis). It
 # supports qualified module names, as well as Unix pattern matching.
 ignored-modules=
 
@@ -272,6 +274,9 @@ missing-member-hint-distance=1
 # The total number of similar names that should be taken in consideration when
 # showing a hint for a missing member.
 missing-member-max-choices=1
+
+# List of decorators that change the signature of a decorated function.
+signature-mutators=
 
 
 [VARIABLES]
@@ -456,7 +461,19 @@ variable-naming-style=snake_case
 #variable-rgx=
 
 
+[STRING]
+
+# This flag controls whether the implicit-str-concat-in-sequence should
+# generate a warning on implicit string concatenation in sequences defined over
+# several lines.
+check-str-concat-over-line-jumps=no
+
+
 [IMPORTS]
+
+# List of modules that can be imported at any level, not just the top level
+# one.
+allow-any-import-level=
 
 # Allow wildcard imports from modules that define __all__.
 allow-wildcard-with-all=no
@@ -488,13 +505,17 @@ known-standard-library=
 # Force import order to recognize a module as part of a third party library.
 known-third-party=enchant
 
+# Couples of modules and preferred modules, separated by a comma.
+preferred-modules=
+
 
 [CLASSES]
 
 # List of method names used to declare (i.e. assign) instance attributes.
 defining-attr-methods=__init__,
                       __new__,
-                      setUp
+                      setUp,
+                      __post_init__
 
 # List of member names, which should be excluded from the protected access
 # warning.
@@ -514,19 +535,19 @@ valid-metaclass-classmethod-first-arg=cls
 [DESIGN]
 
 # Maximum number of arguments for function / method.
-max-args=2
+max-args=3
 
 # Maximum number of attributes for a class (see R0902).
 max-attributes=3
 
-# Maximum number of boolean expressions in an if statement.
+# Maximum number of boolean expressions in an if statement (see R0916).
 max-bool-expr=1
 
 # Maximum number of branch for function / method body.
 max-branches=5
 
 # Maximum number of locals for function / method body.
-max-locals=5
+max-locals=6
 
 # Maximum number of parents for a class (see R0901).
 max-parents=3
@@ -547,5 +568,6 @@ min-public-methods=1
 [EXCEPTIONS]
 
 # Exceptions that will emit a warning when being caught. Defaults to
-# "Exception".
-overgeneral-exceptions=Exception
+# "BaseException, Exception".
+overgeneral-exceptions=BaseException,
+                       Exception

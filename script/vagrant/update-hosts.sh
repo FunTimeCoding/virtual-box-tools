@@ -10,11 +10,11 @@ else
     TEE='tee'
 fi
 
-DOMAIN=$(hostname -f)
 HOST_NAME=$(cat tmp/hostname.txt)
+DOMAIN=$(cat tmp/domain.txt)
 ABSOLUTE_DOMAIN_NAME="${HOST_NAME}.${DOMAIN}"
 RESULT=$(grep "${ABSOLUTE_DOMAIN_NAME}" /etc/hosts) || RESULT=''
-ADDRESS=$(vagrant ssh -c "ip addr list eth1 | grep 'inet ' | cut -d ' ' -f6 | cut -d / -f1" 2> /dev/null | tr -d '\r')
+ADDRESS=$(vagrant ssh --command script/vagrant/address.sh)
 
 if [ "${RESULT}" = '' ]; then
     # shellcheck disable=SC1117

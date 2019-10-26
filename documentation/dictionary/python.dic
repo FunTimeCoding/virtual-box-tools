@@ -1,5 +1,6 @@
 venv
 pycache
+jinja
 pyyaml
 shyaml
 htmlcov

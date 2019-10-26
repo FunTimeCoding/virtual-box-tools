@@ -6,6 +6,7 @@ debian/debhelper-build-stamp
 debian/virtual-box-tools
 debian/virtual-box-tools.substvars
 documentation/man/*.1
+.scannerwork
 
 # Python
 dist

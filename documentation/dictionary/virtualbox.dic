@@ -1,2 +1,4 @@
 VirtualBox
 cpus
+modifyvm
+vram

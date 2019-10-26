@@ -5,27 +5,25 @@ Tools for VirtualBox to simplify manual usage and automated integration.
 
 ## Setup
 
-This section explains how to install and uninstall the project.
-
-Install project dependencies.
+Install project dependencies:
 
 ```sh
 script/setup.sh
 ```
 
-Install pip package from GitHub.
+Install pip package from GitHub:
 
 ```sh
 pip3 install git+https://git@github.com/FunTimeCoding/virtual-box-tools.git#egg=virtual-box-tools
 ```
 
-Install pip package from DevPi.
+Install pip package from DevPi:
 
 ```sh
 pip3 install -i https://testpypi.python.org/pypi virtual-box-tools
 ```
 
-Uninstall package.
+Uninstall package:
 
 ```sh
 pip3 uninstall virtual-box-tools
@@ -33,13 +31,13 @@ pip3 uninstall virtual-box-tools
 
 Configuration file location: ~/.virtual-box-tools.yaml
 
-Optional: Use a host configuration from a different location.
+(Optional) Use a host configuration from a different location:
 
 ```yml
 host_file: ~/srv/salt/pillar/host.sls
 ```
 
-Optional: Run virtual machines as a different user.
+Optional: Run virtual machines as a different user:
 
 ```yml
 sudo_user: vbox
@@ -48,46 +46,50 @@ sudo_user: vbox
 
 ## Usage
 
-This section explains how to use the project.
-
-Run the main program.
+Run the main program:
 
 ```sh
-vbt
+bin/vbt
 ```
 
-Show help.
+Run the main program inside the container:
+
+```sh
+docker run -it --rm funtimecoding/virtual-box-tools
+```
+
+Show help:
 
 ```sh
 vbt --help
 vbt host --help
 ```
 
-Create a host.
+Create a host:
 
 ```sh
 vbt host create --name example
 ```
 
-Create a host and connect it to a bridge interface.
+Create a host and connect it to a bridge interface:
 
 ```sh
 vbt host create --name example --bridge-interface en0
 ```
 
-Destroy a host.
+Destroy a host:
 
 ```sh
 vbt host destroy --name example
 ```
 
-Run the web service.
+Run the web service:
 
 ```sh
 vbt-web-service
 ```
 
-Show users.
+Show users:
 
 ```sh
 bin/show-users.sh
@@ -96,65 +98,69 @@ bin/show-users.sh
 
 ## Development
 
-This section explains how to improve the project.
-
-Configure Git on Windows before cloning. This avoids problems with Vagrant and VirtualBox.
+Configure Git on Windows before cloning:
 
 ```sh
 git config --global core.autocrlf input
 ```
 
-Create the development virtual machine on Linux and Darwin.
+Install NFS plugin for Vagrant on Windows:
+
+```bat
+vagrant plugin install vagrant-winnfsd
+```
+
+Create the development virtual machine on Linux and Darwin:
 
 ```sh
 script/vagrant/create.sh
 ```
 
-Create the development virtual machine on Windows.
+Create the development virtual machine on Windows:
 
 ```bat
 script\vagrant\create.bat
 ```
 
-Run tests, style check and metrics.
+Run tests, style check and metrics:
 
 ```sh
-script/test.sh [--ci-mode]
-script/check.sh [--ci-mode]
-script/measure.sh [--ci-mode]
+script/test.sh [--help]
+script/check.sh [--help]
+script/measure.sh [--help]
 ```
 
-Build project.
+Build project:
 
 ```sh
 script/build.sh
 ```
 
-Install Debian package.
+Install Debian package:
 
 ```sh
 sudo dpkg --install build/python3-virtual-box-tools_0.1.0-1_all.deb
 ```
 
-Show files the package installed.
+Show files the package installed:
 
 ```sh
 dpkg-query --listfiles python3-virtual-box-tools
 ```
 
-Run the web service in a virtual environment.
+Run the web service in a virtual environment:
 
 ```sh
 script/start.sh
 ```
 
-Run VirtualBox commands as a different user.
+Run VirtualBox commands as a different user:
 
 ```sh
 sudo -u virtualbox vboxmanage showvminfo --machinereadable ${MACHINE_NAME}
 ```
 
-Send a request to the web service.
+Send a request to the web service:
 
 ```sh
 curl --silent --header 'Authorization: Token example' localhost:5000/host
