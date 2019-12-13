@@ -489,7 +489,7 @@ class Commands:
 
         if not exists(archive):
             with urlopen(
-                    'http://ftp.debian.org/debian/dists/stretch/main'
+                    'http://ftp.debian.org/debian/dists/buster/main'
                     '/installer-amd64/current/images/netboot/netboot.tar.gz'
             ) as response, open(archive, 'wb') as out_file:
                 copyfileobj(response, out_file)
