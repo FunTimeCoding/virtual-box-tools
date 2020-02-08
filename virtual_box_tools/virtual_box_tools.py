@@ -45,13 +45,8 @@ class VirtualBoxTools:
     DEFAULT_CORES = 1
     DEFAULT_MEMORY = 2048
     DEFAULT_DISK_SIZE = 16
-    STRETCH_RELEASE = 'stretch',
-    BUSTER_RELEASE = 'buster',
-    DEFAULT_RELEASE = BUSTER_RELEASE
-    SUPPORTED_RELEASES = [
-        BUSTER_RELEASE,
-        STRETCH_RELEASE,
-    ]
+    STRETCH_RELEASE = 'stretch'
+    BUSTER_RELEASE = 'buster'
     HOST_COMMAND = 'host'
     START_COMMAND = 'start'
     STOP_COMMAND = 'stop'
@@ -182,8 +177,11 @@ class VirtualBoxTools:
         create_parent.add_argument('--proxy', default='')
         create_parent.add_argument(
             '--release',
-            default=VirtualBoxTools.DEFAULT_RELEASE,
-            choices=VirtualBoxTools.SUPPORTED_RELEASES,
+            default=VirtualBoxTools.BUSTER_RELEASE,
+            choices=[
+                VirtualBoxTools.BUSTER_RELEASE,
+                VirtualBoxTools.STRETCH_RELEASE,
+            ],
         )
         create_parent.add_argument('--user-name', default='')
         create_parent.add_argument('--real-name', default='')
@@ -509,7 +507,7 @@ class Commands:
         if not exists(archive):
             with urlopen(
                     'http://ftp.debian.org/debian/dists/' + release + '/main'
-                    '/installer-amd64/current/images/netboot/netboot.tar.gz'
+                                                                      '/installer-amd64/current/images/netboot/netboot.tar.gz'
             ) as response, open(archive, 'wb') as out_file:
                 copyfileobj(response, out_file)
 
