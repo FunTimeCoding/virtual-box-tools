@@ -2,7 +2,7 @@ from getpass import getuser
 from json import dumps
 from socket import getfqdn, socket, AF_INET, SOCK_STREAM
 from argparse import ArgumentDefaultsHelpFormatter
-from os import name as operating_system_name, umask, makedirs, chdir, chmod
+from os import name as operating_system_name, umask, makedirs, chdir
 from os.path import expanduser, exists, join, abspath, dirname
 from sys import exit as system_exit, argv, platform
 from time import sleep
@@ -559,9 +559,13 @@ class Commands:
                 arguments=[extract_path, archive, trivial_directory],
                 sudo_user=self.sudo_user,
             )
-            chmod(
-                join(trivial_directory, 'debian-installer/amd64/pxelinux.0'),
-                0o755
+            CommandProcess(
+                arguments=[
+                    'chmod',
+                    '755',
+                    join(trivial_directory, 'debian-installer/amd64/pxelinux.0')
+                ],
+                sudo_user=self.sudo_user,
             )
 
         CommandProcess(
