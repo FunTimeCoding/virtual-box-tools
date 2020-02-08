@@ -386,7 +386,7 @@ class Commands:
             graphical: bool = False,
             no_post_install: bool = False,
             proxy: str = '',
-            release: str = VirtualBoxTools.DEFAULT_RELEASE,
+            release: str = VirtualBoxTools.BUSTER_RELEASE,
             user_name: str = '',
             real_name: str = '',
     ) -> None:
