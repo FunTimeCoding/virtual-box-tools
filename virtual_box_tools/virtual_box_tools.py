@@ -65,6 +65,7 @@ class VirtualBoxTools:
         self.parsed_arguments = self.parser.parse_args(arguments)
         config = YamlConfig('~/.virtual-box-tools.yaml')
         self.sudo_user = config.get('sudo_user')
+        self.bridge_interface = config.get('bridge_interface')
 
     @staticmethod
     def main() -> int:
@@ -160,7 +161,10 @@ class VirtualBoxTools:
 
         create_parent = CustomArgumentParser(add_help=False)
         create_parent.add_argument('--name', required=True)
-        create_parent.add_argument('--bridge-interface', required=True)
+        create_parent.add_argument(
+            '--bridge-interface',
+            default=self.bridge_interface,
+        )
         create_parent.add_argument(
             '--cores',
             default=VirtualBoxTools.DEFAULT_CORES,
