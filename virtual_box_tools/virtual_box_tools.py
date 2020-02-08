@@ -84,7 +84,7 @@ class VirtualBoxTools:
                         host_name=arguments.name,
                         cores=arguments.cores,
                         memory=arguments.memory,
-                        disk_size=arguments.disk_size,
+                        disk_size=int(arguments.disk_size),
                         bridge_interface=arguments.bridge_interface,
                         graphical=arguments.graphical,
                         no_post_install=arguments.no_post_install,
