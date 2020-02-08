@@ -43,8 +43,15 @@ class CustomLoggingHandler(SimpleHTTPRequestHandler):
 
 class VirtualBoxTools:
     DEFAULT_CORES = 1
-    DEFAULT_MEMORY = 4096
-    DEFAULT_DISK_SIZE = 64
+    DEFAULT_MEMORY = 2048
+    DEFAULT_DISK_SIZE = 16
+    STRETCH_RELEASE = 'stretch',
+    BUSTER_RELEASE = 'buster',
+    DEFAULT_RELEASE = BUSTER_RELEASE
+    SUPPORTED_RELEASES = [
+        BUSTER_RELEASE,
+        STRETCH_RELEASE,
+    ]
     HOST_COMMAND = 'host'
     START_COMMAND = 'start'
     STOP_COMMAND = 'stop'
@@ -86,6 +93,7 @@ class VirtualBoxTools:
                         graphical=arguments.graphical,
                         no_post_install=arguments.no_post_install,
                         proxy=arguments.proxy,
+                        release=arguments.release,
                         user_name=arguments.user_name,
                         real_name=arguments.real_name,
                     )
@@ -168,6 +176,11 @@ class VirtualBoxTools:
         create_parent.add_argument('--graphical', action='store_true')
         create_parent.add_argument('--no-post-install', action='store_true')
         create_parent.add_argument('--proxy', default='')
+        create_parent.add_argument(
+            '--release',
+            default=VirtualBoxTools.DEFAULT_RELEASE,
+            choices=VirtualBoxTools.SUPPORTED_RELEASES,
+        )
         create_parent.add_argument('--user-name', default='')
         create_parent.add_argument('--real-name', default='')
         create_parser = host_subparsers.add_parser(
@@ -371,6 +384,7 @@ class Commands:
             graphical: bool = False,
             no_post_install: bool = False,
             proxy: str = '',
+            release: str = VirtualBoxTools.DEFAULT_RELEASE,
             user_name: str = '',
             real_name: str = '',
     ) -> None:
@@ -401,6 +415,7 @@ class Commands:
 
         debian_tools_arguments = [
             'dt',
+            '--release', release,
             '--hostname', host_name,
             '--domain', domain_name,
             '--root-password', root_password,
@@ -485,11 +500,11 @@ class Commands:
         if not exists(temporary_directory):
             makedirs(temporary_directory)
 
-        archive = join(temporary_directory, 'netboot.tar.gz')
+        archive = join(temporary_directory, 'netboot-' + release + '.tar.gz')
 
         if not exists(archive):
             with urlopen(
-                    'http://ftp.debian.org/debian/dists/buster/main'
+                    'http://ftp.debian.org/debian/dists/' + release + '/main'
                     '/installer-amd64/current/images/netboot/netboot.tar.gz'
             ) as response, open(archive, 'wb') as out_file:
                 copyfileobj(response, out_file)
