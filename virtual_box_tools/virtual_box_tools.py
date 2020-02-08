@@ -61,11 +61,11 @@ class VirtualBoxTools:
     POWER_OFF_STATE = 'poweroff'
 
     def __init__(self, arguments: list) -> None:
-        self.parser = self.create_parser()
-        self.parsed_arguments = self.parser.parse_args(arguments)
         config = YamlConfig('~/.virtual-box-tools.yaml')
         self.sudo_user = config.get('sudo_user')
         self.bridge_interface = config.get('bridge_interface')
+        self.parser = self.create_parser()
+        self.parsed_arguments = self.parser.parse_args(arguments)
 
     @staticmethod
     def main() -> int:
