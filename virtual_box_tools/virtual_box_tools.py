@@ -672,7 +672,7 @@ class Commands:
             self.keyboard_input(
                 name=host_name,
                 command='wget --output-document - ' + locator
-                        + '/' + script + ' | sh -e\n',
+                        + '/' + script + ' | sh -ex\n',
             )
             self.wait_for_host_to_stop(host_name)
             self.attach_disc(
