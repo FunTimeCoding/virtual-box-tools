@@ -43,8 +43,10 @@ class CustomLoggingHandler(SimpleHTTPRequestHandler):
 
 class VirtualBoxTools:
     DEFAULT_CORES = 1
-    DEFAULT_MEMORY = 4096
-    DEFAULT_DISK_SIZE = 64
+    DEFAULT_MEMORY = 2048
+    DEFAULT_DISK_SIZE = 16
+    STRETCH_RELEASE = 'stretch'
+    BUSTER_RELEASE = 'buster'
     HOST_COMMAND = 'host'
     START_COMMAND = 'start'
     STOP_COMMAND = 'stop'
@@ -54,10 +56,11 @@ class VirtualBoxTools:
     POWER_OFF_STATE = 'poweroff'
 
     def __init__(self, arguments: list) -> None:
-        self.parser = self.create_parser()
-        self.parsed_arguments = self.parser.parse_args(arguments)
         config = YamlConfig('~/.virtual-box-tools.yaml')
         self.sudo_user = config.get('sudo_user')
+        self.bridge_interface = config.get('bridge_interface')
+        self.parser = self.create_parser()
+        self.parsed_arguments = self.parser.parse_args(arguments)
 
     @staticmethod
     def main() -> int:
@@ -81,14 +84,28 @@ class VirtualBoxTools:
                         host_name=arguments.name,
                         cores=arguments.cores,
                         memory=arguments.memory,
-                        disk_size=arguments.disk_size,
+                        disk_size=int(arguments.disk_size),
                         bridge_interface=arguments.bridge_interface,
                         graphical=arguments.graphical,
                         no_post_install=arguments.no_post_install,
                         proxy=arguments.proxy,
+                        release=arguments.release,
                         user_name=arguments.user_name,
                         real_name=arguments.real_name,
                     )
+
+                    if arguments.show_after_install:
+                        commands.start_host(
+                            name=arguments.name,
+                            graphical=arguments.graphical,
+                            wait=True,
+                        )
+                        print(commands.show_host(arguments.name))
+                        commands.stop_host(
+                            name=arguments.name,
+                            force=False,
+                            wait=True,
+                        )
                 except CommandFailed as exception:
                     print(exception)
             elif 'destroy' in arguments:
@@ -152,7 +169,10 @@ class VirtualBoxTools:
 
         create_parent = CustomArgumentParser(add_help=False)
         create_parent.add_argument('--name', required=True)
-        create_parent.add_argument('--bridge-interface', required=True)
+        create_parent.add_argument(
+            '--bridge-interface',
+            default=self.bridge_interface,
+        )
         create_parent.add_argument(
             '--cores',
             default=VirtualBoxTools.DEFAULT_CORES,
@@ -167,7 +187,16 @@ class VirtualBoxTools:
         )
         create_parent.add_argument('--graphical', action='store_true')
         create_parent.add_argument('--no-post-install', action='store_true')
+        create_parent.add_argument('--show-after-install', action='store_true')
         create_parent.add_argument('--proxy', default='')
+        create_parent.add_argument(
+            '--release',
+            default=VirtualBoxTools.BUSTER_RELEASE,
+            choices=[
+                VirtualBoxTools.BUSTER_RELEASE,
+                VirtualBoxTools.STRETCH_RELEASE,
+            ],
+        )
         create_parent.add_argument('--user-name', default='')
         create_parent.add_argument('--real-name', default='')
         create_parser = host_subparsers.add_parser(
@@ -371,6 +400,7 @@ class Commands:
             graphical: bool = False,
             no_post_install: bool = False,
             proxy: str = '',
+            release: str = VirtualBoxTools.BUSTER_RELEASE,
             user_name: str = '',
             real_name: str = '',
     ) -> None:
@@ -401,6 +431,7 @@ class Commands:
 
         debian_tools_arguments = [
             'dt',
+            '--release', release,
             '--hostname', host_name,
             '--domain', domain_name,
             '--root-password', root_password,
@@ -485,12 +516,12 @@ class Commands:
         if not exists(temporary_directory):
             makedirs(temporary_directory)
 
-        archive = join(temporary_directory, 'netboot.tar.gz')
+        archive = join(temporary_directory, 'netboot-' + release + '.tar.gz')
 
         if not exists(archive):
             with urlopen(
-                    'http://ftp.debian.org/debian/dists/stretch/main'
-                    '/installer-amd64/current/images/netboot/netboot.tar.gz'
+                    'http://ftp.debian.org/debian/dists/' + release + '/main'
+                                                                      '/installer-amd64/current/images/netboot/netboot.tar.gz'
             ) as response, open(archive, 'wb') as out_file:
                 copyfileobj(response, out_file)
 
@@ -542,13 +573,21 @@ class Commands:
                 arguments=[extract_path, archive, trivial_directory],
                 sudo_user=self.sudo_user,
             )
+            CommandProcess(
+                arguments=[
+                    'chmod',
+                    '755',
+                    join(trivial_directory, 'debian-installer/amd64/pxelinux.0')
+                ],
+                sudo_user=self.sudo_user,
+            )
 
         CommandProcess(
             arguments=[
                 'vboxmanage', 'modifyvm', host_name,
                 '--nic1', 'nat',
                 '--boot1', 'net',
-                '--nattftpfile1', '/pxelinux.0',
+                '--nattftpfile1', 'pxelinux.0',
             ],
             sudo_user=self.sudo_user,
         )
@@ -647,7 +686,7 @@ class Commands:
             self.keyboard_input(
                 name=host_name,
                 command='wget --output-document - ' + locator
-                        + '/' + script + ' | sh -e\n',
+                        + '/' + script + ' | sh -ex\n',
             )
             self.wait_for_host_to_stop(host_name)
             self.attach_disc(

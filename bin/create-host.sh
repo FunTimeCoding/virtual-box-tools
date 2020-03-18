@@ -1,15 +1,14 @@
 #!/bin/sh -e
 
 NAME="${1}"
-INTERFACE="${2}"
 
-if [ "${NAME}" = "" ] || [ "${INTERFACE}" = "" ]; then
-    echo "Usage: ${0} NAME INTERFACE"
+if [ "${NAME}" = "" ]; then
+    echo "Usage: ${0} NAME"
 
     exit 1
 fi
 
-vbt host create --name "${NAME}" --bridge-interface "${INTERFACE}"
+vbt host create --name "${NAME}"
 sleep 5
 vbt host start --name "${NAME}"
 sleep 60

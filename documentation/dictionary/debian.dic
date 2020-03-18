@@ -2,6 +2,9 @@ Debian
 debhelper
 shlibs
 dpkg
+substvars
+listfiles
+backports
 preseed
 netboot
 pybuild

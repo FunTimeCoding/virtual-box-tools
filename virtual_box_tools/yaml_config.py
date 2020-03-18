@@ -1,6 +1,6 @@
 from os.path import expanduser, isfile
 
-from yaml import load_all, dump
+from yaml import safe_load_all, dump
 
 
 class YamlConfig:
@@ -10,7 +10,7 @@ class YamlConfig:
 
         if self.exists():
             input_file = open(self.path, 'r')
-            elements = load_all(input_file)
+            elements = safe_load_all(input_file)
 
             for dictionary in elements:
                 for key, value in dictionary.items():

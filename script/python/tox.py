@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from virtual_box_tools.command_process import CommandProcess
+from python_skeleton.command_process import CommandProcess
 
 
 def main():

@@ -15,3 +15,4 @@ if [ -f "${HOME}/.pypirc" ]; then
 fi
 
 vagrant up
+vagrant ssh --command /vagrant/script/vagrant/vagrant.sh
