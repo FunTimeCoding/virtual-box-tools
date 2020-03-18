@@ -93,6 +93,19 @@ class VirtualBoxTools:
                         user_name=arguments.user_name,
                         real_name=arguments.real_name,
                     )
+
+                    if arguments.show_after_install:
+                        commands.start_host(
+                            name=arguments.name,
+                            graphical=arguments.graphical,
+                            wait=True,
+                        )
+                        print(commands.show_host(arguments.name))
+                        commands.stop_host(
+                            name=arguments.name,
+                            force=False,
+                            wait=True,
+                        )
                 except CommandFailed as exception:
                     print(exception)
             elif 'destroy' in arguments:
@@ -174,6 +187,7 @@ class VirtualBoxTools:
         )
         create_parent.add_argument('--graphical', action='store_true')
         create_parent.add_argument('--no-post-install', action='store_true')
+        create_parent.add_argument('--show-after-install', action='store_true')
         create_parent.add_argument('--proxy', default='')
         create_parent.add_argument(
             '--release',
