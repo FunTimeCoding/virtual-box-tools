@@ -24,7 +24,6 @@ partman
 crypted
 tasksel
 multiselect
-poweroff
 nooverwrite
 cdimage
 pkgsel
