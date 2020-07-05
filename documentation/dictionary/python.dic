@@ -49,3 +49,9 @@ classmethod
 # pyzabbix
 pyzabbix
 applicationid
+
+# tox
+envlist
+testenv
+deps
+sitepackages
