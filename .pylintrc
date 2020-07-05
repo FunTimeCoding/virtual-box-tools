@@ -3,11 +3,14 @@
 # A comma-separated list of package or module names from where C extensions may
 # be loaded. Extensions are loading into the active Python interpreter and may
 # run arbitrary code.
-extension-pkg-whitelist=
+extension-pkg-whitelist=lxml
+
+# Specify a score threshold to be exceeded before program exits with error.
+fail-under=10
 
 # Add files or directories to the blacklist. They should be base names, not
 # paths.
-ignore=.git,.venv
+ignore=.git
 
 # Add files or directories matching the regex patterns to the blacklist. The
 # regex matches against base names, not paths.
@@ -32,9 +35,6 @@ load-plugins=
 
 # Pickle collected data for later comparisons.
 persistent=no
-
-# Specify a configuration file.
-#rcfile=
 
 # When enabled, pylint would attempt to guess common misconfiguration and emit
 # user-friendly hints instead of false-positive error messages.
@@ -81,6 +81,7 @@ disable=missing-module-docstring,
         useless-suppression,
         deprecated-pragma,
         use-symbolic-message-instead,
+        fixme,
         apply-builtin,
         basestring-builtin,
         buffer-builtin,
@@ -187,10 +188,19 @@ max-nested-blocks=3
 never-returning-functions=sys.exit
 
 
+[MISCELLANEOUS]
+
+# List of note tags to take in consideration, separated by a comma.
+notes=TODO
+
+# Regular expression of note tags to take in consideration.
+#notes-rgx=
+
+
 [LOGGING]
 
-# Format style used to check logging format string. `old` means using %
-# formatting, `new` is for `{}` formatting,and `fstr` is for f-strings.
+# The type of string formatting that logging methods do. `old` means using %
+# formatting, `new` is for `{}` formatting.
 logging-format-style=old
 
 # Logging modules to check that the string format arguments are in logging
@@ -198,14 +208,55 @@ logging-format-style=old
 logging-modules=logging
 
 
+[VARIABLES]
+
+# List of additional names supposed to be defined in builtins. Remember that
+# you should avoid defining new builtins when possible.
+additional-builtins=
+
+# Tells whether unused global variables should be treated as a violation.
+allow-global-unused-variables=yes
+
+# List of strings which can identify a callback function by name. A callback
+# name must start or end with one of those strings.
+callbacks=cb_,
+          _cb
+
+# A regular expression matching the name of dummy variables (i.e. expected to
+# not be used).
+dummy-variables-rgx=_+$|(_[a-zA-Z0-9_]*[a-zA-Z0-9]+?$)|dummy|^ignored_|^unused_
+
+# Argument names that match this expression will be ignored. Default to name
+# with leading underscore.
+ignored-argument-names=RegularExpressionThatNeverMatches
+
+# Tells whether we should check for unused import in __init__ files.
+init-import=no
+
+# List of qualified module names which can have objects that can redefine
+# builtins.
+redefining-builtins-modules=six.moves,past.builtins,future.builtins,builtins,io
+
+
+[STRING]
+
+# This flag controls whether inconsistent-quotes generates a warning when the
+# character used as a quote delimiter is used inconsistently within a module.
+check-quote-consistency=no
+
+# This flag controls whether the implicit-str-concat should generate a warning
+# on implicit string concatenation in sequences defined over several lines.
+check-str-concat-over-line-jumps=no
+
+
 [SPELLING]
 
 # Limits count of emitted suggestions for spelling mistakes.
 max-spelling-suggestions=4
 
-# Spelling dictionary name. Available dictionaries: de_DE (myspell), fr_FR
-# (myspell), en_GB (myspell), en_AU (myspell), en_US (myspell).
-spelling-dict=en_US
+# Spelling dictionary name. Available dictionaries: en_US (myspell), en
+# (aspell), en_AU (aspell), en_CA (aspell), en_GB (aspell).
+spelling-dict=en
 
 # List of comma separated words that should not be checked.
 spelling-ignore-words=
@@ -218,10 +269,55 @@ spelling-private-dict-file=tmp/combined.dic
 spelling-store-unknown-words=no
 
 
-[MISCELLANEOUS]
+[SIMILARITIES]
 
-# List of note tags to take in consideration, separated by a comma.
-notes=TODO
+# Ignore comments when computing similarities.
+ignore-comments=yes
+
+# Ignore docstrings when computing similarities.
+ignore-docstrings=yes
+
+# Ignore imports when computing similarities.
+ignore-imports=no
+
+# Minimum lines number of a similarity.
+min-similarity-lines=4
+
+
+[FORMAT]
+
+# Expected format of line ending, e.g. empty (any line ending), LF or CRLF.
+expected-line-ending-format=LF
+
+# Regexp for a line that is allowed to be longer than the limit.
+ignore-long-lines=RegularExpressionThatNeverMatches
+
+# Number of spaces of indent required inside a hanging or continued line.
+indent-after-paren=4
+
+# String used as indentation unit. This is usually "    " (4 spaces) or "\t" (1
+# tab).
+indent-string='    '
+
+# Maximum number of characters on a single line.
+max-line-length=80
+
+# Maximum number of lines in a module.
+max-module-lines=300
+
+# List of optional constructs for which whitespace checking is disabled. `dict-
+# separator` is used to allow tabulation in dicts, etc.: {1  : 1,\n222: 2}.
+# `trailing-comma` allows a space between comma and closing bracket: (a, ).
+# `empty-line` allows space-only lines.
+no-space-check=
+
+# Allow the body of a class to be on the same line as the declaration if body
+# contains single statement.
+single-line-class-stmt=no
+
+# Allow the body of an if to be on the same line as the test if there is no
+# else.
+single-line-if-stmt=no
 
 
 [TYPECHECK]
@@ -279,87 +375,6 @@ missing-member-max-choices=1
 signature-mutators=
 
 
-[VARIABLES]
-
-# List of additional names supposed to be defined in builtins. Remember that
-# you should avoid defining new builtins when possible.
-additional-builtins=
-
-# Tells whether unused global variables should be treated as a violation.
-allow-global-unused-variables=yes
-
-# List of strings which can identify a callback function by name. A callback
-# name must start or end with one of those strings.
-callbacks=cb_,
-          _cb
-
-# A regular expression matching the name of dummy variables (i.e. expected to
-# not be used).
-dummy-variables-rgx=_+$|(_[a-zA-Z0-9_]*[a-zA-Z0-9]+?$)|dummy|^ignored_|^unused_
-
-# Argument names that match this expression will be ignored. Default to name
-# with leading underscore.
-ignored-argument-names=RegularExpressionThatNeverMatches
-
-# Tells whether we should check for unused import in __init__ files.
-init-import=no
-
-# List of qualified module names which can have objects that can redefine
-# builtins.
-redefining-builtins-modules=six.moves,past.builtins,future.builtins,builtins,io
-
-
-[FORMAT]
-
-# Expected format of line ending, e.g. empty (any line ending), LF or CRLF.
-expected-line-ending-format=LF
-
-# Regexp for a line that is allowed to be longer than the limit.
-ignore-long-lines=RegularExpressionThatNeverMatches
-
-# Number of spaces of indent required inside a hanging or continued line.
-indent-after-paren=4
-
-# String used as indentation unit. This is usually "    " (4 spaces) or "\t" (1
-# tab).
-indent-string='    '
-
-# Maximum number of characters on a single line.
-max-line-length=80
-
-# Maximum number of lines in a module.
-max-module-lines=300
-
-# List of optional constructs for which whitespace checking is disabled. `dict-
-# separator` is used to allow tabulation in dicts, etc.: {1  : 1,\n222: 2}.
-# `trailing-comma` allows a space between comma and closing bracket: (a, ).
-# `empty-line` allows space-only lines.
-no-space-check=
-
-# Allow the body of a class to be on the same line as the declaration if body
-# contains single statement.
-single-line-class-stmt=no
-
-# Allow the body of an if to be on the same line as the test if there is no
-# else.
-single-line-if-stmt=no
-
-
-[SIMILARITIES]
-
-# Ignore comments when computing similarities.
-ignore-comments=yes
-
-# Ignore docstrings when computing similarities.
-ignore-docstrings=yes
-
-# Ignore imports when computing similarities.
-ignore-imports=no
-
-# Minimum lines number of a similarity.
-min-similarity-lines=4
-
-
 [BASIC]
 
 # Naming style matching correct argument names.
@@ -380,6 +395,10 @@ attr-naming-style=snake_case
 bad-names=foo,
           bar,
           baz
+
+# Bad variable names regexes, separated by a comma. If names match any regex,
+# they will always be refused
+bad-names-rgxs=
 
 # Naming style matching correct class attribute names.
 class-attribute-naming-style=any
@@ -415,6 +434,10 @@ function-naming-style=snake_case
 
 # Good variable names which should always be accepted, separated by a comma.
 good-names=
+
+# Good variable names regexes, separated by a comma. If names match any regex,
+# they will always be accepted
+good-names-rgxs=
 
 # Include a hint for the correct naming format with invalid-name.
 include-naming-hint=no
@@ -459,14 +482,6 @@ variable-naming-style=snake_case
 # Regular expression matching correct variable names. Overrides variable-
 # naming-style.
 #variable-rgx=
-
-
-[STRING]
-
-# This flag controls whether the implicit-str-concat-in-sequence should
-# generate a warning on implicit string concatenation in sequences defined over
-# several lines.
-check-str-concat-over-line-jumps=no
 
 
 [IMPORTS]
@@ -535,10 +550,10 @@ valid-metaclass-classmethod-first-arg=cls
 [DESIGN]
 
 # Maximum number of arguments for function / method.
-max-args=3
+max-args=4
 
 # Maximum number of attributes for a class (see R0902).
-max-attributes=3
+max-attributes=4
 
 # Maximum number of boolean expressions in an if statement (see R0916).
 max-bool-expr=1
@@ -550,7 +565,7 @@ max-branches=5
 max-locals=6
 
 # Maximum number of parents for a class (see R0901).
-max-parents=3
+max-parents=4
 
 # Maximum number of public methods for a class (see R0904).
 max-public-methods=10

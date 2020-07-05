@@ -5,6 +5,8 @@ pyenchant # pylint spell check plugin
 pytest # test framework
 pytest-cov # pytest coverage plugin
 mccabe # static analysis
+py-spy # sampling profiler
+mypy # type checker
 pyyaml # YAML parser
 Flask # web framework
 wheel # packaging tool

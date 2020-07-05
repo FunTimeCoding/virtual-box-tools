@@ -7,6 +7,14 @@ if [ ! -f tmp/bootstrap-salt.sh ]; then
     wget --output-document tmp/bootstrap-salt.sh https://bootstrap.saltstack.com
 fi
 
+if [ -f "${HOME}/.gitconfig" ]; then
+    cp "${HOME}/.gitconfig" tmp/gitconfig.txt
+fi
+
+if [ -f "${HOME}/.gitignore_global" ]; then
+    cp "${HOME}/.gitignore_global" tmp/gitignore_global.txt
+fi
+
 touch tmp/pypirc.txt
 chmod 600 tmp/pypirc.txt
 

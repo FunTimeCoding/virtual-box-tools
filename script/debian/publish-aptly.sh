@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 # shellcheck source=/dev/null
-. "${HOME}/.aptly-tools.sh"
+. "${HOME}/.repository-management-tools.sh"
 
 FILE_PATH="${1}"
 REPOSITORY_NAME="${2}"
@@ -19,10 +19,10 @@ PACKAGE_NAME="${PACKAGE_NAME%_*}"
 PACKAGE_NAME="${PACKAGE_NAME%_*}"
 
 echo "Upload:"
-curl --user "${USERNAME}:${PASSWORD}" --request POST --form "file=@${FILE_PATH}" "https://${SERVER}/api/files/${PACKAGE_NAME}"
+curl --user "${APTLY_USERNAME}:${APTLY_PASSWORD}" --request POST --form "file=@${FILE_PATH}" "https://${APTLY_SERVER}/api/files/${PACKAGE_NAME}"
 echo
 echo "Import:"
-curl --user "${USERNAME}:${PASSWORD}" --request POST "https://${SERVER}/api/repos/${REPOSITORY_NAME}/file/${PACKAGE_NAME}"
+curl --user "${APTLY_USERNAME}:${APTLY_PASSWORD}" --request POST "https://${APTLY_SERVER}/api/repos/${REPOSITORY_NAME}/file/${PACKAGE_NAME}"
 echo
 echo "Publish:"
-curl --user "${USERNAME}:${PASSWORD}" --request PUT --header 'Content-Type: application/json' --data '{}' "https://${SERVER}/api/publish/${PREFIX}/${DISTRIBUTION}"
+curl --user "${APTLY_USERNAME}:${APTLY_PASSWORD}" --request PUT --header 'Content-Type: application/json' --data '{}' "https://${APTLY_SERVER}/api/publish/${PREFIX}/${DISTRIBUTION}"

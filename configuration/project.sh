@@ -43,20 +43,22 @@ export VENDOR_NAME_LOWER
 
 # build, tmp, .git, .idea, .scannerwork, .tox, .cache, __pycache__, *.egg-info: Nothing will ever have to be replaced by this.
 # vendor: Do not not break php-skeleton based projects when synchronizing with them.
-# .venv: Do not not break virtual-box-tools based projects.
 # node_modules: Do not not break java-script-skeleton based projects.
 # target: Do not not break java-skeleton based projects.
-EXCLUDE_FILTER='^.*\/(build|tmp|vendor|node_modules|target|\.venv|\.git|\.vagrant|\.idea|\.scannerwork|\.tox|\.cache|__pycache__|[a-z_]+\.egg-info)\/.*$'
+# shellcheck disable=SC1117
+EXCLUDE_FILTER='^.*\/(build|tmp|vendor|node_modules|target|\.git|\.vagrant|\.idea|\.scannerwork|\.tox|\.cache|__pycache__|[a-z_]+\.egg-info)\/.*$'
 export EXCLUDE_FILTER
 
 # lib: shell, ruby
 # src: php, java, clojure, scala, c-sharp
 # test: php
+# benchmark: php
 # tests: python
 # spec: ruby
 # PROJECT_NAME_UNDERSCORE: python
 # TODO: Test and expand this through all skeleton projects.
-INCLUDE_FILTER="^\.\/((src|test|tests|spec|lib|debian|configuration|documentation|test|script\/skeleton|${PROJECT_NAME_UNDERSCORE})\/.*|\.gitignore|Vagrantfile|Dockerfile|README.md|package\.json|sonar-project\.properties|web\/index\.html|composer\.json|setup\.py)$"
+# shellcheck disable=SC1117
+INCLUDE_FILTER="^\.\/((src|test|benchmark|tests|spec|lib|debian|configuration|documentation|test|script\/skeleton|${PROJECT_NAME_UNDERSCORE})\/.*|\.gitignore|Vagrantfile|Dockerfile|README.md|package\.json|sonar-project\.properties|web\/index\.html|composer\.json)$"
 export INCLUDE_FILTER
 INCLUDE_STILL_FILTER='^.*\/__pycache__\/.*$'
 export INCLUDE_STILL_FILTER

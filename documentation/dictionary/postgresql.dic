@@ -1,0 +1,12 @@
+Postgre
+sameuser
+samerole
+samenet
+samehost
+hostssl
+hostnossl
+PGDATA
+KEEPIDLE
+KEEPINTVL
+KEEPCNT
+fsync

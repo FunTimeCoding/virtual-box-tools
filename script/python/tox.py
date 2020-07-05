@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
-from python_skeleton.command_process import CommandProcess
+from python_utility.command_process import CommandProcess
 
 
 def main():
-    process = CommandProcess(['tox'])
+    process = CommandProcess(arguments=['tox'])
     process.print_output()
 
 
