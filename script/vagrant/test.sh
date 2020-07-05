@@ -25,7 +25,7 @@ if [ "${WHILE_RUNNING}" = false ]; then
     if [ "${DELETE_EXISTING}" = true ]; then
         vagrant destroy --force
     else
-        vagrant status | grep 'not created' > /dev/null 2>&1 && EXPECTED_STATE=true || EXPECTED_STATE=false
+        vagrant status | grep 'not created' >/dev/null 2>&1 && EXPECTED_STATE=true || EXPECTED_STATE=false
 
         if [ "${EXPECTED_STATE}" = false ]; then
             echo "The status of the virtual machine must be 'not created'."
@@ -37,7 +37,7 @@ if [ "${WHILE_RUNNING}" = false ]; then
     script/vagrant/create.sh
 fi
 
-ADDRESS=$(vagrant ssh -c "ip addr list eth1 | grep 'inet ' | cut -d ' ' -f6 | cut -d / -f1" 2> /dev/null | tr -d '\r')
+ADDRESS=$(vagrant ssh -c "ip addr list eth1 | grep 'inet ' | cut -d ' ' -f6 | cut -d / -f1" 2>/dev/null | tr -d '\r')
 A_TEST_FAILED=false
 
 echo "Test from outside if the SSH daemon is listening for network connections."
@@ -55,7 +55,6 @@ if [ "${NETSTAT}" = '' ]; then
     A_TEST_FAILED=true
     echo Fail
 fi
-
 
 if [ "${WHILE_RUNNING}" = false ]; then
     vagrant halt

@@ -7,5 +7,14 @@ JenkinsTools
 LowerCaseSeparated
 UpperCaseSeparated
 ic
-VirtualBoxTools
+ShellSkeleton
 ss
+ps
+src
+LanguageExample
+XmlLibrary
+SpecialName
+MultiWordName
+CamelCaseConvention
+CHANGELOG
+pyskel

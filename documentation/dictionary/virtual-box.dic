@@ -1,5 +1,8 @@
+VirtualBox
 virtualbox
 cpus
+modifyvm
+vram
 vbox
 poweroff
 vboxmanage
@@ -16,9 +19,7 @@ showvminfo
 machinereadable
 storageattach
 emptydrive
-vram
 acpi
-modifyvm
 nattftpfile
 dvddrive
 startvm

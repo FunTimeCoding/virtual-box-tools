@@ -5,7 +5,7 @@ CONFIGURATION_PATH="${2}"
 
 if [ ! "${MINION_IDENTIFIER}" = '' ]; then
     mkdir -p /etc/salt/minion.d
-    echo "${MINION_IDENTIFIER}" > /etc/salt/minion_id
+    echo "${MINION_IDENTIFIER}" >/etc/salt/minion_id
 fi
 
 if [ ! "${CONFIGURATION_PATH}" = '' ]; then

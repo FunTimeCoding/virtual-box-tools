@@ -1,3 +1,4 @@
 #!/bin/sh -e
 
-ansible-playbook /vagrant/playbook.yaml -i /vagrant/inventory
+export ANSIBLE_RETRY_FILES_ENABLED=0
+ansible-playbook --diff --inventory /vagrant/inventory /vagrant/playbook.yaml

@@ -1,3 +1,5 @@
 powershell
 WINDIR
 findstr
+USERPROFILE
+USEBACKQ

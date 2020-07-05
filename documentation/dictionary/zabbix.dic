@@ -1,0 +1,11 @@
+zabbix
+libdir
+agentd
+userid
+userparams
+maxlines
+logrt
+hostid
+httptestid
+groupid
+usrgrpid

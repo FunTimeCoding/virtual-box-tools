@@ -5,7 +5,7 @@ SYSTEM=$(uname)
 if [ "${SYSTEM}" = Linux ]; then
     if [ "$(command -v lsb_release || true)" = '' ]; then
         if [ -f /etc/debian_version ]; then
-            VERSION=$(cut -c 1-1 < /etc/debian_version)
+            VERSION=$(cut -c 1-1 </etc/debian_version)
         fi
     else
         VERSION=$(lsb_release --release --short)
@@ -40,7 +40,7 @@ if [ "$(command -v vboxmanage || true)" = '' ]; then
         fi
 
         sudo apt-get --quiet 2 update
-        sudo apt-get --quiet 2 install virtualbox-5.2
+        sudo apt-get --quiet 2 install virtualbox-6.1
     fi
 fi
 
@@ -48,7 +48,7 @@ if [ "$(command -v vagrant || true)" = '' ]; then
     if [ "${SYSTEM}" = Darwin ]; then
         brew cask install vagrant
     else
-        VAGRANT_VERSION=2.2.1
+        VAGRANT_VERSION=2.2.9
         wget --no-verbose --output-document /tmp/vagrant.deb "https://releases.hashicorp.com/vagrant/${VAGRANT_VERSION}/vagrant_${VAGRANT_VERSION}_x86_64.deb"
         sudo dpkg --install /tmp/vagrant.deb
     fi
